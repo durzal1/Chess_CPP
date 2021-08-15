@@ -11,6 +11,8 @@ board::board(SDL_Window* win, SDL_Renderer* renderer1, int width) {
     /*
     for zacky
     // gets the images
+
+    */
     pawnB = IMG_LoadTexture(renderer, "C:\\Users\\zacky\\Desktop\\Coding\\c++\\games\\chess\\Chess_CPP\\images\\pawnb.png");
     horseB  = IMG_LoadTexture(renderer, "C:\\Users\\zacky\\Desktop\\Coding\\c++\\games\\chess\\Chess_CPP\\images\\horseb.png");
     queenB  = IMG_LoadTexture(renderer, "C:\\Users\\zacky\\Desktop\\Coding\\c++\\games\\chess\\Chess_CPP\\images\\queenb.png");
@@ -24,8 +26,10 @@ board::board(SDL_Window* win, SDL_Renderer* renderer1, int width) {
     kingW = IMG_LoadTexture(renderer, "C:\\Users\\zacky\\Desktop\\Coding\\c++\\games\\chess\\Chess_CPP\\images\\kingw.png");
     rookW= IMG_LoadTexture(renderer, "C:\\Users\\zacky\\Desktop\\Coding\\c++\\games\\chess\\Chess_CPP\\images\\rookw.png");
     bishopW = IMG_LoadTexture(renderer, "C:\\Users\\zacky\\Desktop\\Coding\\c++\\games\\chess\\Chess_CPP\\images\\bishopw.png");
-    */
 
+
+    /*
+    for kevin
     pawnW = IMG_LoadTexture(renderer, "C:\\Users\\kevsk\\source\\repos\\Chess\\Chess\\Chess_CPP\\images\\pawnw.png");
     horseW = IMG_LoadTexture(renderer, "C:\\Users\\kevsk\\source\\repos\\Chess\\Chess\\Chess_CPP\\images\\horsew.png");
     queenW = IMG_LoadTexture(renderer, "C:\\Users\\kevsk\\source\\repos\\Chess\\Chess\\Chess_CPP\\images\\queenw.png");
@@ -39,7 +43,7 @@ board::board(SDL_Window* win, SDL_Renderer* renderer1, int width) {
     kingB = IMG_LoadTexture(renderer, "C:\\Users\\kevsk\\source\\repos\\Chess\\Chess\\Chess_CPP\\images\\kingb.png");
     rookB = IMG_LoadTexture(renderer, "C:\\Users\\kevsk\\source\\repos\\Chess\\Chess\\Chess_CPP\\images\\rookb.png");;
     bishopB = IMG_LoadTexture(renderer, "C:\\Users\\kevsk\\source\\repos\\Chess\\Chess\\Chess_CPP\\images\\bishopb.png");
-
+    */
     // adds them to the textures vector
     textures = {pawnB, horseB, queenB, kingB, rookB, bishopB, pawnW, horseW, queenW, kingW, rookW, bishopW};
 }
@@ -48,84 +52,102 @@ board::board(SDL_Window* win, SDL_Renderer* renderer1, int width) {
 void board::createPieces() {
     /// black
     // top row
-    blackIndClass.emplace_back("rookB");
-    blackPieceLoc[blackIndClass.size()] = {0,0};
-    blackBoardLoc[{0,0}] = blackIndClass.size();
+    IndClass.emplace_back("rookB");
+    PieceLoc[IndClass.size()] = {0,0};
+    BoardLoc[{0,0}] = IndClass.size();
+    blackPieces.push_back(IndClass.size());
 
-    blackIndClass.emplace_back("horseB");
-    blackPieceLoc[blackIndClass.size()] = {0,1};
-    blackBoardLoc[{0,1}] = blackIndClass.size();
+    IndClass.emplace_back("horseB");
+    PieceLoc[IndClass.size()] = {0,1};
+    BoardLoc[{0,1}] = IndClass.size();
+    blackPieces.push_back(IndClass.size());
 
-    blackIndClass.emplace_back("bishopB");
-    blackPieceLoc[blackIndClass.size()] = {0,2};
-    blackBoardLoc[{0,2}] = blackIndClass.size();
+    IndClass.emplace_back("bishopB");
+    PieceLoc[IndClass.size()] = {0,2};
+    BoardLoc[{0,2}] = IndClass.size();
+    blackPieces.push_back(IndClass.size());
 
-    blackIndClass.emplace_back("queenB");
-    blackPieceLoc[blackIndClass.size()] = {0,3};
-    blackBoardLoc[{0,3}] = blackIndClass.size();
+    IndClass.emplace_back("queenB");
+    PieceLoc[IndClass.size()] = {0,3};
+    BoardLoc[{0,3}] = IndClass.size();
+    blackPieces.push_back(IndClass.size());
 
-    blackIndClass.emplace_back("kingB");
-    blackPieceLoc[blackIndClass.size()] = {0,4};
-    blackBoardLoc[{0,4}] = blackIndClass.size();
+    IndClass.emplace_back("kingB");
+    PieceLoc[IndClass.size()] = {0,4};
+    BoardLoc[{0,4}] = IndClass.size();
+    blackPieces.push_back(IndClass.size());
 
-    blackIndClass.emplace_back("bishopB");
-    blackPieceLoc[blackIndClass.size()] = {0,5};
-    blackBoardLoc[{0,5}] = blackIndClass.size();
+    IndClass.emplace_back("bishopB");
+    PieceLoc[IndClass.size()] = {0,5};
+    BoardLoc[{0,5}] = IndClass.size();
+    blackPieces.push_back(IndClass.size());
 
-    blackIndClass.emplace_back("horseB");
-    blackPieceLoc[blackIndClass.size()] = {0,6};
-    blackBoardLoc[{0,6}] = blackIndClass.size();
+    IndClass.emplace_back("horseB");
+    PieceLoc[IndClass.size()] = {0,6};
+    BoardLoc[{0,6}] = IndClass.size();
+    blackPieces.push_back(IndClass.size());
 
-    blackIndClass.emplace_back("rookB");
-    blackPieceLoc[blackIndClass.size()] = {0,7};
-    blackBoardLoc[{0,7}] = blackIndClass.size();
+    IndClass.emplace_back("rookB");
+    PieceLoc[IndClass.size()] = {0,7};
+    BoardLoc[{0,7}] = IndClass.size();
+    blackPieces.push_back(IndClass.size());
 
     // pawns
     for (int i = 0; i < 8; i++){
-        blackIndClass.emplace_back("pawnB");
-        blackPieceLoc[blackIndClass.size()] = {1,i};
-        blackBoardLoc[{1,i}] = blackIndClass.size();
+        IndClass.emplace_back("pawnB");
+        PieceLoc[IndClass.size()] = {1,i};
+        BoardLoc[{1,i}] = IndClass.size();
+        blackPieces.push_back(IndClass.size());
     }
 
     /// white
     // bottom row
-    whiteIndClass.emplace_back("rookW");
-    whitePieceLoc[whiteIndClass.size()] = {7,0};
-    whiteBoardLoc[{7,0}] = whiteIndClass.size();
+    IndClass.emplace_back("rookW");
+    PieceLoc[IndClass.size()] = {7,0};
+    BoardLoc[{7,0}] = IndClass.size();
+    whitePieces.push_back(IndClass.size());
 
-    whiteIndClass.emplace_back("horseW");
-    whitePieceLoc[whiteIndClass.size()] = {7,1};
-    whiteBoardLoc[{7,1}] = whiteIndClass.size();
+    IndClass.emplace_back("horseW");
+    PieceLoc[IndClass.size()] = {7,1};
+    BoardLoc[{7,1}] = IndClass.size();
+    whitePieces.push_back(IndClass.size());
 
-    whiteIndClass.emplace_back("bishopW");
-    whitePieceLoc[whiteIndClass.size()] = {7,2};
-    whiteBoardLoc[{7,2}] = whiteIndClass.size();
+    IndClass.emplace_back("bishopW");
+    PieceLoc[IndClass.size()] = {7,2};
+    BoardLoc[{7,2}] = IndClass.size();
+    whitePieces.push_back(IndClass.size());
 
-    whiteIndClass.emplace_back("queenW");
-    whitePieceLoc[whiteIndClass.size()] = {7,3};
-    whiteBoardLoc[{7,3}] = whiteIndClass.size();
+    IndClass.emplace_back("queenW");
+    PieceLoc[IndClass.size()] = {7,3};
+    BoardLoc[{7,3}] = IndClass.size();
+    whitePieces.push_back(IndClass.size());
 
-    whiteIndClass.emplace_back("kingW");
-    whitePieceLoc[whiteIndClass.size()] = {7,4};
-    whiteBoardLoc[{7,4}] = whiteIndClass.size();
+    IndClass.emplace_back("kingW");
+    PieceLoc[IndClass.size()] = {7,4};
+    BoardLoc[{7,4}] = IndClass.size();
+    whitePieces.push_back(IndClass.size());
 
-    whiteIndClass.emplace_back("bishopW");
-    whitePieceLoc[whiteIndClass.size()] = {7,5};
-    whiteBoardLoc[{7,5}] = whiteIndClass.size();
+    IndClass.emplace_back("bishopW");
+    PieceLoc[IndClass.size()] = {7,5};
+    BoardLoc[{7,5}] = IndClass.size();
+    whitePieces.push_back(IndClass.size());
 
-    whiteIndClass.emplace_back("horseW");
-    whitePieceLoc[ whiteIndClass.size()] = {7,6} ;
-    whiteBoardLoc[{7,6}] = whiteIndClass.size();
+    IndClass.emplace_back("horseW");
+    PieceLoc[IndClass.size()] = {7,6} ;
+    BoardLoc[{7,6}] = IndClass.size();
+    whitePieces.push_back(IndClass.size());
 
-    whiteIndClass.emplace_back("rookW");
-    whitePieceLoc[whiteIndClass.size()] = {7,7};
-    whiteBoardLoc[{7,7}] = whiteIndClass.size();
+    IndClass.emplace_back("rookW");
+    PieceLoc[IndClass.size()] = {7,7};
+    BoardLoc[{7,7}] = IndClass.size();
+    whitePieces.push_back(IndClass.size());
 
     // pawns
     for (int i = 0; i < 8; i++){
-        whiteIndClass.emplace_back("pawnW");
-        whitePieceLoc[whiteIndClass.size()] = {6,i};
-        whiteBoardLoc[{6,i}] = whiteIndClass.size();
+        IndClass.emplace_back("pawnW");
+        PieceLoc[IndClass.size()] = {6,i};
+        BoardLoc[{6,i}] = IndClass.size();
+        whitePieces.push_back(IndClass.size());
     }
 
 }
@@ -158,19 +180,12 @@ void board::createBoard() {
             // class it will draw (if any)
             std::string piece;
             // if theres a piece it adds it
-            if (blackBoardLoc.find({ row,col }) != blackBoardLoc.end()) {
+            if (BoardLoc.find({ row,col }) != BoardLoc.end()) {
                 // get the index
-                int index = blackBoardLoc[{row,col}];
+                int index = BoardLoc[{row,col}];
 
                 // checks what piece it is
-                piece = blackIndClass[index -1];
-            }
-            else if (whiteBoardLoc.find({ row,col }) != whiteBoardLoc.end()) {
-                // get the index
-                int index = whiteBoardLoc[{row,col}];
-
-                // checks what piece it is
-                piece = whiteIndClass[index - 1];
+                piece = IndClass[index -1];
             }
             // something belongs in the square
             if (!piece.empty()){

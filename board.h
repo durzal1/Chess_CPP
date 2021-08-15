@@ -6,20 +6,20 @@
 #define CHESS_CPP_BOARD_H
 
 /*
-for zakcy
+for zacky
+*/
 #include "SDL2/SDL.h"
 #include <bits/stdc++.h>
 #include <SDL2/SDL_image.h>
-*/
-
 /*
 for kevin
-*/
-#include "SDL.h"
+ #include "SDL.h"
 #include "SDL_image.h"
 #include <iostream>
 #include <map>
 #include <vector>
+*/
+
 
 class board{
 private:
@@ -51,28 +51,22 @@ private:
     // vector of textures
     std::vector<SDL_Texture*> textures;
 
-    /// For white pieces
     // map of all pieces (ind, cord<x,y>) (DOES UPDATE IF PIECE DIES)
-    std::map<int,std::pair<int,int>> whitePieceLoc;
+    std::map<int,std::pair<int,int>> PieceLoc;
 
     // map of all cords (cord<x,y>,ind) (DOES UPDATE IF PIECE DIES)
     // basically the opposite of the former where you give it pos and it gives piece
     // used it for updating board
-    std::map<std::pair<int,int>,int> whiteBoardLoc;
+    std::map<std::pair<int,int>,int> BoardLoc;
 
     // class of each index (DOES NOT UPDATE IF PIECE DIES)
-    std::vector<std::string>whiteIndClass;
+    std::vector<std::string>IndClass;
 
-    /// For black pieces
-    // map of all pieces (ind, cord<x,y>) (DOES UPDATE IF PIECE DIES)
-    std::map<int,std::pair<int,int>> blackPieceLoc;
+    // indexes of living white pieces (iterate through this for moves)
+    std::vector<int> whitePieces;
 
-    // class of each index (DOES NOT UPDATE IF PIECE DIES)
-    std::vector<std::string>blackIndClass;
-
-    // map of all cords (cord<x,y>,ind) (DOES UPDATE IF PIECE DIES)
-    std::map<std::pair<int,int>,int> blackBoardLoc;
-
+    // indexes of living black pieces (iterate through this for moves)
+    std::vector<int> blackPieces;
 
 public:
     // constructor
