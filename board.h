@@ -4,9 +4,22 @@
 
 #ifndef CHESS_CPP_BOARD_H
 #define CHESS_CPP_BOARD_H
+
+/*
+for zakcy
 #include "SDL2/SDL.h"
 #include <bits/stdc++.h>
 #include <SDL2/SDL_image.h>
+*/
+
+/*
+for kevin
+*/
+#include "SDL.h"
+#include "SDL_image.h"
+#include <iostream>
+#include <map>
+#include <vector>
 
 class board{
 private:
