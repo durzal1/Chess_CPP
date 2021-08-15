@@ -1,0 +1,20 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/board.cpp
+board.h
+C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/board.h
+
+C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/board.h
+SDL2/SDL.h
+C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/SDL2/SDL.h
+bits/stdc++.h
+-
+SDL2/SDL_image.h
+-
+
