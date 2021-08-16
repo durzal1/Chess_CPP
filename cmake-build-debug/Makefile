@@ -128,6 +128,30 @@ Chess/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\Chess.dir\build.make CMakeFiles/Chess.dir/build
 .PHONY : Chess/fast
 
+ai.obj: ai.cpp.obj
+.PHONY : ai.obj
+
+# target to build an object file
+ai.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Chess.dir\build.make CMakeFiles/Chess.dir/ai.cpp.obj
+.PHONY : ai.cpp.obj
+
+ai.i: ai.cpp.i
+.PHONY : ai.i
+
+# target to preprocess a source file
+ai.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Chess.dir\build.make CMakeFiles/Chess.dir/ai.cpp.i
+.PHONY : ai.cpp.i
+
+ai.s: ai.cpp.s
+.PHONY : ai.s
+
+# target to generate assembly for a file
+ai.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Chess.dir\build.make CMakeFiles/Chess.dir/ai.cpp.s
+.PHONY : ai.cpp.s
+
 board.obj: board.cpp.obj
 .PHONY : board.obj
 
@@ -209,6 +233,9 @@ help:
 	@echo ... edit_cache
 	@echo ... rebuild_cache
 	@echo ... Chess
+	@echo ... ai.obj
+	@echo ... ai.i
+	@echo ... ai.s
 	@echo ... board.obj
 	@echo ... board.i
 	@echo ... board.s

@@ -82,6 +82,12 @@
 				</MakeCommands>
 			</Target>
 		</Build>
+		<Unit filename="C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/ai.cpp">
+			<Option target="Chess"/>
+		</Unit>
+		<Unit filename="C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/ai.h">
+			<Option target="Chess"/>
+		</Unit>
 		<Unit filename="C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/board.cpp">
 			<Option target="Chess"/>
 		</Unit>

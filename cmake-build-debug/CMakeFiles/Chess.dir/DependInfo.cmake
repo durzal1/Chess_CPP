@@ -8,6 +8,7 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
+  "C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/ai.cpp" "C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/cmake-build-debug/CMakeFiles/Chess.dir/ai.cpp.obj"
   "C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/board.cpp" "C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/cmake-build-debug/CMakeFiles/Chess.dir/board.cpp.obj"
   "C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/getPossibleMoves.cpp" "C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/cmake-build-debug/CMakeFiles/Chess.dir/getPossibleMoves.cpp.obj"
   "C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/main.cpp" "C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/cmake-build-debug/CMakeFiles/Chess.dir/main.cpp.obj"
