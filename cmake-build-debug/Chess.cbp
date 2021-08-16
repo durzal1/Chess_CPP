@@ -88,7 +88,16 @@
 		<Unit filename="C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/board.h">
 			<Option target="Chess"/>
 		</Unit>
+		<Unit filename="C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/getPossibleMoves.cpp">
+			<Option target="Chess"/>
+		</Unit>
+		<Unit filename="C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/getPossibleMoves.h">
+			<Option target="Chess"/>
+		</Unit>
 		<Unit filename="C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/main.cpp">
+			<Option target="Chess"/>
+		</Unit>
+		<Unit filename="C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/types.h">
 			<Option target="Chess"/>
 		</Unit>
 		<Unit filename="C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/CMakeLists.txt">

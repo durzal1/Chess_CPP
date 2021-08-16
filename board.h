@@ -11,6 +11,7 @@ for zacky
 #include "SDL2/SDL.h"
 #include <bits/stdc++.h>
 #include <SDL2/SDL_image.h>
+#include "getPossibleMoves.h"
 /*
 for kevin
  #include "SDL.h"
@@ -29,6 +30,9 @@ private:
 
     // constants
     int width;
+
+    // size of each square and their interval
+    int inter;
 
     // images
     SDL_Texture *pawnB = nullptr;

@@ -8,6 +8,9 @@ board::board(SDL_Window* win, SDL_Renderer* renderer1, int width) {
     this->renderer = renderer1;
     this->width = width;
 
+    // interval
+    inter = width/ 8;
+
     /*
     for zacky
     // gets the images
@@ -44,8 +47,20 @@ board::board(SDL_Window* win, SDL_Renderer* renderer1, int width) {
     rookB = IMG_LoadTexture(renderer, "C:\\Users\\kevsk\\source\\repos\\Chess\\Chess\\Chess_CPP\\images\\rookb.png");;
     bishopB = IMG_LoadTexture(renderer, "C:\\Users\\kevsk\\source\\repos\\Chess\\Chess\\Chess_CPP\\images\\bishopb.png");
     */
+
     // adds them to the textures vector
     textures = {pawnB, horseB, queenB, kingB, rookB, bishopB, pawnW, horseW, queenW, kingW, rookW, bishopW};
+
+    BoardLoc[{4,4}] = 17;
+    BoardLoc[{4,3}] = 2;
+    BoardLoc[{4,2}] = 1;
+
+    // creates the pieces and board
+    this->createPieces();
+    BoardLoc[{7,4}] = 1;
+    this->createBoard();
+//    posMoves("pawn", 6,1, "white", BoardLoc, inter, renderer);
+    posMoves("rook", 4,4, "white", BoardLoc, inter, renderer);
 }
 
 // inits the pieces in their respective data classes
@@ -159,9 +174,6 @@ void board::createBoard() {
     // Clear the entire screen to black
     SDL_RenderClear(renderer);
 
-    // interval
-    int inter = width/ 8;
-
     // iterate through each square and draw it
     for (int row = 0; row < 8; row++){
         for (int col = 0; col<8; col++){
@@ -207,7 +219,6 @@ void board::createBoard() {
     }
     // present to screen
     SDL_RenderPresent(renderer);
-    SDL_Delay(9005000);
 
 }
 

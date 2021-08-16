@@ -25,7 +25,6 @@ int main(int argc, char* argv[]) {
     win = SDL_CreateWindow("Hello World", posX, posY, width, height, 0);
     renderer = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED);
     board Board = board(win, renderer, width);
-    Board.createPieces();
-    Board.createBoard();
+
     return 0;
 }
