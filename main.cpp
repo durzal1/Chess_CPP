@@ -3,14 +3,14 @@
 /*
 for zacky
 
-*/
 #include <SDL2/SDL_image.h>
 #include <bits/stdc++.h>
+*/
 /*
 for kevin
- #include "SDL_image.h"
 
 */
+ #include "SDL_image.h"
 int main(int argc, char* argv[]) {
 
     // const
