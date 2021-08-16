@@ -51,15 +51,16 @@ board::board(SDL_Window* win, SDL_Renderer* renderer1, int width) {
     // adds them to the textures vector
     textures = {pawnB, horseB, queenB, kingB, rookB, bishopB, pawnW, horseW, queenW, kingW, rookW, bishopW};
 
-    BoardLoc[{4,4}] = 3;
-    BoardLoc[{4,3}] = 2;
-    BoardLoc[{4,2}] = 1;
+    BoardLoc[{4,4}] = 20;
+    
+    BoardLoc[{4, 3}] = 2;
+    BoardLoc[{4, 2}] = 1;
 
     // creates the pieces and board
     this->createPieces();
     this->createBoard();
 //    posMoves("pawn", 6,1, "white", BoardLoc, inter, renderer);
-    posMoves("bishop", 4,4, "white", BoardLoc, inter, renderer);
+    posMoves("queen", 4,4, "white", BoardLoc, inter, renderer);
 }
 
 // inits the pieces in their respective data classes

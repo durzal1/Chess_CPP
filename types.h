@@ -10,6 +10,10 @@ enum Direction{
     Up,
     Down,
     Right,
-    Left
+    Left,
+    topLeft,
+    topRight,
+    bottomLeft,
+    bottomRight
 };
 #endif //CHESS_TYPES_H
