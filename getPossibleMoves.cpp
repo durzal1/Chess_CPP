@@ -177,7 +177,7 @@ std::vector<std::pair<int, int>> posMoves(std::string Class,int row, int col, st
                 else Color = "black";
 
                 if (color != Color){
-                    // legal move since it is the enemies piece
+                    // legal move since it is the enemy's piece
                     possibleMoves.emplace_back(newRow, newCol);
                 }
                 legal = false;
@@ -190,6 +190,118 @@ std::vector<std::pair<int, int>> posMoves(std::string Class,int row, int col, st
                 else if (dir == Left) goLeft = false;
             }
         }
+    }
+    else if (Class == "horse"){
+        // vector of all possible moves here (could be illegal)
+        std::vector<std::pair<int,int>> moves;
+
+        // variables needed
+        int col_down1 = col + 1;
+        int col_down2 = col + 2;
+        int col_up1 = col - 1;
+        int col_up2 = col - 2;
+
+        int row_right1 = row + 1;
+        int row_right2 = row + 2;
+        int row_left1 = row - 1;
+        int row_left2 = row - 2;
+
+        // adds all the moves
+        moves.emplace_back(row_right1, col_down2);
+        moves.emplace_back(row_left1, col_down2);
+
+        moves.emplace_back(row_left2, col_down1);
+        moves.emplace_back(row_left2, col_up1);
+
+        moves.emplace_back(row_left1, col_up2);
+        moves.emplace_back(row_right1, col_up2);
+
+        moves.emplace_back(row_right2, col_up1);
+        moves.emplace_back(row_right2, col_down1);
+
+        int newRow;
+        int newCol;
+        for (std::pair<int,int> pair:moves){
+            newRow = pair.first;
+            newCol = pair.second;
+
+            // checks if the move is legal
+
+            if (BoardLoc.find({newRow,newCol}) == BoardLoc.end()){
+                // open space
+                possibleMoves.emplace_back(newRow, newCol);
+            }else{
+                // check if it's the enemy's piece
+
+                // get the index
+                int index = BoardLoc[{newRow, newCol}];
+
+                // color
+                std::string Color;
+
+                if (index > 16) Color = "white";
+                else Color = "black";
+
+                if (color != Color){
+                    // legal move since it is the enemy's piece
+                    possibleMoves.emplace_back(newRow, newCol);
+                }
+            }
+        }
+    }
+    else if (Class == "king"){
+        // vector of all possible moves here (could be illegal)
+        std::vector<std::pair<int,int>> moves;
+
+        // adds all possible moves
+        int new_col_up = col - 1;
+        int new_col_down = col + 1;
+
+        int new_row_left = row - 1;
+        int new_row_right = row + 1;
+
+        moves.emplace_back(row, new_col_up);
+        moves.emplace_back(row, new_col_down);
+
+        moves.emplace_back(new_row_right, col);
+        moves.emplace_back(new_row_left, col);
+
+        moves.emplace_back(new_row_right, new_col_down);
+        moves.emplace_back(new_row_right, new_col_up);
+
+        moves.emplace_back(new_row_left, new_col_down);
+        moves.emplace_back(new_row_left, new_col_up);
+
+        int newRow;
+        int newCol;
+        for (std::pair<int,int> pair:moves){
+            newRow = pair.first;
+            newCol = pair.second;
+
+            // checks if the move is legal
+
+            if (BoardLoc.find({newRow,newCol}) == BoardLoc.end()){
+                // open space
+                possibleMoves.emplace_back(newRow, newCol);
+            }else{
+                // check if it's the enemy's piece
+
+                // get the index
+                int index = BoardLoc[{newRow, newCol}];
+
+                // color
+                std::string Color;
+
+                if (index > 16) Color = "white";
+                else Color = "black";
+
+                if (color != Color){
+                    // legal move since it is the enemy's piece
+                    possibleMoves.emplace_back(newRow, newCol);
+                }
+            }
+        }
+
     }
 
     for (std::pair<int,int> pair:possibleMoves){
