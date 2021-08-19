@@ -4,9 +4,12 @@
 
 #include "ai.h"
 
-ai::ai(board Board) {
+ai::ai(board Board, int maxDepth) {
+    // gets the max depth recursive function will go to
+    this->maxDepth = maxDepth;
 
-	this->getScores(Board, 4, "black", 2, 4, 5, false);
+    /// HERE ADD A FOR LOOP TO GO THROUGH EVERY PIECE AND ITS MOVES FIRST
+	this->getScores(Board, 4, "black", 1, 4, 5, false);
 	
 }
 // @param Board, this is the Board class that contains all the information of the board
@@ -17,11 +20,6 @@ ai::ai(board Board) {
 // @param Col, same as former except the column
 // @param captured, checks if piece is captured by its move
 void ai::getScores(board Board, int index, std::string color, int depth, int Row, int Col, bool captured) {
-	if (depth == 0) {
-		return;
-	}
-		
-
 	// get next color
 	std::string nextColor;
 
@@ -38,29 +36,45 @@ void ai::getScores(board Board, int index, std::string color, int depth, int Row
 	else {
 		nextColor = "black";
 		if (captured) { // white piece was captured on the last turn by black since it is white's turn now
-			Board.whitePieces.erase(Board.whitePieces.begin() + Board.BoardLoc[{Row, Col}] - 1); // gets index of white piece and erases it
+		    int ind = Board.BoardLoc[{Row, Col}] - 1;
+			Board.whitePieces.erase(Board.whitePieces.begin() + Board.BoardLoc[{Row, Col}] - 16-2); // gets index of white piece and erases it
 			// MAY NOT BE CORRECT INDEX WITH THE -1
 		}
 	}
 
+    // set the old cord to have no piece inside of it
+    std::pair<int,int> oldCords = Board.PieceLoc[index];
+
+	// deletes the key
+	Board.BoardLoc.erase({oldCords.first, oldCords.second});
 
 	// update the row and column in data classes
 	Board.PieceLoc[index] = { Row, Col };
 	Board.BoardLoc[{Row, Col}] = index;
 
+	//// REMOVE THIS LATER IT IS FOR TESTING ONLY AND USES A LOT OF MEMORY
+	Board.createBoard();
 
+	// puts the base case later so it can the piece can do the move before it ends returns
+	if (depth == maxDepth) {
+	    return;
+	}
 
 	// class of piece
-
 	for (auto piece : pieces) {
 		std::string className = Board.IndClass[piece - 1];
 
-		std::vector<std::tuple<int, int, bool>> moves = posMoves(className, Row, Col, color, Board.BoardLoc, Board.inter, Board.renderer);
+		// gets its row and column
+		std::pair<int,int> newCords = Board.PieceLoc[piece];
+
+		int row = newCords.first;
+		int col = newCords.second;
+
+		std::vector<std::tuple<int, int, bool>> moves = posMoves(className, row, col, color, Board.BoardLoc, Board.inter, Board.renderer);
 		// the bool is not yet implemented, states whether the move will cause a capture
 		
 		for (auto move : moves) {
-
-			getScores(Board, piece, nextColor, depth - 1, std::get<0>(move), std::get<1>(move), std::get<2>(move));
+			getScores(Board, piece, nextColor, depth+1, std::get<0>(move), std::get<1>(move), std::get<2>(move));
 			
 		}
 	}

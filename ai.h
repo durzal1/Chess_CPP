@@ -8,10 +8,10 @@
 #include "getPossibleMoves.h"
 
 /* zacky
+
+ */
 #include <bits/stdc++.h>
 #include <SDL2/SDL_image.h>
- */
-
 /*
 kevin
 */
@@ -20,10 +20,12 @@ kevin
 
 class ai{
 private:
+    int maxDepth;
+
 public:
 
     // constructor (dont know what to put here yet)
-    ai(board Board);
+    ai(board Board, int maxDepth);
 
 
     // main recursive function that gets moves and gets scores with minMax

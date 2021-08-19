@@ -7,7 +7,7 @@
 
 std::vector<std::tuple<int, int, bool>> posMoves(std::string Class, int row, int col, std::string color, std::map<std::pair<int, int>, int> BoardLoc, int inter, SDL_Renderer* renderer) {
 	// vector with all legal moves
-	std::vector<std::pair<int, int>> possibleMoves;
+	std::vector<std::tuple<int, int,bool>> possibleMoves;
 
 	// TODO: convert to tuple with bool being if the move captures a piece
 
@@ -24,12 +24,13 @@ std::vector<std::tuple<int, int, bool>> posMoves(std::string Class, int row, int
 
 				if (BoardLoc.find({ newRow,newCol }) == BoardLoc.end()) {
 					// there is no piece on the square (move is legal)
-					possibleMoves.emplace_back(newRow, newCol);
+					// false at the end since it's not capturing a piece
+					possibleMoves.emplace_back(newRow, newCol, false);
 				}
 			}
 			// checks one square in front
 			if (BoardLoc.find({ row + 1 ,col }) == BoardLoc.end()) {
-				possibleMoves.emplace_back(row + 1, col);
+				possibleMoves.emplace_back(row + 1, col, false);
 			}
 
 			// checks the attacks it can do
@@ -42,7 +43,8 @@ std::vector<std::tuple<int, int, bool>> posMoves(std::string Class, int row, int
 				// checks if its white
 				if (index > 16) {
 					// legal move
-					possibleMoves.emplace_back(row + 1, col + 1);
+					// true since there is an enemy piece there
+					possibleMoves.emplace_back(row + 1, col + 1, true);
 				}
 			}
 			if (BoardLoc.find({ row + 1 ,col - 1 }) != BoardLoc.end()) {
@@ -52,7 +54,7 @@ std::vector<std::tuple<int, int, bool>> posMoves(std::string Class, int row, int
 				// checks if its white
 				if (index > 16) {
 					// legal move
-					possibleMoves.emplace_back(row + 1, col - 1);
+					possibleMoves.emplace_back(row + 1, col - 1, true);
 				}
 			}
 		}
@@ -68,12 +70,12 @@ std::vector<std::tuple<int, int, bool>> posMoves(std::string Class, int row, int
 
 				if (BoardLoc.find({ newRow,newCol }) == BoardLoc.end()) {
 					// there is no piece on the square (move is legal)
-					possibleMoves.emplace_back(newRow, newCol);
+					possibleMoves.emplace_back(newRow, newCol, false);
 				}
 			}
 			// checks one square in front
 			if (BoardLoc.find({ row - 1 ,col }) == BoardLoc.end()) {
-				possibleMoves.emplace_back(row - 1, col);
+				possibleMoves.emplace_back(row - 1, col,false);
 			}
 
 			// checks the attacks it can do
@@ -86,7 +88,7 @@ std::vector<std::tuple<int, int, bool>> posMoves(std::string Class, int row, int
 				// checks if its black
 				if (index <= 16) {
 					// legal move
-					possibleMoves.emplace_back(row - 1, col + 1);
+					possibleMoves.emplace_back(row - 1, col + 1, true);
 				}
 			}
 			if (BoardLoc.find({ row - 1 ,col - 1 }) != BoardLoc.end()) {
@@ -96,7 +98,7 @@ std::vector<std::tuple<int, int, bool>> posMoves(std::string Class, int row, int
 				// checks if its white
 				if (index <= 16) {
 					// legal move
-					possibleMoves.emplace_back(row - 1, col - 1);
+					possibleMoves.emplace_back(row - 1, col - 1, true);
 				}
 			}
 		}
@@ -166,7 +168,7 @@ std::vector<std::tuple<int, int, bool>> posMoves(std::string Class, int row, int
 
 			// if there is nothing in the square
 			if (BoardLoc.find({ newRow,newCol }) == BoardLoc.end()) {
-				possibleMoves.emplace_back(newRow, newCol);
+				possibleMoves.emplace_back(newRow, newCol, false);
 			}
 			// if there is a piece on the square
 			else {
@@ -183,7 +185,7 @@ std::vector<std::tuple<int, int, bool>> posMoves(std::string Class, int row, int
 
 				if (color != Color) {
 					// legal move since it is the enemy's piece
-					possibleMoves.emplace_back(newRow, newCol);
+					possibleMoves.emplace_back(newRow, newCol, true);
 				}
 				legal = false;
 			}
@@ -236,7 +238,7 @@ std::vector<std::tuple<int, int, bool>> posMoves(std::string Class, int row, int
 			// checks if the move is legal
 			if (BoardLoc.find({ newRow,newCol }) == BoardLoc.end()) {
 				// open space
-				possibleMoves.emplace_back(newRow, newCol);
+				possibleMoves.emplace_back(newRow, newCol, false);
 			}
 			else {
 				// check if it's the enemy's piece
@@ -252,7 +254,7 @@ std::vector<std::tuple<int, int, bool>> posMoves(std::string Class, int row, int
 
 				if (color != Color) {
 					// legal move since it is the enemy's piece
-					possibleMoves.emplace_back(newRow, newCol);
+					possibleMoves.emplace_back(newRow, newCol, true);
 				}
 			}
 		}
@@ -293,7 +295,7 @@ std::vector<std::tuple<int, int, bool>> posMoves(std::string Class, int row, int
 
 			if (BoardLoc.find({ newRow,newCol }) == BoardLoc.end()) {
 				// open space
-				possibleMoves.emplace_back(newRow, newCol);
+				possibleMoves.emplace_back(newRow, newCol, false);
 			}
 			else {
 				// check if it's the enemy's piece
@@ -309,7 +311,7 @@ std::vector<std::tuple<int, int, bool>> posMoves(std::string Class, int row, int
 
 				if (color != Color) {
 					// legal move since it is the enemy's piece
-					possibleMoves.emplace_back(newRow, newCol);
+					possibleMoves.emplace_back(newRow, newCol, true);
 				}
 			}
 		}
@@ -398,7 +400,7 @@ std::vector<std::tuple<int, int, bool>> posMoves(std::string Class, int row, int
 			if (newRow < 0 || newRow > 7 || newCol < 0 || newCol > 7) continue;
 
 			// determine which direction it is going
-			// we do this by looking at the remainder (1 = up, 2 = down, 3 = right, 4 = left)
+			// we do this by looking at the remainder (1 = up, 2 = down, 3 = right, 4 = left, 5 topRight...)
 			Direction dir = Direction((i + 8) % 8);
 
 			// check to see if we can keep going that direction
@@ -410,7 +412,7 @@ std::vector<std::tuple<int, int, bool>> posMoves(std::string Class, int row, int
 
 			// if there is nothing in the square
 			if (BoardLoc.find({ newRow,newCol }) == BoardLoc.end()) {
-				possibleMoves.emplace_back(newRow, newCol);
+			    possibleMoves.emplace_back(newRow, newCol, false);
 			}
 			// if there is a piece on the square
 			else {
@@ -427,7 +429,7 @@ std::vector<std::tuple<int, int, bool>> posMoves(std::string Class, int row, int
 
 				if (color != Color) {
 					// legal move since it is the enemy's piece
-					possibleMoves.emplace_back(newRow, newCol);
+					possibleMoves.emplace_back(newRow, newCol, true);
 				}
 				legal = false;
 			}
@@ -511,7 +513,7 @@ std::vector<std::tuple<int, int, bool>> posMoves(std::string Class, int row, int
 
 			// if there is nothing in the square
 			if (BoardLoc.find({ newRow,newCol }) == BoardLoc.end()) {
-				possibleMoves.emplace_back(newRow, newCol);
+			    possibleMoves.emplace_back(newRow, newCol, false);
 			}
 			// if there is a piece on the square
 			else {
@@ -528,7 +530,7 @@ std::vector<std::tuple<int, int, bool>> posMoves(std::string Class, int row, int
 
 				if (color != Color) {
 					// legal move since it is the enemies piece
-					possibleMoves.emplace_back(newRow, newCol);
+					possibleMoves.emplace_back(newRow, newCol, false);
 				}
 				legal = false;
 			}
@@ -542,8 +544,8 @@ std::vector<std::tuple<int, int, bool>> posMoves(std::string Class, int row, int
 		}
 	}
 
-	for (std::pair<int, int> pair : possibleMoves) {
-		SDL_Rect rect{ pair.second * inter + inter / 4 , pair.first * inter + inter / 4 , inter / 4, inter / 4 };
+	for (std::tuple<int, int,bool> pair : possibleMoves) {
+	    SDL_Rect rect{ std::get<1>(pair) * inter + inter / 4 ,std::get<0>(pair) * inter + inter / 4 , inter / 4, inter / 4 };
 		SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
 		SDL_RenderFillRect(renderer, &rect);
 	}

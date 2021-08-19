@@ -4,14 +4,14 @@
 
 /*
 for zacky
-
+*/
 #include <SDL2/SDL_image.h>
 #include <bits/stdc++.h>
-*/
 /*
 for kevin
+ #include "SDL_image.h"
 */
-#include "SDL_image.h"
+
 int main(int argc, char* argv[]) {
 
     // const
@@ -27,7 +27,7 @@ int main(int argc, char* argv[]) {
     renderer = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED);
     board Board = board(win, renderer, width);
 
-    ai AI = ai(Board);
+    ai AI = ai(Board,4);
     SDL_Delay(90200);
     return 0;
 }

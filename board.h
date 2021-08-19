@@ -8,18 +8,20 @@
 /*
 for zacky
 
+
+*/
 #include "SDL2/SDL.h"
 #include <bits/stdc++.h>
 #include <SDL2/SDL_image.h>
-*/
 /*
 for kevin
-*/
-#include "SDL.h"
+ #include "SDL.h"
 #include "SDL_image.h"
 #include <iostream>
 #include <map>
 #include <vector>
+*/
+
 
 
 class board{
