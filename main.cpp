@@ -1,5 +1,7 @@
 #include <iostream>
 #include "board.h"
+#include "ai.h"
+
 /*
 for zacky
 
@@ -10,7 +12,6 @@ for zacky
 for kevin
 #include "SDL_image.h"
 */
-
 int main(int argc, char* argv[]) {
 
     // const
@@ -25,6 +26,8 @@ int main(int argc, char* argv[]) {
     win = SDL_CreateWindow("Hello World", posX, posY, width, height, 0);
     renderer = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED);
     board Board = board(win, renderer, width);
+
+    ai AI = ai(Board);
 
     return 0;
 }

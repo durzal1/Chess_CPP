@@ -20,11 +20,10 @@ for kevin
 #include <map>
 #include <vector>
 */
-#include "getPossibleMoves.h"
 
 
 class board{
-private:
+public:
     // SDL variables
     SDL_Window* win = NULL;
     SDL_Renderer* renderer = NULL;
@@ -73,7 +72,7 @@ private:
     // indexes of living black pieces (iterate through this for moves)
     std::vector<int> blackPieces;
 
-public:
+
     // constructor
     board(SDL_Window* win, SDL_Renderer* renderer1, int width);
 

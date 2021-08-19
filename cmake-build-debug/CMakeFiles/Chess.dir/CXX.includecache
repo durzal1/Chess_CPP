@@ -6,9 +6,19 @@
 
 #IncludeRegexTransform: 
 
-C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/board.cpp
+C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/ai.cpp
+ai.h
+C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/ai.h
+
+C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/ai.h
 board.h
 C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/board.h
+getPossibleMoves.h
+C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/getPossibleMoves.h
+bits/stdc++.h
+-
+SDL2/SDL_image.h
+-
 
 C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/board.h
 SDL2/SDL.h
@@ -27,8 +37,6 @@ map
 -
 vector
 -
-getPossibleMoves.h
-C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/getPossibleMoves.h
 
 C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/getPossibleMoves.h
 bits/stdc++.h

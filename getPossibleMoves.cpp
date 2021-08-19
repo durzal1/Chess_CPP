@@ -149,6 +149,9 @@ std::vector<std::pair<int, int>> posMoves(std::string Class, int row, int col, s
 			newRow = pair.first;
 			newCol = pair.second;
 
+			// makes sure its in bounds
+            if (newRow < 0 || newRow > 7 || newCol < 0 || newCol > 7) continue;
+
 			// determine which direction it is going
 			// we do this by looking at the remainder (1 = up, 2 = down, 3 = right, 4 = left)
 			Direction dir = Direction((i + 4) % 4);
@@ -225,8 +228,10 @@ std::vector<std::pair<int, int>> posMoves(std::string Class, int row, int col, s
 			newRow = pair.first;
 			newCol = pair.second;
 
-			// checks if the move is legal
+			// makes sure its in bounds
+			if (newRow < 0 || newRow > 7 || newCol < 0 || newCol > 7) continue;
 
+			// checks if the move is legal
 			if (BoardLoc.find({ newRow,newCol }) == BoardLoc.end()) {
 				// open space
 				possibleMoves.emplace_back(newRow, newCol);
@@ -279,6 +284,9 @@ std::vector<std::pair<int, int>> posMoves(std::string Class, int row, int col, s
 			newRow = pair.first;
 			newCol = pair.second;
 
+			// makes sure its in bounds
+			if (newRow < 0 || newRow > 7 || newCol < 0 || newCol > 7) continue;
+
 			// checks if the move is legal
 
 			if (BoardLoc.find({ newRow,newCol }) == BoardLoc.end()) {
@@ -321,6 +329,7 @@ std::vector<std::pair<int, int>> posMoves(std::string Class, int row, int col, s
 		bool goBtmRight = true;
 		bool goTopRight = true;
 		bool goBtmLeft = true;
+
 		// vector of all possible moves here (could be illegal)
 		std::vector<std::pair<int, int>> moves;
 
@@ -383,12 +392,15 @@ std::vector<std::pair<int, int>> posMoves(std::string Class, int row, int col, s
 			newRow = pair.first;
 			newCol = pair.second;
 
+			// makes sure its in bounds
+			if (newRow < 0 || newRow > 7 || newCol < 0 || newCol > 7) continue;
+
 			// determine which direction it is going
 			// we do this by looking at the remainder (1 = up, 2 = down, 3 = right, 4 = left)
 			Direction dir = Direction((i + 8) % 8);
 
 			// check to see if we can keep going that direction
-			if (dir == Up && !goUp || dir == Down && !goDown || dir == Right && !goRight || dir == Left && !goLeft || dir == topLeft && !goTopLeft|| dir == topRight && !goTopLeft ||
+			if (dir == Up && !goUp || dir == Down && !goDown || dir == Right && !goRight || dir == Left && !goLeft || dir == topLeft && !goTopLeft|| dir == topRight && !goTopRight ||
 				dir == bottomLeft && !goBtmLeft || dir == bottomRight && !goBtmRight) continue;
 
 			// check if the move is legal
@@ -486,6 +498,9 @@ std::vector<std::pair<int, int>> posMoves(std::string Class, int row, int col, s
 			// we do this by looking at the remainder (1 = up, 2 = down, 3 = right, 4 = left)
 			Direction dir = Direction((i + 4) % 4);
 
+			// makes sure its in bounds
+			if (newRow < 0 || newRow > 7 || newCol < 0 || newCol > 7) continue;
+
 			// check to see if we can keep going that direction
 			if (dir == Up && !goUp || dir == Down && !goDown || dir == Right && !goRight || dir == Left && !goLeft) continue;
 
@@ -533,7 +548,5 @@ std::vector<std::pair<int, int>> posMoves(std::string Class, int row, int col, s
 
 
 	SDL_RenderPresent(renderer);
-	SDL_Delay(500000);
-
 	return possibleMoves;
 }
