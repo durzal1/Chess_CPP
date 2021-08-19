@@ -5,9 +5,11 @@
 #include "getPossibleMoves.h"
 
 
-std::vector<std::pair<int, int>> posMoves(std::string Class, int row, int col, std::string color, std::map<std::pair<int, int>, int> BoardLoc, int inter, SDL_Renderer* renderer) {
+std::vector<std::tuple<int, int, bool>> posMoves(std::string Class, int row, int col, std::string color, std::map<std::pair<int, int>, int> BoardLoc, int inter, SDL_Renderer* renderer) {
 	// vector with all legal moves
 	std::vector<std::pair<int, int>> possibleMoves;
+
+	// TODO: convert to tuple with bool being if the move captures a piece
 
 	// checks what class it is and gives the moves accordingly
 	if (Class == "pawn") {

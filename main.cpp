@@ -5,13 +5,13 @@
 /*
 for zacky
 
-*/
 #include <SDL2/SDL_image.h>
 #include <bits/stdc++.h>
+*/
 /*
 for kevin
-#include "SDL_image.h"
 */
+#include "SDL_image.h"
 int main(int argc, char* argv[]) {
 
     // const
@@ -28,6 +28,6 @@ int main(int argc, char* argv[]) {
     board Board = board(win, renderer, width);
 
     ai AI = ai(Board);
-
+    SDL_Delay(90200);
     return 0;
 }

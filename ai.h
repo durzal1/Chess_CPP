@@ -8,9 +8,15 @@
 #include "getPossibleMoves.h"
 
 /* zacky
- */
 #include <bits/stdc++.h>
 #include <SDL2/SDL_image.h>
+ */
+
+/*
+kevin
+*/
+#include <iostream>
+
 
 class ai{
 private:
@@ -22,7 +28,7 @@ public:
 
     // main recursive function that gets moves and gets scores with minMax
     // @param
-    void getScores(board Board, int index, std::string color, int depth, int row, int col) ;
+    void getScores(board Board, int index, std::string color, int depth, int row, int col, bool captured) ;
 
 };
 #endif //CHESS_AI_H
