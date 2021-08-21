@@ -543,14 +543,14 @@ std::vector<std::tuple<int, int, bool>> posMoves(std::string Class, int row, int
 			}
 		}
 	}
+//
+//	for (std::tuple<int, int,bool> pair : possibleMoves) {
+//	    SDL_Rect rect{ std::get<1>(pair) * inter + inter / 4 ,std::get<0>(pair) * inter + inter / 4 , inter / 4, inter / 4 };
+//		SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
+//		SDL_RenderFillRect(renderer, &rect);
+//	}
 
-	for (std::tuple<int, int,bool> pair : possibleMoves) {
-	    SDL_Rect rect{ std::get<1>(pair) * inter + inter / 4 ,std::get<0>(pair) * inter + inter / 4 , inter / 4, inter / 4 };
-		SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
-		SDL_RenderFillRect(renderer, &rect);
-	}
 
-
-	SDL_RenderPresent(renderer);
+//	SDL_RenderPresent(renderer);
 	return possibleMoves;
 }

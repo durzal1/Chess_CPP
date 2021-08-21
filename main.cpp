@@ -23,11 +23,11 @@ int main(int argc, char* argv[]) {
 
     SDL_Init(SDL_INIT_VIDEO);
 
-    win = SDL_CreateWindow("Hello World", posX, posY, width, height, 0);
+//    win = SDL_CreateWindow("Hello World", posX, posY, width, height, 0);
     renderer = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED);
-    board Board = board(win, renderer, width);
+    board Board = board(width); // win, renderer,
 
-    ai AI = ai(Board,4);
+    ai AI = ai(Board,5);
     SDL_Delay(90200);
     return 0;
 }

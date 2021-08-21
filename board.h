@@ -69,14 +69,14 @@ public:
     std::vector<std::string>IndClass;
 
     // indexes of living white pieces (iterate through this for moves)
-    std::vector<int> whitePieces;
+    std::unordered_set<int> whitePieces;
 
     // indexes of living black pieces (iterate through this for moves)
-    std::vector<int> blackPieces;
+    std::unordered_set<int> blackPieces;
 
 
     // constructor
-    board(SDL_Window* win, SDL_Renderer* renderer1, int width);
+    board(int width); // SDL_Window* win, SDL_Renderer* renderer1,
 
     // creates/updates board visually
     void createBoard();
