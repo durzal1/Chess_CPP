@@ -15,9 +15,10 @@ for zacky
 */
 /*
 for kevin
-*/
- #include "SDL.h"
+  #include "SDL.h"
 #include "SDL_image.h"
+*/
+
 #include <iostream>
 #include <map>
 #include <vector>
@@ -26,40 +27,40 @@ for kevin
 
 
 class board{
-public:
-    // SDL variables
-    SDL_Window* win = NULL;
-    SDL_Renderer* renderer = NULL;
-
+private:
+//    // SDL variables
+//    SDL_Window* win = NULL;
+//    SDL_Renderer* renderer = NULL;
+//
     // constants
     int width;
 
-    // size of each square and their interval
-    int inter;
+//    // images
+//    SDL_Texture *pawnB = nullptr;
+//    SDL_Texture *horseB  = nullptr;
+//    SDL_Texture *queenB  = nullptr;
+//    SDL_Texture *kingB  = nullptr;
+//    SDL_Texture *rookB = nullptr;
+//    SDL_Texture *bishopB  = nullptr;
+//
+//    SDL_Texture *pawnW  = nullptr;
+//    SDL_Texture *horseW  = nullptr;
+//    SDL_Texture *queenW = nullptr;
+//    SDL_Texture *kingW = nullptr;
+//    SDL_Texture *rookW= nullptr;
+//    SDL_Texture *bishopW = nullptr;
 
-    // images
-    SDL_Texture *pawnB = nullptr;
-    SDL_Texture *horseB  = nullptr;
-    SDL_Texture *queenB  = nullptr;
-    SDL_Texture *kingB  = nullptr;
-    SDL_Texture *rookB = nullptr;
-    SDL_Texture *bishopB  = nullptr;
+//    // vector with names of pieces whos index correlate to the next with the textures
+//    std::vector<std::string> texturesStr {"pawnB", "horseB", "queenB", "kingB", "rookB", "bishopB", "pawnW", "horseW", "queenW", "kingW", "rookW", "bishopW"};
 
-    SDL_Texture *pawnW  = nullptr;
-    SDL_Texture *horseW  = nullptr;
-    SDL_Texture *queenW = nullptr;
-    SDL_Texture *kingW = nullptr;
-    SDL_Texture *rookW= nullptr;
-    SDL_Texture *bishopW = nullptr;
-
-    // vector with names of pieces whos index correlate to the next with the textures
-    std::vector<std::string> texturesStr {"pawnB", "horseB", "queenB", "kingB", "rookB", "bishopB", "pawnW", "horseW", "queenW", "kingW", "rookW", "bishopW"};
-
-    // vector of textures
-    std::vector<SDL_Texture*> textures;
-
+//    // vector of textures
+//    std::vector<SDL_Texture*> textures;
+public:
     // map of all pieces (ind, cord<x,y>) (DOES UPDATE IF PIECE DIES)
     std::map<int,std::pair<int,int>> PieceLoc;
+
+    // size of each square and their interval
+    int inter;
 
     // map of all cords (cord<x,y>,ind) (DOES UPDATE IF PIECE DIES)
     // basically the opposite of the former where you give it pos and it gives piece

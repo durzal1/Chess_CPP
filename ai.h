@@ -24,6 +24,8 @@ private:
 
     // if check against user
     //bool check = false;
+
+    bool CheckMate = false;
 public:
     std::string winner;
 
@@ -38,5 +40,9 @@ public:
     // function to check if the move will stop the check
     // @return whether it is still check
     bool moveCheck(board Board, std::string curr_color, int index, int row, int col, bool captured);
+
+    // function that looks at all squares that can attack the king and determines if the piece there can do the attack
+    // @return number of pieces that can attack the king (0,1,2)
+    int kingAttacks(board Board, std::string curr_color, int row, int col);
 };
 #endif //CHESS_AI_H
