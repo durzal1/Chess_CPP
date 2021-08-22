@@ -9,9 +9,9 @@
 
 /* zacky
 
- */
 #include <bits/stdc++.h>
 #include <SDL2/SDL_image.h>
+ */
 /*
 kevin
 */
@@ -23,7 +23,7 @@ private:
     int maxDepth;
 
     // if check against user
-    bool check = false;
+    //bool check = false;
 public:
     std::string winner;
 
@@ -37,6 +37,6 @@ public:
 
     // function to check if the move will stop the check
     // @return whether it is still check
-    bool moveCheck(board Board, int index, int row, int col);
+    bool moveCheck(board Board, std::string curr_color, int index, int row, int col, bool captured);
 };
 #endif //CHESS_AI_H
