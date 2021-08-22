@@ -4,11 +4,12 @@
 
 #include "getPossibleMoves.h"
 
-std::vector<std::tuple<int, int, bool>> posMoves(std::string Class, int row, int col, std::string color, std::map<std::pair<int, int>, int> BoardLoc, int inter) { // , SDL_Renderer* renderer
-	// vector with all legal moves
-	std::vector<std::tuple<int, int, bool>> possibleMoves;
+std::vector<std::tuple<int, int, bool>> posMoves(std::string Class, int row, int col, std::string color, board Board) { // , SDL_Renderer* renderer
+	// gets data needed
+	auto BoardLoc = Board.BoardLoc;
 
-	// TODO: convert to tuple with bool being if the move captures a piece
+    // vector with all legal moves
+	std::vector<std::tuple<int, int, bool>> possibleMoves;
 
 	// checks what class it is and gives the moves accordingly
 	if (Class == "pawn") {
@@ -29,7 +30,7 @@ std::vector<std::tuple<int, int, bool>> posMoves(std::string Class, int row, int
 			}
 			// checks one square in front
 			if (BoardLoc.find({ row + 1 ,col }) == BoardLoc.end()) {
-				possibleMoves.emplace_back(row + 1, col, false);
+			    possibleMoves.emplace_back(row + 1, col, false);
 			}
 
 			// checks the attacks it can do
@@ -74,7 +75,7 @@ std::vector<std::tuple<int, int, bool>> posMoves(std::string Class, int row, int
 			}
 			// checks one square in front
 			if (BoardLoc.find({ row - 1 ,col }) == BoardLoc.end()) {
-				possibleMoves.emplace_back(row - 1, col, false);
+			    possibleMoves.emplace_back(row - 1, col, false);
 			}
 
 			// checks the attacks it can do
@@ -167,7 +168,7 @@ std::vector<std::tuple<int, int, bool>> posMoves(std::string Class, int row, int
 
 			// if there is nothing in the square
 			if (BoardLoc.find({ newRow,newCol }) == BoardLoc.end()) {
-				possibleMoves.emplace_back(newRow, newCol, false);
+			    possibleMoves.emplace_back(newRow, newCol, false);
 			}
 			// if there is a piece on the square
 			else {
@@ -195,6 +196,65 @@ std::vector<std::tuple<int, int, bool>> posMoves(std::string Class, int row, int
 				else if (dir == Right) goRight = false;
 				else if (dir == Left) goLeft = false;
 			}
+		}
+		// castling
+
+		// for white
+		if (color == "white"){
+		    // left
+		    if (Board.whiteCastleLeft){
+		        // check if both pieces haven't been captured
+		        bool first = Board.whitePieces.find(17) != Board.whitePieces.end();
+		        bool second = Board.whitePieces.find(21) != Board.whitePieces.end();
+
+		        // two squares between them are empty
+		        bool third = BoardLoc.find({7,1}) == BoardLoc.end();
+		        bool fourth = BoardLoc.find({7,2})== BoardLoc.end();
+		        bool fifth = BoardLoc.find({7,3})== BoardLoc.end();
+
+		        // if all are true
+		        if (first && second && third && fourth && fifth) possibleMoves.emplace_back(1,1,false);
+		    }
+		    if (Board.whiteCastleRight){
+		        // check if both pieces haven't been captured
+		        bool first = Board.whitePieces.find(24) != Board.whitePieces.end();
+		        bool second = Board.whitePieces.find(21) != Board.whitePieces.end();
+
+		        // two squares between them are empty
+		        bool third = BoardLoc.find({7,5}) == BoardLoc.end();
+		        bool fourth = BoardLoc.find({7,6})== BoardLoc.end();
+
+		        // if all are true
+		        if (first && second && third && fourth) possibleMoves.emplace_back(1,1,false);
+		    }
+		}
+		else{
+		    // left
+		    if (Board.blackCastleLeft){
+		        // check if both pieces haven't been captured
+		        bool first = Board.blackPieces.find(1) != Board.blackPieces.end();
+		        bool second = Board.blackPieces.find(5) != Board.blackPieces.end();
+
+		        // two squares between them are empty
+		        bool third = BoardLoc.find({0,1}) == BoardLoc.end();
+		        bool fourth = BoardLoc.find({0,2})== BoardLoc.end();
+		        bool fifth = BoardLoc.find({0,3})== BoardLoc.end();
+
+		        // if all are true
+		        if (first && second && third && fourth && fifth) possibleMoves.emplace_back(1,1,false);
+		    }
+		    if (Board.blackCastleRight){
+		        // check if both pieces haven't been captured
+		        bool first = Board.blackPieces.find(8) != Board.blackPieces.end();
+		        bool second = Board.blackPieces.find(5) != Board.blackPieces.end();
+
+		        // two squares between them are empty
+		        bool third = BoardLoc.find({7,5}) == BoardLoc.end();
+		        bool fourth = BoardLoc.find({7,6})== BoardLoc.end();
+
+		        // if all are true
+		        if (first && second && third && fourth) possibleMoves.emplace_back(1,1,false);
+		    }
 		}
 	}
 	else if (Class == "horse") {
@@ -411,7 +471,7 @@ std::vector<std::tuple<int, int, bool>> posMoves(std::string Class, int row, int
 
 			// if there is nothing in the square
 			if (BoardLoc.find({ newRow,newCol }) == BoardLoc.end()) {
-				possibleMoves.emplace_back(newRow, newCol, false);
+			    possibleMoves.emplace_back(newRow, newCol, false);
 			}
 			// if there is a piece on the square
 			else {
@@ -447,7 +507,7 @@ std::vector<std::tuple<int, int, bool>> posMoves(std::string Class, int row, int
 	}
 
 	else if (Class == "bishop") {
-		// loop through all the possible moves a rook can move up/down/left/right
+		// loop through all the possible moves a bishop can move up/down/left/right
 		int newRow;
 		int newCol;
 
@@ -512,7 +572,7 @@ std::vector<std::tuple<int, int, bool>> posMoves(std::string Class, int row, int
 
 			// if there is nothing in the square
 			if (BoardLoc.find({ newRow,newCol }) == BoardLoc.end()) {
-				possibleMoves.emplace_back(newRow, newCol, false);
+			    possibleMoves.emplace_back(newRow, newCol, false);
 			}
 			// if there is a piece on the square
 			else {

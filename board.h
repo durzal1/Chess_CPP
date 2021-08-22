@@ -25,7 +25,6 @@ for kevin
 #include <unordered_set>
 
 
-
 class board{
 private:
 //    // SDL variables
@@ -55,7 +54,23 @@ private:
 
 //    // vector of textures
 //    std::vector<SDL_Texture*> textures;
+
+
+
 public:
+    // if right has the  right to castle (right rook and king hasnt moved)
+    bool whiteCastleRight = true;
+
+    // if right has the  right to castle (left rook and king hasnt moved)
+    bool whiteCastleLeft = true;
+
+
+    // if right has the  right to castle (rightrook hasnt moved)
+    bool blackCastleRight = true;
+
+    // if right has the  right to castle (left rook hasnt moved)
+    bool blackCastleLeft = true;
+
     // map of all pieces (ind, cord<x,y>) (DOES UPDATE IF PIECE DIES)
     std::map<int,std::pair<int,int>> PieceLoc;
 

@@ -34,7 +34,15 @@ public:
 
 
     // main recursive function that gets moves and gets scores with minMax
-    // @param
+    // @param Board, this is the Board class that contains all the information of the board
+    // @param index, index of the piece
+    // @param color, color of the peice (black or white)
+    // @param depth, current depth of the recursive search
+    // @param Row, this is the row that the piece is currently moving to that we need to update in the Board data classes
+    // @param Col, same as former except the column
+    // @param captured, checks if piece is captured by its move
+    // @param totalMoves, for debugging checks how many moves have occured
+    // @param string castle, this is a string that tells if the move is a castle
     void getScores(board Board, int index, std::string color, int depth, int row, int col, bool captured, int &totalMoves) ;
 
     // function to check if the move will stop the check
