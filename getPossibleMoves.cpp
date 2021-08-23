@@ -1,615 +1,616 @@
+
 //
 // Created by zacky on 8/16/2021.
 //
 
 #include "getPossibleMoves.h"
 
-std::vector<std::tuple<int, int, bool>> posMoves(std::string Class, int row, int col, std::string color, board Board) { // , SDL_Renderer* renderer
-	// gets data needed
-	auto BoardLoc = Board.BoardLoc;
+std::vector<std::tuple<int, int, bool, std::string>> posMoves(std::string Class, int row, int col, std::string color, board Board) { // , SDL_Renderer* renderer
+    // gets data needed
+    auto BoardLoc = Board.BoardLoc;
 
     // vector with all legal moves
-	std::vector<std::tuple<int, int, bool>> possibleMoves;
-
-	// checks what class it is and gives the moves accordingly
-	if (Class == "pawn") {
-		if (color == "black") {
-			// checks if its on the starting row
-			if (row == 1) {
-				// lets it moves two moves ahead
-
-				// gets the cords of two moves ahead
-				int newRow = row + 2;
-				int newCol = col;
-
-				if (BoardLoc.find({ newRow,newCol }) == BoardLoc.end()) {
-					// there is no piece on the square (move is legal)
-					// false at the end since it's not capturing a piece
-					possibleMoves.emplace_back(newRow, newCol, false);
-				}
-			}
-			// checks one square in front
-			if (BoardLoc.find({ row + 1 ,col }) == BoardLoc.end()) {
-			    possibleMoves.emplace_back(row + 1, col, false);
-			}
-
-			// checks the attacks it can do
-			if (BoardLoc.find({ row + 1 ,col + 1 }) != BoardLoc.end()) {
-				// there is a piece there, so now we check if it's the enemies
-
-				// get the index of the piece
-				int index = BoardLoc[{row + 1, col + 1}];
-
-				// checks if its white
-				if (index > 16) {
-					// legal move
-					// true since there is an enemy piece there
-					possibleMoves.emplace_back(row + 1, col + 1, true);
-				}
-			}
-			if (BoardLoc.find({ row + 1 ,col - 1 }) != BoardLoc.end()) {
-				// get the index of the piece
-				int index = BoardLoc[{row + 1, col - 1}];
-
-				// checks if its white
-				if (index > 16) {
-					// legal move
-					possibleMoves.emplace_back(row + 1, col - 1, true);
-				}
-			}
-		}
-		// white
-		else {
-			// checks if its on the starting row
-			if (row == 6) {
-				// lets it moves two moves ahead
-
-				// gets the cords of two moves ahead
-				int newRow = row - 2;
-				int newCol = col;
-
-				if (BoardLoc.find({ newRow,newCol }) == BoardLoc.end()) {
-					// there is no piece on the square (move is legal)
-					possibleMoves.emplace_back(newRow, newCol, false);
-				}
-			}
-			// checks one square in front
-			if (BoardLoc.find({ row - 1 ,col }) == BoardLoc.end()) {
-			    possibleMoves.emplace_back(row - 1, col, false);
-			}
-
-			// checks the attacks it can do
-			if (BoardLoc.find({ row - 1 ,col + 1 }) != BoardLoc.end()) {
-				// there is a piece there, so now we check if it's the enemies
-
-				// get the index of the piece
-				int index = BoardLoc[{row - 1, col + 1}];
-
-				// checks if its black
-				if (index <= 16) {
-					// legal move
-					possibleMoves.emplace_back(row - 1, col + 1, true);
-				}
-			}
-			if (BoardLoc.find({ row - 1 ,col - 1 }) != BoardLoc.end()) {
-				// get the index of the piece
-				int index = BoardLoc[{row - 1, col - 1}];
-
-				// checks if its white
-				if (index <= 16) {
-					// legal move
-					possibleMoves.emplace_back(row - 1, col - 1, true);
-				}
-			}
-		}
-	}
-	// rooks
-	if (Class == "rook") {
-		// loop through all the possible moves a rook can move up/down/left/right
-		int newRow;
-		int newCol;
-
-		// boolean variables to determine whether we should continue going a specific direction
-		// this is useful because if it is going up and sees an obstacle it can not go up further
-		// so this is the indicator to not go up anymore
-		bool goUp = true;
-		bool goDown = true;
-		bool goRight = true;
-		bool goLeft = true;
-
-		// vector of all possible moves here (could be illegal)
-		std::vector<std::pair<int, int>> moves;
-
-		for (int i = 1; i <= 8; i++) {
-
-			// up
-			newRow = row - i;
-			newCol = col;
-
-			// add to moves vector
-			moves.emplace_back(newRow, newCol);
-
-			// down
-			newRow = row + i;
-			newCol = col;
-
-			moves.emplace_back(newRow, newCol);
-
-			// right
-			newRow = row;
-			newCol = col + i;
-
-			moves.emplace_back(newRow, newCol);
-
-			// left
-			newRow = row;
-			newCol = col - i;
-
-			moves.emplace_back(newRow, newCol);
-		}
-		// iterate through the possible moves to find which ones are legal
-		for (int i = 0; i < moves.size(); i++) {
-			std::pair<int, int> pair = moves[i];
-			newRow = pair.first;
-			newCol = pair.second;
-
-			// makes sure its in bounds
-			if (newRow < 0 || newRow > 7 || newCol < 0 || newCol > 7) continue;
-
-			// determine which direction it is going
-			// we do this by looking at the remainder (1 = up, 2 = down, 3 = right, 4 = left)
-			Direction dir = Direction((i + 4) % 4);
-
-			// check to see if we can keep going that direction
-			if (dir == Up && !goUp || dir == Down && !goDown || dir == Right && !goRight || dir == Left && !goLeft) continue;
-
-			// check if the move is legal
-			bool legal = true;
-
-			// if there is nothing in the square
-			if (BoardLoc.find({ newRow,newCol }) == BoardLoc.end()) {
-			    possibleMoves.emplace_back(newRow, newCol, false);
-			}
-			// if there is a piece on the square
-			else {
-				// make sure its the enemies
-
-				// get the index
-				int index = BoardLoc[{newRow, newCol}];
-
-				// color
-				std::string Color;
-
-				if (index > 16) Color = "white";
-				else Color = "black";
-
-				if (color != Color) {
-					// legal move since it is the enemy's piece
-					possibleMoves.emplace_back(newRow, newCol, true);
-				}
-				legal = false;
-			}
-			if (!legal) {
-				// we make it illegal to go that direction
-				if (dir == Up) goUp = false;
-				else if (dir == Down) goDown = false;
-				else if (dir == Right) goRight = false;
-				else if (dir == Left) goLeft = false;
-			}
-		}
-		// castling
-
-		// for white
-		if (color == "white"){
-		    // left
-		    if (Board.whiteCastleLeft){
-		        // check if both pieces haven't been captured
-		        bool first = Board.whitePieces.find(17) != Board.whitePieces.end();
-		        bool second = Board.whitePieces.find(21) != Board.whitePieces.end();
-
-		        // two squares between them are empty
-		        bool third = BoardLoc.find({7,1}) == BoardLoc.end();
-		        bool fourth = BoardLoc.find({7,2})== BoardLoc.end();
-		        bool fifth = BoardLoc.find({7,3})== BoardLoc.end();
-
-		        // if all are true
-		        if (first && second && third && fourth && fifth) possibleMoves.emplace_back(1,1,false);
-		    }
-		    if (Board.whiteCastleRight){
-		        // check if both pieces haven't been captured
-		        bool first = Board.whitePieces.find(24) != Board.whitePieces.end();
-		        bool second = Board.whitePieces.find(21) != Board.whitePieces.end();
-
-		        // two squares between them are empty
-		        bool third = BoardLoc.find({7,5}) == BoardLoc.end();
-		        bool fourth = BoardLoc.find({7,6})== BoardLoc.end();
-
-		        // if all are true
-		        if (first && second && third && fourth) possibleMoves.emplace_back(1,1,false);
-		    }
-		}
-		else{
-		    // left
-		    if (Board.blackCastleLeft){
-		        // check if both pieces haven't been captured
-		        bool first = Board.blackPieces.find(1) != Board.blackPieces.end();
-		        bool second = Board.blackPieces.find(5) != Board.blackPieces.end();
-
-		        // two squares between them are empty
-		        bool third = BoardLoc.find({0,1}) == BoardLoc.end();
-		        bool fourth = BoardLoc.find({0,2})== BoardLoc.end();
-		        bool fifth = BoardLoc.find({0,3})== BoardLoc.end();
-
-		        // if all are true
-		        if (first && second && third && fourth && fifth) possibleMoves.emplace_back(1,1,false);
-		    }
-		    if (Board.blackCastleRight){
-		        // check if both pieces haven't been captured
-		        bool first = Board.blackPieces.find(8) != Board.blackPieces.end();
-		        bool second = Board.blackPieces.find(5) != Board.blackPieces.end();
-
-		        // two squares between them are empty
-		        bool third = BoardLoc.find({7,5}) == BoardLoc.end();
-		        bool fourth = BoardLoc.find({7,6})== BoardLoc.end();
-
-		        // if all are true
-		        if (first && second && third && fourth) possibleMoves.emplace_back(1,1,false);
-		    }
-		}
-	}
-	else if (Class == "horse") {
-		// vector of all possible moves here (could be illegal)
-		std::vector<std::pair<int, int>> moves;
-
-		// variables needed
-		int col_down1 = col + 1;
-		int col_down2 = col + 2;
-		int col_up1 = col - 1;
-		int col_up2 = col - 2;
-
-		int row_right1 = row + 1;
-		int row_right2 = row + 2;
-		int row_left1 = row - 1;
-		int row_left2 = row - 2;
-
-		// adds all the moves
-		moves.emplace_back(row_right1, col_down2);
-		moves.emplace_back(row_left1, col_down2);
-
-		moves.emplace_back(row_left2, col_down1);
-		moves.emplace_back(row_left2, col_up1);
-
-		moves.emplace_back(row_left1, col_up2);
-		moves.emplace_back(row_right1, col_up2);
-
-		moves.emplace_back(row_right2, col_up1);
-		moves.emplace_back(row_right2, col_down1);
-
-		int newRow;
-		int newCol;
-		for (std::pair<int, int> pair : moves) {
-			newRow = pair.first;
-			newCol = pair.second;
-
-			// makes sure its in bounds
-			if (newRow < 0 || newRow > 7 || newCol < 0 || newCol > 7) continue;
-
-			// checks if the move is legal
-			if (BoardLoc.find({ newRow,newCol }) == BoardLoc.end()) {
-				// open space
-				possibleMoves.emplace_back(newRow, newCol, false);
-			}
-			else {
-				// check if it's the enemy's piece
-
-				// get the index
-				int index = BoardLoc[{newRow, newCol}];
-
-				// color
-				std::string Color;
-
-				if (index > 16) Color = "white";
-				else Color = "black";
-
-				if (color != Color) {
-					// legal move since it is the enemy's piece
-					possibleMoves.emplace_back(newRow, newCol, true);
-				}
-			}
-		}
-	}
-	else if (Class == "king") {
-		// vector of all possible moves here (could be illegal)
-		std::vector<std::pair<int, int>> moves;
-
-		// adds all possible moves
-		int new_col_up = col - 1;
-		int new_col_down = col + 1;
-
-		int new_row_left = row - 1;
-		int new_row_right = row + 1;
-
-		moves.emplace_back(row, new_col_up);
-		moves.emplace_back(row, new_col_down);
-
-		moves.emplace_back(new_row_right, col);
-		moves.emplace_back(new_row_left, col);
-
-		moves.emplace_back(new_row_right, new_col_down);
-		moves.emplace_back(new_row_right, new_col_up);
-
-		moves.emplace_back(new_row_left, new_col_down);
-		moves.emplace_back(new_row_left, new_col_up);
-
-		int newRow;
-		int newCol;
-		for (std::pair<int, int> pair : moves) {
-			newRow = pair.first;
-			newCol = pair.second;
-
-			// makes sure its in bounds
-			if (newRow < 0 || newRow > 7 || newCol < 0 || newCol > 7) continue;
-
-			// checks if the move is legal
-
-			if (BoardLoc.find({ newRow,newCol }) == BoardLoc.end()) {
-				// open space
-				possibleMoves.emplace_back(newRow, newCol, false);
-			}
-			else {
-				// check if it's the enemy's piece
-
-				// get the index
-				int index = BoardLoc[{newRow, newCol}];
-
-				// color
-				std::string Color;
-
-				if (index > 16) Color = "white";
-				else Color = "black";
-
-				if (color != Color) {
-					// legal move since it is the enemy's piece
-					possibleMoves.emplace_back(newRow, newCol, true);
-				}
-			}
-		}
-
-	}
-	else if (Class == "queen") {
-		// loop through all the possible moves a rook can move up/down/left/right
-		int newRow;
-		int newCol;
-
-		// boolean variables to determine whether we should continue going a specific direction
-		// this is useful because if it is going up and sees an obstacle it can not go up further
-		// so this is the indicator to not go up anymore
-		bool goUp = true;
-		bool goDown = true;
-		bool goRight = true;
-		bool goLeft = true;
-		bool goTopLeft = true;
-		bool goBtmRight = true;
-		bool goTopRight = true;
-		bool goBtmLeft = true;
-
-		// vector of all possible moves here (could be illegal)
-		std::vector<std::pair<int, int>> moves;
-
-		for (int i = 1; i <= 8; i++) {
-
-			// up
-			newRow = row - i;
-			newCol = col;
-
-			// add to moves vector
-			moves.emplace_back(newRow, newCol);
-
-			// down
-			newRow = row + i;
-			newCol = col;
-
-			moves.emplace_back(newRow, newCol);
-
-			// right
-			newRow = row;
-			newCol = col + i;
-
-			moves.emplace_back(newRow, newCol);
-
-			// left
-			newRow = row;
-			newCol = col - i;
-
-			moves.emplace_back(newRow, newCol);
-
-			// up left
-			newRow = row - i;
-			newCol = col - i;
-
-
-			// add to moves vector
-			moves.emplace_back(newRow, newCol);
-
-			// down right
-			newRow = row + i;
-			newCol = col + i;
-
-			moves.emplace_back(newRow, newCol);
-
-			// down right
-			newRow = row - i;
-			newCol = col + i;
-
-			moves.emplace_back(newRow, newCol);
-
-			// down left
-			newRow = row + i;
-			newCol = col - i;
-
-			moves.emplace_back(newRow, newCol);
-		}
-		// iterate through the possible moves to find which ones are legal
-		for (int i = 0; i < moves.size(); i++) {
-			std::pair<int, int> pair = moves[i];
-			newRow = pair.first;
-			newCol = pair.second;
-
-			// makes sure its in bounds
-			if (newRow < 0 || newRow > 7 || newCol < 0 || newCol > 7) continue;
-
-			// determine which direction it is going
-			// we do this by looking at the remainder (1 = up, 2 = down, 3 = right, 4 = left, 5 topRight...)
-			Direction dir = Direction((i + 8) % 8);
-
-			// check to see if we can keep going that direction
-			if (dir == Up && !goUp || dir == Down && !goDown || dir == Right && !goRight || dir == Left && !goLeft || dir == topLeft && !goTopLeft || dir == topRight && !goTopRight ||
-				dir == bottomLeft && !goBtmLeft || dir == bottomRight && !goBtmRight) continue;
-
-			// check if the move is legal
-			bool legal = true;
-
-			// if there is nothing in the square
-			if (BoardLoc.find({ newRow,newCol }) == BoardLoc.end()) {
-			    possibleMoves.emplace_back(newRow, newCol, false);
-			}
-			// if there is a piece on the square
-			else {
-				// make sure its the enemies
-
-				// get the index
-				int index = BoardLoc[{newRow, newCol}];
-
-				// color
-				std::string Color;
-
-				if (index > 16) Color = "white";
-				else Color = "black";
-
-				if (color != Color) {
-					// legal move since it is the enemy's piece
-					possibleMoves.emplace_back(newRow, newCol, true);
-				}
-				legal = false;
-			}
-			if (!legal) {
-				// we make it illegal to go that direction
-				if (dir == Up) goUp = false;
-				else if (dir == Down) goDown = false;
-				else if (dir == Right) goRight = false;
-				else if (dir == Left) goLeft = false;
-				else if (dir == topLeft) goTopLeft = false;
-				else if (dir == topRight) goTopRight = false;
-				else if (dir == bottomLeft) goBtmLeft = false;
-				else if (dir == bottomRight) goBtmRight = false;
-			}
-		}
-	}
-
-	else if (Class == "bishop") {
-		// loop through all the possible moves a bishop can move up/down/left/right
-		int newRow;
-		int newCol;
-
-		// boolean variables to determine whether we should continue going a specific direction
-		// this is useful because if it is going up and sees an obstacle it can not go up further
-		// so this is the indicator to not go up anymore
-		bool goUp = true;
-		bool goDown = true;
-		bool goRight = true;
-		bool goLeft = true;
-
-		// vector of all possible moves here (could be illegal)
-		std::vector<std::pair<int, int>> moves;
-
-		for (int i = 1; i <= 8; i++) {
-
-			// up left
-			newRow = row - i;
-			newCol = col - i;
-
-			// add to moves vector
-			moves.emplace_back(newRow, newCol);
-
-			// down right
-			newRow = row + i;
-			newCol = col + i;
-
-			moves.emplace_back(newRow, newCol);
-
-			// down right
-			newRow = row - i;
-			newCol = col + i;
-
-			moves.emplace_back(newRow, newCol);
-
-			// down left
-			newRow = row + i;
-			newCol = col - i;
-
-			moves.emplace_back(newRow, newCol);
-
-		}
-
-		// iterate through the possible moves to find which ones are legal
-		for (int i = 0; i < moves.size(); i++) {
-			std::pair<int, int> pair = moves[i];
-			newRow = pair.first;
-			newCol = pair.second;
-
-			// determine which direction it is going
-			// we do this by looking at the remainder (1 = up, 2 = down, 3 = right, 4 = left)
-			Direction dir = Direction((i + 4) % 4);
-
-			// makes sure its in bounds
-			if (newRow < 0 || newRow > 7 || newCol < 0 || newCol > 7) continue;
-
-			// check to see if we can keep going that direction
-			if (dir == Up && !goUp || dir == Down && !goDown || dir == Right && !goRight || dir == Left && !goLeft) continue;
-
-			// check if the move is legal
-			bool legal = true;
-
-			// if there is nothing in the square
-			if (BoardLoc.find({ newRow,newCol }) == BoardLoc.end()) {
-			    possibleMoves.emplace_back(newRow, newCol, false);
-			}
-			// if there is a piece on the square
-			else {
-				// make sure its the enemies
-
-				// get the index
-				int index = BoardLoc[{newRow, newCol}];
-
-				// color
-				std::string Color;
-
-				if (index > 16) Color = "white";
-				else Color = "black";
-
-				if (color != Color) {
-					// legal move since it is the enemies piece
-					possibleMoves.emplace_back(newRow, newCol, true);
-				}
-				legal = false;
-			}
-			if (!legal) {
-				// we make it illegal to go that direction
-				if (dir == Up) goUp = false;
-				else if (dir == Down) goDown = false;
-				else if (dir == Right) goRight = false;
-				else if (dir == Left) goLeft = false;
-			}
-		}
-	}
-	//
-	//	for (std::tuple<int, int,bool> pair : possibleMoves) {
-	//	    SDL_Rect rect{ std::get<1>(pair) * inter + inter / 4 ,std::get<0>(pair) * inter + inter / 4 , inter / 4, inter / 4 };
-	//		SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
-	//		SDL_RenderFillRect(renderer, &rect);
-	//	}
-
-
-	//	SDL_RenderPresent(renderer);
-	return possibleMoves;
+    std::vector<std::tuple<int, int, bool, std::string>> possibleMoves;
+
+    // checks what class it is and gives the moves accordingly
+    if (Class == "pawn") {
+        if (color == "black") {
+            // checks if its on the starting row
+            if (row == 1) {
+                // lets it moves two moves ahead
+
+                // gets the cords of two moves ahead
+                int newRow = row + 2;
+                int newCol = col;
+
+                if (BoardLoc.find({ newRow,newCol }) == BoardLoc.end()) {
+                    // there is no piece on the square (move is legal)
+                    // false at the end since it's not capturing a piece
+                    possibleMoves.emplace_back(newRow, newCol, false, "");
+                }
+            }
+            // checks one square in front
+            if (BoardLoc.find({ row + 1 ,col }) == BoardLoc.end()) {
+                possibleMoves.emplace_back(row + 1, col, false, "");
+            }
+
+            // checks the attacks it can do
+            if (BoardLoc.find({ row + 1 ,col + 1 }) != BoardLoc.end()) {
+                // there is a piece there, so now we check if it's the enemies
+
+                // get the index of the piece
+                int index = BoardLoc[{row + 1, col + 1}];
+
+                // checks if its white
+                if (index > 16) {
+                    // legal move
+                    // true since there is an enemy piece there
+                    possibleMoves.emplace_back(row + 1, col + 1, true, "");
+                }
+            }
+            if (BoardLoc.find({ row + 1 ,col - 1 }) != BoardLoc.end()) {
+                // get the index of the piece
+                int index = BoardLoc[{row + 1, col - 1}];
+
+                // checks if its white
+                if (index > 16) {
+                    // legal move
+                    possibleMoves.emplace_back(row + 1, col - 1, true, "");
+                }
+            }
+        }
+        // white
+        else {
+            // checks if its on the starting row
+            if (row == 6) {
+                // lets it moves two moves ahead
+
+                // gets the cords of two moves ahead
+                int newRow = row - 2;
+                int newCol = col;
+
+                if (BoardLoc.find({ newRow,newCol }) == BoardLoc.end()) {
+                    // there is no piece on the square (move is legal)
+                    possibleMoves.emplace_back(newRow, newCol, false, "");
+                }
+            }
+            // checks one square in front
+            if (BoardLoc.find({ row - 1 ,col }) == BoardLoc.end()) {
+                possibleMoves.emplace_back(row - 1, col, false, "");
+            }
+
+            // checks the attacks it can do
+            if (BoardLoc.find({ row - 1 ,col + 1 }) != BoardLoc.end()) {
+                // there is a piece there, so now we check if it's the enemies
+
+                // get the index of the piece
+                int index = BoardLoc[{row - 1, col + 1}];
+
+                // checks if its black
+                if (index <= 16) {
+                    // legal move
+                    possibleMoves.emplace_back(row - 1, col + 1, true, "");
+                }
+            }
+            if (BoardLoc.find({ row - 1 ,col - 1 }) != BoardLoc.end()) {
+                // get the index of the piece
+                int index = BoardLoc[{row - 1, col - 1}];
+
+                // checks if its white
+                if (index <= 16) {
+                    // legal move
+                    possibleMoves.emplace_back(row - 1, col - 1, true, "");
+                }
+            }
+        }
+    }
+    // rooks
+    if (Class == "rook") {
+        // loop through all the possible moves a rook can move up/down/left/right
+        int newRow;
+        int newCol;
+
+        // boolean variables to determine whether we should continue going a specific direction
+        // this is useful because if it is going up and sees an obstacle it can not go up further
+        // so this is the indicator to not go up anymore
+        bool goUp = true;
+        bool goDown = true;
+        bool goRight = true;
+        bool goLeft = true;
+
+        // vector of all possible moves here (could be illegal)
+        std::vector<std::pair<int, int>> moves;
+
+        for (int i = 1; i <= 8; i++) {
+
+            // up
+            newRow = row - i;
+            newCol = col;
+
+            // add to moves vector
+            moves.emplace_back(newRow, newCol);
+
+            // down
+            newRow = row + i;
+            newCol = col;
+
+            moves.emplace_back(newRow, newCol);
+
+            // right
+            newRow = row;
+            newCol = col + i;
+
+            moves.emplace_back(newRow, newCol);
+
+            // left
+            newRow = row;
+            newCol = col - i;
+
+            moves.emplace_back(newRow, newCol);
+        }
+        // iterate through the possible moves to find which ones are legal
+        for (int i = 0; i < moves.size(); i++) {
+            std::pair<int, int> pair = moves[i];
+            newRow = pair.first;
+            newCol = pair.second;
+
+            // makes sure its in bounds
+            if (newRow < 0 || newRow > 7 || newCol < 0 || newCol > 7) continue;
+
+            // determine which direction it is going
+            // we do this by looking at the remainder (1 = up, 2 = down, 3 = right, 4 = left)
+            Direction dir = Direction((i + 4) % 4);
+
+            // check to see if we can keep going that direction
+            if (dir == Up && !goUp || dir == Down && !goDown || dir == Right && !goRight || dir == Left && !goLeft) continue;
+
+            // check if the move is legal
+            bool legal = true;
+
+            // if there is nothing in the square
+            if (BoardLoc.find({ newRow,newCol }) == BoardLoc.end()) {
+                possibleMoves.emplace_back(newRow, newCol, false, "");
+            }
+            // if there is a piece on the square
+            else {
+                // make sure its the enemies
+
+                // get the index
+                int index = BoardLoc[{newRow, newCol}];
+
+                // color
+                std::string Color;
+
+                if (index > 16) Color = "white";
+                else Color = "black";
+
+                if (color != Color) {
+                    // legal move since it is the enemy's piece
+                    possibleMoves.emplace_back(newRow, newCol, true, "");
+                }
+                legal = false;
+            }
+            if (!legal) {
+                // we make it illegal to go that direction
+                if (dir == Up) goUp = false;
+                else if (dir == Down) goDown = false;
+                else if (dir == Right) goRight = false;
+                else if (dir == Left) goLeft = false;
+            }
+        }
+        // castling
+
+        // for white
+        if (color == "white"){
+            // left
+            if (Board.whiteCastleLeft){
+                // check if both pieces haven't been captured
+                bool first = Board.whitePieces.find(17) != Board.whitePieces.end();
+                bool second = Board.whitePieces.find(21) != Board.whitePieces.end();
+
+                // two squares between them are empty
+                bool third = BoardLoc.find({7,1}) == BoardLoc.end();
+                bool fourth = BoardLoc.find({7,2})== BoardLoc.end();
+                bool fifth = BoardLoc.find({7,3})== BoardLoc.end();
+
+                // if all are true
+                if (first && second && third && fourth && fifth) possibleMoves.emplace_back(1,1,false, "whiteLeft");
+            }
+            if (Board.whiteCastleRight){
+                // check if both pieces haven't been captured
+                bool first = Board.whitePieces.find(24) != Board.whitePieces.end();
+                bool second = Board.whitePieces.find(21) != Board.whitePieces.end();
+
+                // two squares between them are empty
+                bool third = BoardLoc.find({7,5}) == BoardLoc.end();
+                bool fourth = BoardLoc.find({7,6})== BoardLoc.end();
+
+                // if all are true
+                if (first && second && third && fourth) possibleMoves.emplace_back(1,1,false, "whiteRight");
+            }
+        }
+        else{
+            // left
+            if (Board.blackCastleLeft){
+                // check if both pieces haven't been captured
+                bool first = Board.blackPieces.find(1) != Board.blackPieces.end();
+                bool second = Board.blackPieces.find(5) != Board.blackPieces.end();
+
+                // two squares between them are empty
+                bool third = BoardLoc.find({0,1}) == BoardLoc.end();
+                bool fourth = BoardLoc.find({0,2})== BoardLoc.end();
+                bool fifth = BoardLoc.find({0,3})== BoardLoc.end();
+
+                // if all are true
+                if (first && second && third && fourth && fifth) possibleMoves.emplace_back(1,1,false, "blackLeft");
+            }
+            if (Board.blackCastleRight){
+                // check if both pieces haven't been captured
+                bool first = Board.blackPieces.find(8) != Board.blackPieces.end();
+                bool second = Board.blackPieces.find(5) != Board.blackPieces.end();
+
+                // two squares between them are empty
+                bool third = BoardLoc.find({7,5}) == BoardLoc.end();
+                bool fourth = BoardLoc.find({7,6})== BoardLoc.end();
+
+                // if all are true
+                if (first && second && third && fourth) possibleMoves.emplace_back(1,1,false, "blackRight");
+            }
+        }
+    }
+    else if (Class == "horse") {
+        // vector of all possible moves here (could be illegal)
+        std::vector<std::pair<int, int>> moves;
+
+        // variables needed
+        int col_down1 = col + 1;
+        int col_down2 = col + 2;
+        int col_up1 = col - 1;
+        int col_up2 = col - 2;
+
+        int row_right1 = row + 1;
+        int row_right2 = row + 2;
+        int row_left1 = row - 1;
+        int row_left2 = row - 2;
+
+        // adds all the moves
+        moves.emplace_back(row_right1, col_down2);
+        moves.emplace_back(row_left1, col_down2);
+
+        moves.emplace_back(row_left2, col_down1);
+        moves.emplace_back(row_left2, col_up1);
+
+        moves.emplace_back(row_left1, col_up2);
+        moves.emplace_back(row_right1, col_up2);
+
+        moves.emplace_back(row_right2, col_up1);
+        moves.emplace_back(row_right2, col_down1);
+
+        int newRow;
+        int newCol;
+        for (std::pair<int, int> pair : moves) {
+            newRow = pair.first;
+            newCol = pair.second;
+
+            // makes sure its in bounds
+            if (newRow < 0 || newRow > 7 || newCol < 0 || newCol > 7) continue;
+
+            // checks if the move is legal
+            if (BoardLoc.find({ newRow,newCol }) == BoardLoc.end()) {
+                // open space
+                possibleMoves.emplace_back(newRow, newCol, false, "");
+            }
+            else {
+                // check if it's the enemy's piece
+
+                // get the index
+                int index = BoardLoc[{newRow, newCol}];
+
+                // color
+                std::string Color;
+
+                if (index > 16) Color = "white";
+                else Color = "black";
+
+                if (color != Color) {
+                    // legal move since it is the enemy's piece
+                    possibleMoves.emplace_back(newRow, newCol, true, "");
+                }
+            }
+        }
+    }
+    else if (Class == "king") {
+        // vector of all possible moves here (could be illegal)
+        std::vector<std::pair<int, int>> moves;
+
+        // adds all possible moves
+        int new_col_up = col - 1;
+        int new_col_down = col + 1;
+
+        int new_row_left = row - 1;
+        int new_row_right = row + 1;
+
+        moves.emplace_back(row, new_col_up);
+        moves.emplace_back(row, new_col_down);
+
+        moves.emplace_back(new_row_right, col);
+        moves.emplace_back(new_row_left, col);
+
+        moves.emplace_back(new_row_right, new_col_down);
+        moves.emplace_back(new_row_right, new_col_up);
+
+        moves.emplace_back(new_row_left, new_col_down);
+        moves.emplace_back(new_row_left, new_col_up);
+
+        int newRow;
+        int newCol;
+        for (std::pair<int, int> pair : moves) {
+            newRow = pair.first;
+            newCol = pair.second;
+
+            // makes sure its in bounds
+            if (newRow < 0 || newRow > 7 || newCol < 0 || newCol > 7) continue;
+
+            // checks if the move is legal
+
+            if (BoardLoc.find({ newRow,newCol }) == BoardLoc.end()) {
+                // open space
+                possibleMoves.emplace_back(newRow, newCol, false, "");
+            }
+            else {
+                // check if it's the enemy's piece
+
+                // get the index
+                int index = BoardLoc[{newRow, newCol}];
+
+                // color
+                std::string Color;
+
+                if (index > 16) Color = "white";
+                else Color = "black";
+
+                if (color != Color) {
+                    // legal move since it is the enemy's piece
+                    possibleMoves.emplace_back(newRow, newCol, true, "");
+                }
+            }
+        }
+
+    }
+    else if (Class == "queen") {
+        // loop through all the possible moves a rook can move up/down/left/right
+        int newRow;
+        int newCol;
+
+        // boolean variables to determine whether we should continue going a specific direction
+        // this is useful because if it is going up and sees an obstacle it can not go up further
+        // so this is the indicator to not go up anymore
+        bool goUp = true;
+        bool goDown = true;
+        bool goRight = true;
+        bool goLeft = true;
+        bool goTopLeft = true;
+        bool goBtmRight = true;
+        bool goTopRight = true;
+        bool goBtmLeft = true;
+
+        // vector of all possible moves here (could be illegal)
+        std::vector<std::pair<int, int>> moves;
+
+        for (int i = 1; i <= 8; i++) {
+
+            // up
+            newRow = row - i;
+            newCol = col;
+
+            // add to moves vector
+            moves.emplace_back(newRow, newCol);
+
+            // down
+            newRow = row + i;
+            newCol = col;
+
+            moves.emplace_back(newRow, newCol);
+
+            // right
+            newRow = row;
+            newCol = col + i;
+
+            moves.emplace_back(newRow, newCol);
+
+            // left
+            newRow = row;
+            newCol = col - i;
+
+            moves.emplace_back(newRow, newCol);
+
+            // up left
+            newRow = row - i;
+            newCol = col - i;
+
+
+            // add to moves vector
+            moves.emplace_back(newRow, newCol);
+
+            // down right
+            newRow = row + i;
+            newCol = col + i;
+
+            moves.emplace_back(newRow, newCol);
+
+            // down right
+            newRow = row - i;
+            newCol = col + i;
+
+            moves.emplace_back(newRow, newCol);
+
+            // down left
+            newRow = row + i;
+            newCol = col - i;
+
+            moves.emplace_back(newRow, newCol);
+        }
+        // iterate through the possible moves to find which ones are legal
+        for (int i = 0; i < moves.size(); i++) {
+            std::pair<int, int> pair = moves[i];
+            newRow = pair.first;
+            newCol = pair.second;
+
+            // makes sure its in bounds
+            if (newRow < 0 || newRow > 7 || newCol < 0 || newCol > 7) continue;
+
+            // determine which direction it is going
+            // we do this by looking at the remainder (1 = up, 2 = down, 3 = right, 4 = left, 5 topRight...)
+            Direction dir = Direction((i + 8) % 8);
+
+            // check to see if we can keep going that direction
+            if (dir == Up && !goUp || dir == Down && !goDown || dir == Right && !goRight || dir == Left && !goLeft || dir == topLeft && !goTopLeft || dir == topRight && !goTopRight ||
+            dir == bottomLeft && !goBtmLeft || dir == bottomRight && !goBtmRight) continue;
+
+            // check if the move is legal
+            bool legal = true;
+
+            // if there is nothing in the square
+            if (BoardLoc.find({ newRow,newCol }) == BoardLoc.end()) {
+                possibleMoves.emplace_back(newRow, newCol, false, "");
+            }
+            // if there is a piece on the square
+            else {
+                // make sure its the enemies
+
+                // get the index
+                int index = BoardLoc[{newRow, newCol}];
+
+                // color
+                std::string Color;
+
+                if (index > 16) Color = "white";
+                else Color = "black";
+
+                if (color != Color) {
+                    // legal move since it is the enemy's piece
+                    possibleMoves.emplace_back(newRow, newCol, true, "");
+                }
+                legal = false;
+            }
+            if (!legal) {
+                // we make it illegal to go that direction
+                if (dir == Up) goUp = false;
+                else if (dir == Down) goDown = false;
+                else if (dir == Right) goRight = false;
+                else if (dir == Left) goLeft = false;
+                else if (dir == topLeft) goTopLeft = false;
+                else if (dir == topRight) goTopRight = false;
+                else if (dir == bottomLeft) goBtmLeft = false;
+                else if (dir == bottomRight) goBtmRight = false;
+            }
+        }
+    }
+
+    else if (Class == "bishop") {
+        // loop through all the possible moves a bishop can move up/down/left/right
+        int newRow;
+        int newCol;
+
+        // boolean variables to determine whether we should continue going a specific direction
+        // this is useful because if it is going up and sees an obstacle it can not go up further
+        // so this is the indicator to not go up anymore
+        bool goUp = true;
+        bool goDown = true;
+        bool goRight = true;
+        bool goLeft = true;
+
+        // vector of all possible moves here (could be illegal)
+        std::vector<std::pair<int, int>> moves;
+
+        for (int i = 1; i <= 8; i++) {
+
+            // up left
+            newRow = row - i;
+            newCol = col - i;
+
+            // add to moves vector
+            moves.emplace_back(newRow, newCol);
+
+            // down right
+            newRow = row + i;
+            newCol = col + i;
+
+            moves.emplace_back(newRow, newCol);
+
+            // down right
+            newRow = row - i;
+            newCol = col + i;
+
+            moves.emplace_back(newRow, newCol);
+
+            // down left
+            newRow = row + i;
+            newCol = col - i;
+
+            moves.emplace_back(newRow, newCol);
+
+        }
+
+        // iterate through the possible moves to find which ones are legal
+        for (int i = 0; i < moves.size(); i++) {
+            std::pair<int, int> pair = moves[i];
+            newRow = pair.first;
+            newCol = pair.second;
+
+            // determine which direction it is going
+            // we do this by looking at the remainder (1 = up, 2 = down, 3 = right, 4 = left)
+            Direction dir = Direction((i + 4) % 4);
+
+            // makes sure its in bounds
+            if (newRow < 0 || newRow > 7 || newCol < 0 || newCol > 7) continue;
+
+            // check to see if we can keep going that direction
+            if (dir == Up && !goUp || dir == Down && !goDown || dir == Right && !goRight || dir == Left && !goLeft) continue;
+
+            // check if the move is legal
+            bool legal = true;
+
+            // if there is nothing in the square
+            if (BoardLoc.find({ newRow,newCol }) == BoardLoc.end()) {
+                possibleMoves.emplace_back(newRow, newCol, false, "");
+            }
+            // if there is a piece on the square
+            else {
+                // make sure its the enemies
+
+                // get the index
+                int index = BoardLoc[{newRow, newCol}];
+
+                // color
+                std::string Color;
+
+                if (index > 16) Color = "white";
+                else Color = "black";
+
+                if (color != Color) {
+                    // legal move since it is the enemies piece
+                    possibleMoves.emplace_back(newRow, newCol, true, "");
+                }
+                legal = false;
+            }
+            if (!legal) {
+                // we make it illegal to go that direction
+                if (dir == Up) goUp = false;
+                else if (dir == Down) goDown = false;
+                else if (dir == Right) goRight = false;
+                else if (dir == Left) goLeft = false;
+            }
+        }
+    }
+    //
+    //	for (std::tuple<int, int,bool> pair : possibleMoves) {
+    //	    SDL_Rect rect{ std::get<1>(pair) * inter + inter / 4 ,std::get<0>(pair) * inter + inter / 4 , inter / 4, inter / 4 };
+    //		SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
+    //		SDL_RenderFillRect(renderer, &rect);
+    //	}
+
+
+    //	SDL_RenderPresent(renderer);
+    return possibleMoves;
 }

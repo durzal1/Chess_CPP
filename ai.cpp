@@ -5,119 +5,173 @@
 #include "ai.h"
 
 ai::ai(board Board, int maxDepth) {
-	// gets the max depth recursive function will go to (+1 is to make depth more accurate)
-	this->maxDepth = maxDepth;
+    // gets the max depth recursive function will go to (+1 is to make depth more accurate)
+    this->maxDepth = maxDepth;
 
-	/// HERE ADD A FOR LOOP TO GO THROUGH EVERY PIECE AND ITS MOVES FIRST
+    /// HERE ADD A FOR LOOP TO GO THROUGH EVERY PIECE AND ITS MOVES FIRST
 
-	int total = 0;
-	for (int index : Board.whitePieces) {
+    int total = 0;
+    for (int index : Board.whitePieces) {
 
-		int addTotal = 0;
+        int addTotal = 0;
 
-		// class of piece
-		std::string className = Board.IndClass[index - 1];
+        // class of piece
+        std::string className = Board.IndClass[index - 1];
 
-		// gets its row and column
-		std::pair<int, int> newCords = Board.PieceLoc[index];
+        // gets its row and column
+        std::pair<int, int> newCords = Board.PieceLoc[index];
 
-		int row = newCords.first;
-		int col = newCords.second;
+        int row = newCords.first;
+        int col = newCords.second;
 
-		std::vector<std::tuple<int, int, bool>> moves = posMoves(className, row, col, "white", Board); // , Board.renderer
+        std::vector<std::tuple<int, int, bool, std::string>> moves = posMoves(className, row, col, "white", Board); // , Board.renderer
 
-		// the bool is not yet implemented, states whether the move will cause a capture
-		for (auto move : moves) {
-			int row_ = std::get<0>(move);
-			int col_ = std::get<1>(move);
-			bool Captured = std::get<2>(move);
+        // the bool is not yet implemented, states whether the move will cause a capture
+        for (auto move : moves) {
+            int row_ = std::get<0>(move);
+            int col_ = std::get<1>(move);
+            bool Captured = std::get<2>(move);
 
-			getScores(Board, index, "black", 1, row_, col_, Captured, addTotal);
-		}
-		total += addTotal;
-	}
-	std::cout << total;
+            getScores(Board, index, "black", 1, row_, col_, Captured, addTotal, "");
+        }
+        total += addTotal;
+    }
+    std::cout << total;
 
 }
 
-void ai::getScores(board Board, int index, std::string color, int depth, int Row, int Col, bool captured, int& totalMoves) {
+void ai::getScores(board Board, int index, std::string color, int depth, int Row, int Col, bool captured, int& totalMoves, std::string castle) {
 
-	// get next color
-	std::string nextColor;
+    // get next color
+    std::string nextColor;
 
-	auto pieces = Board.whitePieces; // pieces store current color pieces being searched, white by default
-	auto opposingPieces = Board.blackPieces;
-	if (color == "black") {
-		nextColor = "white";
-		if (captured) { // black piece was captured on the last turn by white since it is black's turn now
-			// gets index of black piece
-			int ind = Board.BoardLoc[{Row, Col}];
+    auto pieces = Board.whitePieces; // pieces store current color pieces being searched, white by default
+    auto opposingPieces = Board.blackPieces;
+    if (color == "black") {
+        nextColor = "white";
+        if (captured) { // black piece was captured on the last turn by white since it is black's turn now
+            // gets index of black piece
+            int ind = Board.BoardLoc[{Row, Col}];
 
-			// erases it
-			Board.whitePieces.erase(ind);
+            // erases it
+            Board.whitePieces.erase(ind);
 
-			//			Board.blackPieces.erase(Board.blackPieces.begin() + Board.BoardLoc[{Row, Col}] - 2);
-		}
-		pieces = Board.blackPieces;
-		opposingPieces = Board.whitePieces;
-	}
-	else {
-		nextColor = "black";
-		if (captured) { // white piece was captured on the last turn by black since it is white's turn now
-			// gets index of white piece and erases it
-			int ind = Board.BoardLoc[{Row, Col}];
+            //			Board.blackPieces.erase(Board.blackPieces.begin() + Board.BoardLoc[{Row, Col}] - 2);
+        }
+        pieces = Board.blackPieces;
+        opposingPieces = Board.whitePieces;
+    }
+    else {
+        nextColor = "black";
+        if (captured) { // white piece was captured on the last turn by black since it is white's turn now
+            // gets index of white piece and erases it
+            int ind = Board.BoardLoc[{Row, Col}];
 
-			// erases it
-			Board.whitePieces.erase(ind);
-		}
-	}
+            // erases it
+            Board.whitePieces.erase(ind);
+        }
+    }
+    // checks if the move is a castle
+    if (!castle.empty()){
+        // checks where the castle is located
+        if (castle == "whiteLeft"){
+            // deletes the old positions of king and rook
+            Board.BoardLoc.erase({ 7, 4 });
+            Board.BoardLoc.erase({ 7, 0 });
 
+            // update the row and column in data classes
+            Board.PieceLoc[17] = { 7, 3 };
+            Board.BoardLoc[{7, 3}] = 17;
+
+            Board.PieceLoc[21] = { 7, 2 };
+            Board.BoardLoc[{7, 2}] = 21;
+
+        }else if (castle == "whiteRight"){
+            // deletes the old positions of king and rook
+            Board.BoardLoc.erase({ 7, 4 });
+            Board.BoardLoc.erase({ 7, 7 });
+
+            // update the row and column in data classes
+            Board.PieceLoc[24] = { 7, 5 };
+            Board.BoardLoc[{7, 5}] = 24;
+
+            Board.PieceLoc[21] = { 7, 6 };
+            Board.BoardLoc[{7, 6}] = 21;
+        }else if (castle == "blackLeft"){
+            // deletes the old positions of king and rook
+            Board.BoardLoc.erase({ 0, 0 });
+            Board.BoardLoc.erase({ 0, 4 });
+
+            // update the row and column in data classes
+            Board.PieceLoc[1] = { 0, 3};
+            Board.BoardLoc[{0, 3}] = 1;
+
+            Board.PieceLoc[5] = { 0, 2};
+            Board.BoardLoc[{0, 2}] = 5;
+        }
+        else if (castle == "blackRight"){
+            // deletes the old positions of king and rook
+            Board.BoardLoc.erase({ 0, 7});
+            Board.BoardLoc.erase({ 0, 4 });
+
+            // update the row and column in data classes
+            Board.PieceLoc[7] = { 0, 5};
+            Board.BoardLoc[{0, 5}] = 7;
+
+            Board.PieceLoc[5] = { 0, 6};
+            Board.BoardLoc[{0, 6}] = 5;
+        }
+        else{
+            std::cout << "broken fix castle";
+        }
+        std::cout<< "F";
+    }
     // not a castle move
+    else{
+        // set the old cord to have no piece inside of it
+        std::pair<int, int> oldCords = Board.PieceLoc[index];
 
-    // set the old cord to have no piece inside of it
-    std::pair<int, int> oldCords = Board.PieceLoc[index];
+        // deletes the key
+        Board.BoardLoc.erase({ oldCords.first, oldCords.second });
 
-	// deletes the key
-	Board.BoardLoc.erase({ oldCords.first, oldCords.second });
-
-	// update the row and column in data classes
-	Board.PieceLoc[index] = { Row, Col };
-	Board.BoardLoc[{Row, Col}] = index;
+        // update the row and column in data classes
+        Board.PieceLoc[index] = { Row, Col };
+        Board.BoardLoc[{Row, Col}] = index;
+    }
 
 
+    //// REMOVE THIS LATER IT IS FOR TESTING ONLY AND USES A LOT OF MEMORY
+    //	Board.createBoard();
 
-	//// REMOVE THIS LATER IT IS FOR TESTING ONLY AND USES A LOT OF MEMORY
-//	Board.createBoard();
+    // puts the base case later so it can the piece can do the move before it ends returns
+    if (depth == maxDepth) {
+        totalMoves++;
+        return;
+    }
 
-	// puts the base case later so it can the piece can do the move before it ends returns
-	if (depth == maxDepth) {
-		totalMoves++;
-		return;
-	}
-//
-//	// if its a king that moved or one of rooks then player or ai lost their right to castle
-//	if (Board.IndClass[index-1] == "king"){
-//	    if (color == "white"){
-//	        Board.whiteCastleRight = false;
-//	        Board.whiteCastleLeft = false;
-//	    }else{
-//	        Board.blackCastleRight = false;
-//	        Board.blackCastleLeft = false;
-//	    }
-//	}
-//	else if (Board.IndClass[index-1] == "rook"){
-//	    if (color == "white"){
-//	        // check which side it is on
-//            if (index == 17) Board.whiteCastleLeft = false;
-//	        else if (index == 24) Board.whiteCastleRight = false;
-//	    }else{
-//	        if (index == 1) Board.blackCastleLeft = false;
-//            else if (index == 7)Board.blackCastleRight = false;
-//	    }
-//	}
-	/// if there is check i am not going to look to see if castle can help it
+    // if its a king that moved or one of rooks then player or ai lost their right to castle
+    if (Board.IndClass[index-1] == "king"){
+        if (color == "white"){
+            Board.whiteCastleRight = false;
+            Board.whiteCastleLeft = false;
+        }else{
+            Board.blackCastleRight = false;
+            Board.blackCastleLeft = false;
+        }
+    }
+    else if (Board.IndClass[index-1] == "rook"){
+        if (color == "white"){
+            // check which side it is on
+            if (index == 17) Board.whiteCastleLeft = false;
+            else if (index == 24) Board.whiteCastleRight = false;
+        }else{
+            if (index == 1) Board.blackCastleLeft = false;
+            else if (index == 7)Board.blackCastleRight = false;
+        }
+    }
+    /// if there is check i am not going to look to see if castle can help it
 
-	// index of king
+    // index of king
     int kingInd;
     if (color == "black") kingInd = 5;
     else kingInd = 21;
@@ -130,162 +184,162 @@ void ai::getScores(board Board, int index, std::string color, int depth, int Row
 
     // check all of opposite color's moves in case of check
     // moves correlates to the amount of pieces that can kill the king
-//    int moves = kingAttacks(Board, color, row, col);
+    int moves = kingAttacks(Board, color, row, col);
 
-	// here any move can help get out of check
-//	if (moves == 1) {
-//	    bool checkMate = true;
-//		// iterate through each piece
-//		for (int piece : pieces) {
-//			std::string className = Board.IndClass[piece - 1];
-//
-//			// gets its row and column
-//			std::pair<int, int> NewCords = Board.PieceLoc[piece];
-//
-//			int Row_ = NewCords.first;
-//			int Col_ = NewCords.second;
-//
-//			std::vector<std::tuple<int, int, bool, std::string>> Moves = posMoves(className, Row_, Col_, color, Board); // Board.renderer
-//
-//
-//			for (auto move : Moves) {
-//
-//				int row_ = std::get<0>(move);
-//				int col_ = std::get<1>(move);
-//				bool Captured = std::get<2>(move);
-//				std::string Castle = std::get<3>(move);
-//
-//				// castle is possible but again i don't want to deal with this for now
-//				if (!Castle.empty()) continue;
-//
-//				if (!moveCheck(Board, color, piece, row_, col_, Captured)) { // if not in check after move (valid)
-//					checkMate = false;
-//					getScores(Board, piece, nextColor, depth + 1, row_, col_, Captured, totalMoves, "");
-//				}
-//			}
-//		}
-//		if (checkMate){
-//		    // add one to moves and return since the game is over
-//		    totalMoves++;
-//		    return;
-//		}
-//	}
-//
-//	// here only the king is allowed to move
-//	else if (moves == 2){
-//	    std::string className = Board.IndClass[kingInd - 1];
-//
-//	    // gets its row and column
-//	    std::pair<int, int> newCords = Board.PieceLoc[kingInd];
-//
-//	    int row = newCords.first;
-//	    int col = newCords.second;
-//
-//	    std::vector<std::tuple<int, int, bool, std::string>> moves = posMoves(className, row, col, color, Board);
-//
-//	    bool checkMate = true;
-//	    for (auto move:moves){
-//	        int row_ = std::get<0>(move);
-//	        int col_ = std::get<1>(move);
-//	        bool Captured = std::get<2>(move);
-//	        std::string Castle = std::get<3>(move);
-//
-//	        // castle is possible but again i don't want to deal with this for now
-//            if (!Castle.empty()) continue;
-//
-//	        if (!moveCheck(Board, color, kingInd, row_, col_, Captured)) { // if not in check after move (valid)
-//	            checkMate = false;
-//	            getScores(Board, kingInd, nextColor, depth + 1, row_, col_, Captured, totalMoves, "");
-//	        }
-//	    }
-//	    if (checkMate){
-//	        // add one to moves and return since the game is over
-//	        totalMoves++;
-//	        return;
-//	    }
-//	}
-	// no check to worry about
-	if (true) {
+//     here any move can help get out of check
+    	if (moves == 1) {
+    	    bool checkMate = true;
+    		// iterate through each piece
+    		for (int piece : pieces) {
+    			std::string className = Board.IndClass[piece - 1];
 
-		// class of piece
-		for (auto piece : pieces) {
-			std::string className = Board.IndClass[piece - 1];
+    			// gets its row and column
+    			std::pair<int, int> NewCords = Board.PieceLoc[piece];
 
-			// gets its row and column
-			std::pair<int, int> NewCords = Board.PieceLoc[piece];
+    			int Row_ = NewCords.first;
+    			int Col_ = NewCords.second;
 
-			int row1 = NewCords.first;
-			int col1 = NewCords.second;
+    			std::vector<std::tuple<int, int, bool, std::string>> Moves = posMoves(className, Row_, Col_, color, Board); // Board.renderer
 
-			std::vector<std::tuple<int, int, bool>> Moves = posMoves(className, row1, col1, color, Board); // , Board.renderer
 
-			// iterate through all of the moves
-			for (auto move : Moves) {
-				int row_ = std::get<0>(move);
-				int col_ = std::get<1>(move);
-				bool Captured = std::get<2>(move);
-//				std::string Castle = std::get<3>(move);
+    			for (auto move : Moves) {
 
-				getScores(Board, piece, nextColor, depth + 1, row_, col_, Captured, totalMoves);
+    				int row_ = std::get<0>(move);
+    				int col_ = std::get<1>(move);
+    				bool Captured = std::get<2>(move);
+    				std::string Castle = std::get<3>(move);
 
-			}
-		}
-	}
+    				// castle is possible but again i don't want to deal with this for now
+    				if (!Castle.empty()) continue;
+
+    				if (!moveCheck(Board, color, piece, row_, col_, Captured)) { // if not in check after move (valid)
+    					checkMate = false;
+    					getScores(Board, piece, nextColor, depth + 1, row_, col_, Captured, totalMoves, "");
+    				}
+    			}
+    		}
+    		if (checkMate){
+    		    // add one to moves and return since the game is over
+    		    totalMoves++;
+    		    return;
+    		}
+    	}
+
+    	// here only the king is allowed to move
+    	else if (moves == 2){
+    	    std::string className = Board.IndClass[kingInd - 1];
+
+    	    // gets its row and column
+    	    std::pair<int, int> newCords = Board.PieceLoc[kingInd];
+
+    	    int row = newCords.first;
+    	    int col = newCords.second;
+
+    	    std::vector<std::tuple<int, int, bool, std::string>> moves = posMoves(className, row, col, color, Board);
+
+    	    bool checkMate = true;
+    	    for (auto move:moves){
+    	        int row_ = std::get<0>(move);
+    	        int col_ = std::get<1>(move);
+    	        bool Captured = std::get<2>(move);
+    	        std::string Castle = std::get<3>(move);
+
+    	        // castle is possible but again i don't want to deal with this for now
+                if (!Castle.empty()) continue;
+
+    	        if (!moveCheck(Board, color, kingInd, row_, col_, Captured)) { // if not in check after move (valid)
+    	            checkMate = false;
+    	            getScores(Board, kingInd, nextColor, depth + 1, row_, col_, Captured, totalMoves, "");
+    	        }
+    	    }
+    	    if (checkMate){
+    	        // add one to moves and return since the game is over
+    	        totalMoves++;
+    	        return;
+    	    }
+    	}
+//     no check to worry about
+    else {
+
+        // class of piece
+        for (auto piece : pieces) {
+            std::string className = Board.IndClass[piece - 1];
+
+            // gets its row and column
+            std::pair<int, int> NewCords = Board.PieceLoc[piece];
+
+            int row1 = NewCords.first;
+            int col1 = NewCords.second;
+
+            std::vector<std::tuple<int, int, bool, std::string>> Moves = posMoves(className, row1, col1, color, Board); // , Board.renderer
+
+            // iterate through all of the moves
+            for (auto move : Moves) {
+                int row_ = std::get<0>(move);
+                int col_ = std::get<1>(move);
+                bool Captured = std::get<2>(move);
+                std::string Castle = std::get<3>(move);
+
+                getScores(Board, piece, nextColor, depth + 1, row_, col_, Captured, totalMoves, "");
+
+            }
+        }
+    }
 
 }
 
 bool ai::moveCheck(board Board, std::string color, int index, int row, int col, bool captured) {
 
-	auto opposingPieces = Board.whitePieces;
-	if (color == "black") {
+    auto opposingPieces = Board.whitePieces;
+    if (color == "black") {
 
-		if (captured) { // black piece was captured on the last turn by white since it is black's turn now
-			// gets index of black piece
-			int ind = Board.BoardLoc[{row, col}];
+        if (captured) { // black piece was captured on the last turn by white since it is black's turn now
+            // gets index of black piece
+            int ind = Board.BoardLoc[{row, col}];
 
-			// erases it
-			Board.whitePieces.erase(ind);
+            // erases it
+            Board.whitePieces.erase(ind);
 
-			//			Board.blackPieces.erase(Board.blackPieces.begin() + Board.BoardLoc[{Row, Col}] - 2);
-		}
-		opposingPieces = Board.blackPieces;
-	}
-	else {
+            //			Board.blackPieces.erase(Board.blackPieces.begin() + Board.BoardLoc[{Row, Col}] - 2);
+        }
+        opposingPieces = Board.blackPieces;
+    }
+    else {
 
-		if (captured) { // white piece was captured on the last turn by black since it is white's turn now
-			// gets index of white piece and erases it
-			int ind = Board.BoardLoc[{row, col}];
+        if (captured) { // white piece was captured on the last turn by black since it is white's turn now
+            // gets index of white piece and erases it
+            int ind = Board.BoardLoc[{row, col}];
 
-			// erases it
-			Board.whitePieces.erase(ind);
-		}
-	}
+            // erases it
+            Board.whitePieces.erase(ind);
+        }
+    }
 
-	// set the old cord to have no piece inside of it
-	std::pair<int, int> oldCords = Board.PieceLoc[index];
+    // set the old cord to have no piece inside of it
+    std::pair<int, int> oldCords = Board.PieceLoc[index];
 
-	// deletes the key
-	Board.BoardLoc.erase({ oldCords.first, oldCords.second });
+    // deletes the key
+    Board.BoardLoc.erase({ oldCords.first, oldCords.second });
 
-	// update the row and column in data classes
-	Board.PieceLoc[index] = { row, col };
-	Board.BoardLoc[{row, col}] = index;
+    // update the row and column in data classes
+    Board.PieceLoc[index] = { row, col };
+    Board.BoardLoc[{row, col}] = index;
 
-	// index of king
-	int kingInd;
-	if (color == "black") kingInd = 5;
-	else kingInd = 21;
+    // index of king
+    int kingInd;
+    if (color == "black") kingInd = 5;
+    else kingInd = 21;
 
 
-	// gets its row and column
-	std::pair<int, int> newCords = Board.PieceLoc[kingInd];
-	row = newCords.first;
-	col = newCords.second;
+    // gets its row and column
+    std::pair<int, int> newCords = Board.PieceLoc[kingInd];
+    row = newCords.first;
+    col = newCords.second;
 
-	int moves = kingAttacks(Board, color, row, col);
+    int moves = kingAttacks(Board, color, row, col);
 
-	if (moves == 0) return false;
-	else return true;
+    if (moves == 0) return false;
+    else return true;
 }
 
 int ai::kingAttacks(board Board, std::string color, int row, int col) {

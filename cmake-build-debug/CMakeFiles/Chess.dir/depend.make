@@ -11,6 +11,7 @@ CMakeFiles/Chess.dir/board.cpp.obj: \
  ../board.cpp \
  ../board.h
 CMakeFiles/Chess.dir/getPossibleMoves.cpp.obj: \
+ ../board.h \
  ../getPossibleMoves.cpp \
  ../getPossibleMoves.h \
  ../types.h

@@ -43,7 +43,7 @@ public:
     // @param captured, checks if piece is captured by its move
     // @param totalMoves, for debugging checks how many moves have occured
     // @param string castle, this is a string that tells if the move is a castle
-    void getScores(board Board, int index, std::string color, int depth, int row, int col, bool captured, int &totalMoves) ;
+    void getScores(board Board, int index, std::string color, int depth, int row, int col, bool captured, int &totalMoves, std::string castle) ;
 
     // function to check if the move will stop the check
     // @return whether it is still check

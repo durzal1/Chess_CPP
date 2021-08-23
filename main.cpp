@@ -24,7 +24,7 @@ int main(int argc, char* argv[]) {
 //    SDL_Renderer* renderer = NULL;
 //
 //    SDL_Init(SDL_INIT_VIDEO);
-
+//
 //    win = SDL_CreateWindow("Hello World", posX, posY, width, height, 0);
 //    renderer = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED);
 
