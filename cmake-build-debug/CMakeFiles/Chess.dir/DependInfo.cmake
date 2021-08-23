@@ -12,6 +12,7 @@ set(CMAKE_DEPENDS_CHECK_CXX
   "C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/board.cpp" "C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/cmake-build-debug/CMakeFiles/Chess.dir/board.cpp.obj"
   "C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/getPossibleMoves.cpp" "C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/cmake-build-debug/CMakeFiles/Chess.dir/getPossibleMoves.cpp.obj"
   "C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/main.cpp" "C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/cmake-build-debug/CMakeFiles/Chess.dir/main.cpp.obj"
+  "C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/piece.cpp" "C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/cmake-build-debug/CMakeFiles/Chess.dir/piece.cpp.obj"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 

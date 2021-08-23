@@ -6,5 +6,5 @@ CXX_DEFINES =
 
 CXX_INCLUDES = @CMakeFiles/Chess.dir/includes_CXX.rsp
 
-CXX_FLAGS =  -std=c++11 -lmingw32 -g -std=gnu++14
+CXX_FLAGS = -g -std=gnu++14
 

@@ -3,6 +3,7 @@ file(REMOVE_RECURSE
   "CMakeFiles/Chess.dir/board.cpp.obj"
   "CMakeFiles/Chess.dir/getPossibleMoves.cpp.obj"
   "CMakeFiles/Chess.dir/main.cpp.obj"
+  "CMakeFiles/Chess.dir/piece.cpp.obj"
   "Chess.exe"
   "Chess.exe.manifest"
   "Chess.pdb"

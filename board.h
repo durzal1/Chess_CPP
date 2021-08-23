@@ -23,7 +23,8 @@ for kevin
 #include <map>
 #include <vector>
 #include <unordered_set>
-
+#include "types.h"
+#include "piece.h"
 
 class board{
 private:
@@ -55,7 +56,8 @@ private:
 //    // vector of textures
 //    std::vector<SDL_Texture*> textures;
 
-
+    // vector of castle bool vars that it has done recently(and will have to undo)
+    std::vector<bool> castles;
 
 public:
     // if right has the  right to castle (right rook and king hasnt moved)
@@ -83,7 +85,7 @@ public:
     std::map<std::pair<int,int>,int> BoardLoc;
 
     // class of each index (DOES NOT UPDATE IF PIECE DIES)
-    std::vector<std::string>IndClass;
+    std::vector<PieceTypes>IndClass;
 
     // indexes of living white pieces (iterate through this for moves)
     std::unordered_set<int> whitePieces;
@@ -91,6 +93,8 @@ public:
     // indexes of living black pieces (iterate through this for moves)
     std::unordered_set<int> blackPieces;
 
+    // array of the board
+    piece boardArr[8][8];
 
     // constructor
     board(int width); // SDL_Window* win, SDL_Renderer* renderer1,
@@ -100,5 +104,13 @@ public:
 
     // inits the pieces in their respective data classes
     void createPieces();
+
+    // @returns the piece that used to be there
+    // does the move
+    piece move(piece &Piece);
+
+    // undoes the move
+    void undoMove(piece &Piece, piece oldPiece);
+
 };
 #endif //CHESS_CPP_BOARD_H

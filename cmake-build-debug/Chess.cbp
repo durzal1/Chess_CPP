@@ -103,6 +103,12 @@
 		<Unit filename="C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/main.cpp">
 			<Option target="Chess"/>
 		</Unit>
+		<Unit filename="C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/piece.cpp">
+			<Option target="Chess"/>
+		</Unit>
+		<Unit filename="C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/piece.h">
+			<Option target="Chess"/>
+		</Unit>
 		<Unit filename="C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/types.h">
 			<Option target="Chess"/>
 		</Unit>

@@ -21,11 +21,17 @@ for kevin
 */
 #include "types.h"
 #include "board.h"
+#include "piece.h"
 // @returns the all legal moves a piece can do
 // @param int, row of the move
 // @param int, col of the move
 // @param bool, if the move captures another piece
 // @param string, either empty or castle location ex. "whiteLeft"
-std::vector<std::tuple<int, int, bool, std::string>> posMoves(std::string Class,int row, int col, std::string color,board Board); //, SDL_Renderer* renderer
+void posMoves(piece Piece, board Board, std::vector<piece> &moves, Mode mode); //, SDL_Renderer* renderer
 
+std::vector<piece> allPosMoves(board b, Color color);
+
+std::vector<piece> allCaptures(board b, Color color);
+
+std::vector<piece> noCaptures(board b, Color color);
 #endif //CHESS_GETPOSSIBLEMOVES_H

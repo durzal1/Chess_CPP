@@ -224,6 +224,30 @@ main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\Chess.dir\build.make CMakeFiles/Chess.dir/main.cpp.s
 .PHONY : main.cpp.s
 
+piece.obj: piece.cpp.obj
+.PHONY : piece.obj
+
+# target to build an object file
+piece.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Chess.dir\build.make CMakeFiles/Chess.dir/piece.cpp.obj
+.PHONY : piece.cpp.obj
+
+piece.i: piece.cpp.i
+.PHONY : piece.i
+
+# target to preprocess a source file
+piece.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Chess.dir\build.make CMakeFiles/Chess.dir/piece.cpp.i
+.PHONY : piece.cpp.i
+
+piece.s: piece.cpp.s
+.PHONY : piece.s
+
+# target to generate assembly for a file
+piece.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Chess.dir\build.make CMakeFiles/Chess.dir/piece.cpp.s
+.PHONY : piece.cpp.s
+
 # Help Target
 help:
 	@echo The following are some of the valid targets for this Makefile:
@@ -245,6 +269,9 @@ help:
 	@echo ... main.obj
 	@echo ... main.i
 	@echo ... main.s
+	@echo ... piece.obj
+	@echo ... piece.i
+	@echo ... piece.s
 .PHONY : help
 
 

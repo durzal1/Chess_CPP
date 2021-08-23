@@ -6,7 +6,8 @@
 #define CHESS_AI_H
 #include "board.h"
 #include "getPossibleMoves.h"
-
+#include "piece.h"
+#include "types.h"
 /* zacky
 
 #include <bits/stdc++.h>
@@ -16,8 +17,7 @@
 kevin
 */
 #include <iostream>
-
-
+#include <set>
 class ai{
 private:
     int maxDepth;
@@ -27,8 +27,6 @@ private:
 
     bool CheckMate = false;
 public:
-    std::string winner;
-
     // constructor (dont know what to put here yet)
     ai(board Board, int maxDepth);
 
@@ -47,10 +45,12 @@ public:
 
     // function to check if the move will stop the check
     // @return whether it is still check
-    bool moveCheck(board Board, std::string curr_color, int index, int row, int col, bool captured);
+    bool moveCheck(board b, piece Piece, int kingMoves);
 
     // function that looks at all squares that can attack the king and determines if the piece there can do the attack
     // @return number of pieces that can attack the king (0,1,2)
-    int kingAttacks(board Board, std::string curr_color, int row, int col);
+    int kingAttacks(board Board, piece Piece);
+
+    U64 perft(board b, int depth, bool print, Color color);
 };
 #endif //CHESS_AI_H

@@ -1,111 +1,197 @@
-
 //
-// Created by zacky on 8/16/2021.
+////
+//// Created by zacky on 8/16/2021.
+////
 //
-
 #include "getPossibleMoves.h"
+std::vector<piece> allPosMoves(board b, Color color){
+    std::vector<piece> moves;
+    for (int i = 0; i < 8 ; i++){
+        for (int j = 0; j < 8; j++){
+            piece type = b.boardArr[j][i];
+            if (type.color == color && type.type != NONE) posMoves(type, b, moves,everything);
+        }
+    }
+    return moves;
+}
 
-std::vector<std::tuple<int, int, bool, std::string>> posMoves(std::string Class, int row, int col, std::string color, board Board) { // , SDL_Renderer* renderer
-    // gets data needed
-    auto BoardLoc = Board.BoardLoc;
+// only gets the captures
+std::vector<piece> allCaptures(board b, Color color){
+    std::vector<piece> moves;
+    for (int i = 0; i < 8 ; i++){
+        for (int j = 0; j < 8; j++){
+            piece type = b.boardArr[i][j];
+            posMoves(type, b, moves, captures);
+        }
+    }
+    return moves;
+}
 
-    // vector with all legal moves
-    std::vector<std::tuple<int, int, bool, std::string>> possibleMoves;
+// only gets nonCaptures
+std::vector<piece> noCaptures(board b, Color color){
+    std::vector<piece> moves;
+    for (int i = 0; i < 8 ; i++){
+        for (int j = 0; j < 8; j++){
+            piece type = b.boardArr[i][j];
+            posMoves(type, b, moves, nonCaptures);
+        }
+    }
+    return moves;
+}
+
+// directly adds moves to the moves vector in allPosMoves
+void posMoves(piece Piece,board b, std::vector<piece> &allMoves, Mode mode) { // , SDL_Renderer* renderer
+
+    // sets variables of the piece
+    auto Class = Piece.type;
+    Color color = Piece.color;
+
+    row Row = Piece.curRow;
+    col Col = Piece.curCol;
+
+    auto Board = b.boardArr;
 
     // checks what class it is and gives the moves accordingly
-    if (Class == "pawn") {
-        if (color == "black") {
+    if (Class == PAWN) {
+        if (color == black) {
             // checks if its on the starting row
-            if (row == 1) {
+            if (Row == 1) {
                 // lets it moves two moves ahead
 
                 // gets the cords of two moves ahead
-                int newRow = row + 2;
-                int newCol = col;
+                int newRow = Row + 2;
+                int newCol = Col;
 
-                if (BoardLoc.find({ newRow,newCol }) == BoardLoc.end()) {
+                if (Board[newRow][newCol].type == NONE && mode != captures){
                     // there is no piece on the square (move is legal)
                     // false at the end since it's not capturing a piece
-                    possibleMoves.emplace_back(newRow, newCol, false, "");
+
+                    // create a copy of the piece
+                    piece newPiece = piece(Piece);
+
+                    // adjust the new Piece
+                    newPiece.nextCol = newCol;
+                    newPiece.nextRow = newRow;
+
+                    allMoves.push_back(newPiece);
                 }
             }
-            // checks one square in front
-            if (BoardLoc.find({ row + 1 ,col }) == BoardLoc.end()) {
-                possibleMoves.emplace_back(row + 1, col, false, "");
+            row newRow = Row + 1;
+            col newCol = Col;
+
+            if (Board[newRow][newCol].type == NONE && mode != captures){
+                // create a copy of the piece
+                piece newPiece = piece(Piece);
+
+                // adjust the new Piece
+                newPiece.nextCol = newCol;
+                newPiece.nextRow = newRow;
+
+                allMoves.push_back(newPiece);
             }
+
+            newRow = Row + 1;
+            newCol = Col + 1;
 
             // checks the attacks it can do
-            if (BoardLoc.find({ row + 1 ,col + 1 }) != BoardLoc.end()) {
-                // there is a piece there, so now we check if it's the enemies
+            if (Board[newRow][newCol].color == white && Board[newRow][newCol].type != NONE && mode != nonCaptures){
+                // create a copy of the piece
+                piece newPiece = piece(Piece);
 
-                // get the index of the piece
-                int index = BoardLoc[{row + 1, col + 1}];
+                // adjust the new Piece
+                newPiece.nextCol = newCol;
+                newPiece.nextRow = newRow;
 
-                // checks if its white
-                if (index > 16) {
-                    // legal move
-                    // true since there is an enemy piece there
-                    possibleMoves.emplace_back(row + 1, col + 1, true, "");
-                }
+                newPiece.captured = true;
+
+                allMoves.push_back(newPiece);
             }
-            if (BoardLoc.find({ row + 1 ,col - 1 }) != BoardLoc.end()) {
-                // get the index of the piece
-                int index = BoardLoc[{row + 1, col - 1}];
 
-                // checks if its white
-                if (index > 16) {
-                    // legal move
-                    possibleMoves.emplace_back(row + 1, col - 1, true, "");
-                }
+            newRow = Row + 1;
+            newCol = Col - 1;
+            if (Board[newRow][newCol].color == white && Board[newRow][newCol].type != NONE && mode != nonCaptures){
+                // create a copy of the piece
+                piece newPiece = piece(Piece);
+
+                // adjust the new Piece
+                newPiece.nextCol = newCol;
+                newPiece.nextRow = newRow;
+
+                newPiece.captured = true;
+
+                allMoves.push_back(newPiece);
             }
         }
         // white
         else {
             // checks if its on the starting row
-            if (row == 6) {
+            if (Row == 6) {
                 // lets it moves two moves ahead
 
                 // gets the cords of two moves ahead
-                int newRow = row - 2;
-                int newCol = col;
+                int newRow = Row - 2;
+                int newCol = Col;
 
-                if (BoardLoc.find({ newRow,newCol }) == BoardLoc.end()) {
-                    // there is no piece on the square (move is legal)
-                    possibleMoves.emplace_back(newRow, newCol, false, "");
+                if (Board[newRow][newCol].type == NONE && mode != captures){
+                    // create a copy of the piece
+                    piece newPiece = piece(Piece);
+
+                    // adjust the new Piece
+                    newPiece.nextCol = newCol;
+                    newPiece.nextRow = newRow;
+
+                    allMoves.push_back(newPiece);
                 }
             }
+            row newRow = Row - 1;
+            col newCol = Col;
             // checks one square in front
-            if (BoardLoc.find({ row - 1 ,col }) == BoardLoc.end()) {
-                possibleMoves.emplace_back(row - 1, col, false, "");
+            if (Board[newRow][newCol].type == NONE && mode != captures){
+                // create a copy of the piece
+                piece newPiece = piece(Piece);
+
+                // adjust the new Piece
+                newPiece.nextCol = newCol;
+                newPiece.nextRow = newRow;
+
+                allMoves.push_back(newPiece);
             }
 
+            newRow = Row-1;
+            newCol = Col + 1;
             // checks the attacks it can do
-            if (BoardLoc.find({ row - 1 ,col + 1 }) != BoardLoc.end()) {
-                // there is a piece there, so now we check if it's the enemies
+            if (Board[newRow][newCol].color == black && Board[newRow][newCol].type != NONE && mode != nonCaptures){
+                // create a copy of the piece
+                piece newPiece = piece(Piece);
 
-                // get the index of the piece
-                int index = BoardLoc[{row - 1, col + 1}];
+                // adjust the new Piece
+                newPiece.nextCol = newCol;
+                newPiece.nextRow = newRow;
 
-                // checks if its black
-                if (index <= 16) {
-                    // legal move
-                    possibleMoves.emplace_back(row - 1, col + 1, true, "");
-                }
+                newPiece.captured = true;
+
+                allMoves.push_back(newPiece);
             }
-            if (BoardLoc.find({ row - 1 ,col - 1 }) != BoardLoc.end()) {
-                // get the index of the piece
-                int index = BoardLoc[{row - 1, col - 1}];
 
-                // checks if its white
-                if (index <= 16) {
-                    // legal move
-                    possibleMoves.emplace_back(row - 1, col - 1, true, "");
-                }
+            newRow = Row-1;
+            newCol = Col-1;
+            if (Board[newRow][newCol].color == black && Board[newRow][newCol].type != NONE && mode != nonCaptures){
+                // create a copy of the piece
+                piece newPiece = piece(Piece);
+
+                // adjust the new Piece
+                newPiece.nextCol = newCol;
+                newPiece.nextRow = newRow;
+
+                newPiece.captured = true;
+
+                allMoves.push_back(newPiece);
             }
+
         }
     }
     // rooks
-    if (Class == "rook") {
+    if (Class == ROOK) {
         // loop through all the possible moves a rook can move up/down/left/right
         int newRow;
         int newCol;
@@ -124,27 +210,27 @@ std::vector<std::tuple<int, int, bool, std::string>> posMoves(std::string Class,
         for (int i = 1; i <= 8; i++) {
 
             // up
-            newRow = row - i;
-            newCol = col;
+            newRow = Row - i;
+            newCol = Col;
 
             // add to moves vector
             moves.emplace_back(newRow, newCol);
 
             // down
-            newRow = row + i;
-            newCol = col;
+            newRow = Row + i;
+            newCol = Col;
 
             moves.emplace_back(newRow, newCol);
 
             // right
-            newRow = row;
-            newCol = col + i;
+            newRow = Row;
+            newCol = Col + i;
 
             moves.emplace_back(newRow, newCol);
 
             // left
-            newRow = row;
-            newCol = col - i;
+            newRow = Row;
+            newCol = Col - i;
 
             moves.emplace_back(newRow, newCol);
         }
@@ -168,26 +254,31 @@ std::vector<std::tuple<int, int, bool, std::string>> posMoves(std::string Class,
             bool legal = true;
 
             // if there is nothing in the square
-            if (BoardLoc.find({ newRow,newCol }) == BoardLoc.end()) {
-                possibleMoves.emplace_back(newRow, newCol, false, "");
+            if (Board[newRow][newCol].type == NONE && mode != captures){
+                // create a copy of the piece
+                piece newPiece = piece(Piece);
+
+                // adjust the new Piece
+                newPiece.nextCol = newCol;
+                newPiece.nextRow = newRow;
+
+                allMoves.push_back(newPiece);
             }
             // if there is a piece on the square
-            else {
-                // make sure its the enemies
+            if (Board[newRow][newCol].type != NONE && mode != nonCaptures){
+                if (Board[newRow][newCol].color != color){
+                    // create a copy of the piece
+                    piece newPiece = piece(Piece);
 
-                // get the index
-                int index = BoardLoc[{newRow, newCol}];
+                    // adjust the new Piece
+                    newPiece.nextCol = newCol;
+                    newPiece.nextRow = newRow;
 
-                // color
-                std::string Color;
+                    newPiece.captured = true;
 
-                if (index > 16) Color = "white";
-                else Color = "black";
-
-                if (color != Color) {
-                    // legal move since it is the enemy's piece
-                    possibleMoves.emplace_back(newRow, newCol, true, "");
+                    allMoves.push_back(newPiece);
                 }
+
                 legal = false;
             }
             if (!legal) {
@@ -201,77 +292,110 @@ std::vector<std::tuple<int, int, bool, std::string>> posMoves(std::string Class,
         // castling
 
         // for white
-        if (color == "white"){
+        if (color == white){
             // left
-            if (Board.whiteCastleLeft){
+            if (b.whiteCastleLeft){
                 // check if both pieces haven't been captured
-                bool first = Board.whitePieces.find(17) != Board.whitePieces.end();
-                bool second = Board.whitePieces.find(21) != Board.whitePieces.end();
+                bool first = Board[7][0].color == white && Board[7][0].type == ROOK ;
+                bool second = Board[7][4].color == white && Board[7][4].type == KING;
 
                 // two squares between them are empty
-                bool third = BoardLoc.find({7,1}) == BoardLoc.end();
-                bool fourth = BoardLoc.find({7,2})== BoardLoc.end();
-                bool fifth = BoardLoc.find({7,3})== BoardLoc.end();
+                bool third = Board[7][1].type == NONE;
+                bool fourth = Board[7][2].type == NONE;
+                bool fifth = Board[7][3].type == NONE;
 
                 // if all are true
-                if (first && second && third && fourth && fifth) possibleMoves.emplace_back(1,1,false, "whiteLeft");
+                if (first && second && third && fourth && fifth){
+                    // create a copy of the piece
+                    piece newPiece = piece(Piece);
+
+                    // adjust the new Piece
+                    newPiece.Castle = whiteCastleLeft;
+
+                    allMoves.push_back(newPiece);
+                }
             }
-            if (Board.whiteCastleRight){
+            if (b.whiteCastleRight){
                 // check if both pieces haven't been captured
-                bool first = Board.whitePieces.find(24) != Board.whitePieces.end();
-                bool second = Board.whitePieces.find(21) != Board.whitePieces.end();
+                bool first = Board[7][7].color == white && Board[7][7].type == ROOK ;
+                bool second = Board[7][4].color == white && Board[7][4].type == KING;
 
                 // two squares between them are empty
-                bool third = BoardLoc.find({7,5}) == BoardLoc.end();
-                bool fourth = BoardLoc.find({7,6})== BoardLoc.end();
+                bool third = Board[7][5].type == NONE;
+                bool fourth = Board[7][6].type == NONE;
 
                 // if all are true
-                if (first && second && third && fourth) possibleMoves.emplace_back(1,1,false, "whiteRight");
+                if (first && second && third && fourth){
+                    // create a copy of the piece
+                    piece newPiece = piece(Piece);
+
+                    // adjust the new Piece
+                    newPiece.Castle = whiteCastleRight;
+
+                    allMoves.push_back(newPiece);
+                }
             }
         }
+        // black
         else{
             // left
-            if (Board.blackCastleLeft){
+            if (b.blackCastleLeft){
                 // check if both pieces haven't been captured
-                bool first = Board.blackPieces.find(1) != Board.blackPieces.end();
-                bool second = Board.blackPieces.find(5) != Board.blackPieces.end();
+                bool first = Board[0][0].color == black && Board[0][0].type == ROOK ;
+                bool second = Board[0][4].color == black && Board[0][4].type == KING;
 
                 // two squares between them are empty
-                bool third = BoardLoc.find({0,1}) == BoardLoc.end();
-                bool fourth = BoardLoc.find({0,2})== BoardLoc.end();
-                bool fifth = BoardLoc.find({0,3})== BoardLoc.end();
-              
+                bool third = Board[0][1].type == NONE;
+                bool fourth = Board[0][2].type == NONE;
+                bool fifth = Board[0][3].type == NONE;
+
                 // if all are true
-                if (first && second && third && fourth && fifth) possibleMoves.emplace_back(1,1,false, "blackLeft");
+                if (first && second && third && fourth && fifth){
+                    // create a copy of the piece
+                    piece newPiece = piece(Piece);
+
+                    // adjust the new Piece
+                    newPiece.Castle = blackCastleLeft;
+
+                    allMoves.push_back(newPiece);
+                }
             }
-            if (Board.blackCastleRight){
+            if (b.blackCastleRight){
                 // check if both pieces haven't been captured
-                bool first = Board.blackPieces.find(8) != Board.blackPieces.end();
-                bool second = Board.blackPieces.find(5) != Board.blackPieces.end();
+                bool first = Board[0][7].color == black && Board[0][7].type == ROOK ;
+                bool second = Board[0][4].color == black && Board[0][4].type == KING;
 
                 // two squares between them are empty
-                bool third = BoardLoc.find({7,5}) == BoardLoc.end();
-                bool fourth = BoardLoc.find({7,6})== BoardLoc.end();
+                bool third = Board[0][5].type == NONE;
+                bool fourth = Board[0][6].type == NONE;
 
                 // if all are true
-                if (first && second && third && fourth) possibleMoves.emplace_back(1,1,false, "blackRight");
+                if (first && second && third && fourth){
+                    // create a copy of the piece
+                    piece newPiece = piece(Piece);
+
+                    // adjust the new Piece
+                    newPiece.Castle = blackCastleRight;
+
+                    allMoves.push_back(newPiece);
+                }
             }
         }
     }
-    else if (Class == "horse") {
+    else if (Class == HORSE) {
         // vector of all possible moves here (could be illegal)
         std::vector<std::pair<int, int>> moves;
 
         // variables needed
-        int col_down1 = col + 1;
-        int col_down2 = col + 2;
-        int col_up1 = col - 1;
-        int col_up2 = col - 2;
+        int col_down1 = Col + 1;
+        int col_down2 = Col + 2;
+        int col_up1 = Col - 1;
+        int col_up2 = Col - 2;
 
-        int row_right1 = row + 1;
-        int row_right2 = row + 2;
-        int row_left1 = row - 1;
-        int row_left2 = row - 2;
+        int row_right1 = Row + 1;
+        int row_right2 = Row + 2;
+        int row_left1 = Row - 1;
+        int row_left2 = Row - 2;
 
         // adds all the moves
         moves.emplace_back(row_right1, col_down2);
@@ -296,45 +420,48 @@ std::vector<std::tuple<int, int, bool, std::string>> posMoves(std::string Class,
             if (newRow < 0 || newRow > 7 || newCol < 0 || newCol > 7) continue;
 
             // checks if the move is legal
-            if (BoardLoc.find({ newRow,newCol }) == BoardLoc.end()) {
-                // open space
-                possibleMoves.emplace_back(newRow, newCol, false, "");
+
+            if (Board[newRow][newCol].type == NONE && mode != captures){
+                // create a copy of the piece
+                piece newPiece = piece(Piece);
+
+                // adjust the new Piece
+                newPiece.nextCol = newCol;
+                newPiece.nextRow = newRow;
+
+                allMoves.push_back(newPiece);
             }
-            else {
-                // check if it's the enemy's piece
 
-                // get the index
-                int index = BoardLoc[{newRow, newCol}];
+            if (Board[newRow][newCol].color != color && Board[newRow][newCol].type != NONE && mode != nonCaptures){
+                // create a copy of the piece
+                piece newPiece = piece(Piece);
 
-                // color
-                std::string Color;
+                // adjust the new Piece
+                newPiece.nextCol = newCol;
+                newPiece.nextRow = newRow;
 
-                if (index > 16) Color = "white";
-                else Color = "black";
+                newPiece.captured = true;
 
-                if (color != Color) {
-                    // legal move since it is the enemy's piece
-                    possibleMoves.emplace_back(newRow, newCol, true, "");
-                }
+                allMoves.push_back(newPiece);
             }
         }
     }
-    else if (Class == "king") {
+    else if (Class == KING) {
         // vector of all possible moves here (could be illegal)
         std::vector<std::pair<int, int>> moves;
 
         // adds all possible moves
-        int new_col_up = col - 1;
-        int new_col_down = col + 1;
+        int new_col_up = Col - 1;
+        int new_col_down = Col + 1;
 
-        int new_row_left = row - 1;
-        int new_row_right = row + 1;
+        int new_row_left = Row - 1;
+        int new_row_right = Row + 1;
 
-        moves.emplace_back(row, new_col_up);
-        moves.emplace_back(row, new_col_down);
+        moves.emplace_back(Row, new_col_up);
+        moves.emplace_back(Row, new_col_down);
 
-        moves.emplace_back(new_row_right, col);
-        moves.emplace_back(new_row_left, col);
+        moves.emplace_back(new_row_right, Col);
+        moves.emplace_back(new_row_left, Col);
 
         moves.emplace_back(new_row_right, new_col_down);
         moves.emplace_back(new_row_right, new_col_up);
@@ -353,31 +480,33 @@ std::vector<std::tuple<int, int, bool, std::string>> posMoves(std::string Class,
 
             // checks if the move is legal
 
-            if (BoardLoc.find({ newRow,newCol }) == BoardLoc.end()) {
-                // open space
-                possibleMoves.emplace_back(newRow, newCol, false, "");
+
+            if (Board[newRow][newCol].type == NONE && mode != captures){
+                // create a copy of the piece
+                piece newPiece = piece(Piece);
+
+                // adjust the new Piece
+                newPiece.nextCol = newCol;
+                newPiece.nextRow = newRow;
+
+                allMoves.push_back(newPiece);
             }
-            else {
-                // check if it's the enemy's piece
+            if (Board[newRow][newCol].color != color && Board[newRow][newCol].type != NONE && mode != nonCaptures){
+                // create a copy of the piece
+                piece newPiece = piece(Piece);
 
-                // get the index
-                int index = BoardLoc[{newRow, newCol}];
+                // adjust the new Piece
+                newPiece.nextCol = newCol;
+                newPiece.nextRow = newRow;
 
-                // color
-                std::string Color;
+                newPiece.captured = true;
 
-                if (index > 16) Color = "white";
-                else Color = "black";
-
-                if (color != Color) {
-                    // legal move since it is the enemy's piece
-                    possibleMoves.emplace_back(newRow, newCol, true, "");
-                }
+                allMoves.push_back(newPiece);
             }
         }
 
     }
-    else if (Class == "queen") {
+    else if (Class == QUEEN) {
         // loop through all the possible moves a rook can move up/down/left/right
         int newRow;
         int newCol;
@@ -400,53 +529,53 @@ std::vector<std::tuple<int, int, bool, std::string>> posMoves(std::string Class,
         for (int i = 1; i <= 8; i++) {
 
             // up
-            newRow = row - i;
-            newCol = col;
+            newRow = Row - i;
+            newCol = Col;
 
             // add to moves vector
             moves.emplace_back(newRow, newCol);
 
             // down
-            newRow = row + i;
-            newCol = col;
+            newRow = Row + i;
+            newCol = Col;
 
             moves.emplace_back(newRow, newCol);
 
             // right
-            newRow = row;
-            newCol = col + i;
+            newRow = Row;
+            newCol = Col + i;
 
             moves.emplace_back(newRow, newCol);
 
             // left
-            newRow = row;
-            newCol = col - i;
+            newRow = Row;
+            newCol = Col - i;
 
             moves.emplace_back(newRow, newCol);
 
             // up left
-            newRow = row - i;
-            newCol = col - i;
+            newRow = Row - i;
+            newCol = Col - i;
 
 
             // add to moves vector
             moves.emplace_back(newRow, newCol);
 
             // down right
-            newRow = row + i;
-            newCol = col + i;
+            newRow = Row + i;
+            newCol = Col + i;
 
             moves.emplace_back(newRow, newCol);
 
             // down right
-            newRow = row - i;
-            newCol = col + i;
+            newRow = Row - i;
+            newCol = Col + i;
 
             moves.emplace_back(newRow, newCol);
 
             // down left
-            newRow = row + i;
-            newCol = col - i;
+            newRow = Row + i;
+            newCol = Col - i;
 
             moves.emplace_back(newRow, newCol);
         }
@@ -471,26 +600,32 @@ std::vector<std::tuple<int, int, bool, std::string>> posMoves(std::string Class,
             bool legal = true;
 
             // if there is nothing in the square
-            if (BoardLoc.find({ newRow,newCol }) == BoardLoc.end()) {
-                possibleMoves.emplace_back(newRow, newCol, false, "");
+            if (Board[newRow][newCol].type == NONE && mode != captures){
+                // create a copy of the piece
+                piece newPiece = piece(Piece);
+
+                // adjust the new Piece
+                newPiece.nextCol = newCol;
+                newPiece.nextRow = newRow;
+
+                allMoves.push_back(newPiece);
             }
+
             // if there is a piece on the square
-            else {
-                // make sure its the enemies
+            if (Board[newRow][newCol].type != NONE && mode != nonCaptures){
+                if (Board[newRow][newCol].color != color){
+                    // create a copy of the piece
+                    piece newPiece = piece(Piece);
 
-                // get the index
-                int index = BoardLoc[{newRow, newCol}];
+                    // adjust the new Piece
+                    newPiece.nextCol = newCol;
+                    newPiece.nextRow = newRow;
 
-                // color
-                std::string Color;
+                    newPiece.captured = true;
 
-                if (index > 16) Color = "white";
-                else Color = "black";
-
-                if (color != Color) {
-                    // legal move since it is the enemy's piece
-                    possibleMoves.emplace_back(newRow, newCol, true, "");
+                    allMoves.push_back(newPiece);
                 }
+
                 legal = false;
             }
             if (!legal) {
@@ -507,7 +642,7 @@ std::vector<std::tuple<int, int, bool, std::string>> posMoves(std::string Class,
         }
     }
 
-    else if (Class == "bishop") {
+    else if (Class == BISHOP) {
         // loop through all the possible moves a bishop can move up/down/left/right
         int newRow;
         int newCol;
@@ -526,27 +661,27 @@ std::vector<std::tuple<int, int, bool, std::string>> posMoves(std::string Class,
         for (int i = 1; i <= 8; i++) {
 
             // up left
-            newRow = row - i;
-            newCol = col - i;
+            newRow = Row - i;
+            newCol = Col - i;
 
             // add to moves vector
             moves.emplace_back(newRow, newCol);
 
             // down right
-            newRow = row + i;
-            newCol = col + i;
+            newRow = Row + i;
+            newCol = Col + i;
 
             moves.emplace_back(newRow, newCol);
 
             // down right
-            newRow = row - i;
-            newCol = col + i;
+            newRow = Row - i;
+            newCol = Col + i;
 
             moves.emplace_back(newRow, newCol);
 
             // down left
-            newRow = row + i;
-            newCol = col - i;
+            newRow = Row + i;
+            newCol = Col - i;
 
             moves.emplace_back(newRow, newCol);
 
@@ -572,26 +707,31 @@ std::vector<std::tuple<int, int, bool, std::string>> posMoves(std::string Class,
             bool legal = true;
 
             // if there is nothing in the square
-            if (BoardLoc.find({ newRow,newCol }) == BoardLoc.end()) {
-                possibleMoves.emplace_back(newRow, newCol, false, "");
+            if (Board[newRow][newCol].type == NONE && mode != captures){
+                // create a copy of the piece
+                piece newPiece = piece(Piece);
+
+                // adjust the new Piece
+                newPiece.nextCol = newCol;
+                newPiece.nextRow = newRow;
+
+                allMoves.push_back(newPiece);
             }
             // if there is a piece on the square
-            else {
-                // make sure its the enemies
+            if (Board[newRow][newCol].type != NONE && mode != nonCaptures){
+                if (Board[newRow][newCol].color != color){
+                    // create a copy of the piece
+                    piece newPiece = piece(Piece);
 
-                // get the index
-                int index = BoardLoc[{newRow, newCol}];
+                    // adjust the new Piece
+                    newPiece.nextCol = newCol;
+                    newPiece.nextRow = newRow;
 
-                // color
-                std::string Color;
+                    newPiece.captured = true;
 
-                if (index > 16) Color = "white";
-                else Color = "black";
-
-                if (color != Color) {
-                    // legal move since it is the enemies piece
-                    possibleMoves.emplace_back(newRow, newCol, true, "");
+                    allMoves.push_back(newPiece);
                 }
+
                 legal = false;
             }
             if (!legal) {
@@ -604,7 +744,7 @@ std::vector<std::tuple<int, int, bool, std::string>> posMoves(std::string Class,
         }
     }
     //
-    //	for (std::tuple<int, int,bool> pair : possibleMoves) {
+    //	for (std::tuple<int, int,bool> pair : moves) {
     //	    SDL_Rect rect{ std::get<1>(pair) * inter + inter / 4 ,std::get<0>(pair) * inter + inter / 4 , inter / 4, inter / 4 };
     //		SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
     //		SDL_RenderFillRect(renderer, &rect);
@@ -612,5 +752,4 @@ std::vector<std::tuple<int, int, bool, std::string>> posMoves(std::string Class,
 
 
     //	SDL_RenderPresent(renderer);
-    return possibleMoves;
 }
