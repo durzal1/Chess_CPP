@@ -240,7 +240,7 @@ std::vector<std::tuple<int, int, bool, std::string>> posMoves(std::string Class,
                 bool third = BoardLoc.find({0,1}) == BoardLoc.end();
                 bool fourth = BoardLoc.find({0,2})== BoardLoc.end();
                 bool fifth = BoardLoc.find({0,3})== BoardLoc.end();
-
+              
                 // if all are true
                 if (first && second && third && fourth && fifth) possibleMoves.emplace_back(1,1,false, "blackLeft");
             }
