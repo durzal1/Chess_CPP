@@ -32,7 +32,7 @@ private:
 //    SDL_Renderer* renderer = NULL;
 //
     // constants
-    int width;
+    static int width;
 
 //    // images
 //    SDL_Texture *pawnB = nullptr;
@@ -75,7 +75,7 @@ public:
     std::map<int,std::pair<int,int>> PieceLoc;
 
     // size of each square and their interval
-    int inter;
+    static int inter;
 
     // map of all cords (cord<x,y>,ind) (DOES UPDATE IF PIECE DIES)
     // basically the opposite of the former where you give it pos and it gives piece
@@ -83,7 +83,7 @@ public:
     std::map<std::pair<int,int>,int> BoardLoc;
 
     // class of each index (DOES NOT UPDATE IF PIECE DIES)
-    std::vector<std::string>IndClass;
+    static std::vector<std::string>IndClass;
 
     // indexes of living white pieces (iterate through this for moves)
     std::unordered_set<int> whitePieces;
