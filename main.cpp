@@ -31,7 +31,7 @@ int main(int argc, char* argv[]) {
     board Board = board(width); // win, renderer,
     auto start = std::chrono::high_resolution_clock::now();
 
-    ai AI = ai(Board, 5);
+    ai AI = ai(Board, 4);
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
     std::cout << " moves took " << duration.count() << " ms.";

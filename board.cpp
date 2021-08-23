@@ -2,7 +2,13 @@
 // Created by zacky on 8/15/2021.
 //
 
+
 #include "board.h"
+
+
+std::vector<std::string> board::IndClass;
+int board::width;
+int board::inter;
 board::board( int width) { // SDL_Window* win, SDL_Renderer* renderer1,
 //    this->win = win;
 //    this->renderer = renderer1;
