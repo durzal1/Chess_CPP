@@ -5,7 +5,12 @@
 #ifndef CHESS_PIECE_H
 #define CHESS_PIECE_H
 #include "types.h"
+#include "string"
 class piece{
+private:
+    // array to convert col nums to A-H uci format
+    char conversion[8] {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'};
+
 public:
     // current cords
     col curCol;
@@ -18,6 +23,10 @@ public:
     col nextCol;
     row nextRow;
 
+    // the old cords of the moves(used to undo them)
+    row oldRow;
+    col oldCol;
+
     // color
     Color color;
 
@@ -26,6 +35,10 @@ public:
 
     // if its a castle the location
     castle Castle = none;
+
+    // position of the piece killed by en passant
+    row capRow = -1;
+    col capCol = -1;
 
     piece();
 
@@ -36,7 +49,10 @@ public:
 
     piece& operator=(const piece& Piece);
 
-    // checks if a move is legal
-    bool moveLegal(int kingMoves);
+
+    /* prints move in uci-output to help with debugging
+     * @return string with the output
+    */
+    std::string toString();
 };
 #endif //CHESS_PIECE_H

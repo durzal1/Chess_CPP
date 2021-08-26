@@ -59,19 +59,29 @@ private:
     // vector of castle bool vars that it has done recently(and will have to undo)
     std::vector<bool> castles;
 
+    // converts letters to numbers for the col
+    std::map<char, int> conversion;
+
 public:
+    // all castle rights are false by default
     // if right has the  right to castle (right rook and king hasnt moved)
-    bool whiteCastleRight = true;
+    bool whiteCastleRight = false;
 
     // if right has the  right to castle (left rook and king hasnt moved)
-    bool whiteCastleLeft = true;
+    bool whiteCastleLeft = false;
 
 
     // if right has the  right to castle (rightrook hasnt moved)
-    bool blackCastleRight = true;
+    bool blackCastleRight = false;
 
     // if right has the  right to castle (left rook hasnt moved)
-    bool blackCastleLeft = true;
+    bool blackCastleLeft = false;
+
+    // full turns that have been made the entire game
+    int fullTurns = 0;
+
+    // half turns that have been made since last time a peice was captured or pawn moved
+    int halfTurns = 0;
 
     // map of all pieces (ind, cord<x,y>) (DOES UPDATE IF PIECE DIES)
     std::map<int,std::pair<int,int>> PieceLoc;
@@ -96,8 +106,21 @@ public:
     // array of the board
     piece boardArr[8][8];
 
+    // whos turn it is
+    Color playerTurn = white;
+
+    // vector of en passent moves
+    std::vector<std::pair<row, col>> passentMoves;
+
     // constructor
     board(int width); // SDL_Window* win, SDL_Renderer* renderer1,
+
+    board();
+
+    // copy constructor
+    board(const board& b);
+
+    board& operator=(const board& b);
 
     // creates/updates board visually
     void createBoard();
@@ -110,7 +133,14 @@ public:
     piece move(piece &Piece);
 
     // undoes the move
-    void undoMove(piece &Piece, piece oldPiece);
+    void undoMove(piece &Piece, const piece& oldPiece);
+
+    // create board from FEN string
+    //@param FEN string
+    void FENboard(std::string FEN);
+
+    // prints screen to cmd
+    void print();
 
 };
 #endif //CHESS_CPP_BOARD_H

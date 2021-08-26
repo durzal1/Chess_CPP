@@ -27,7 +27,7 @@ for kevin
 // @param int, col of the move
 // @param bool, if the move captures another piece
 // @param string, either empty or castle location ex. "whiteLeft"
-void posMoves(piece Piece, board Board, std::vector<piece> &moves, Mode mode); //, SDL_Renderer* renderer
+void posMoves(const piece& Piece, board Board, std::vector<piece> &moves, Mode mode); //, SDL_Renderer* renderer
 
 std::vector<piece> allPosMoves(board b, Color color);
 

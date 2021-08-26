@@ -40,7 +40,7 @@ std::vector<piece> noCaptures(board b, Color color){
 }
 
 // directly adds moves to the moves vector in allPosMoves
-void posMoves(piece Piece,board b, std::vector<piece> &allMoves, Mode mode) { // , SDL_Renderer* renderer
+void posMoves(const piece& Piece,board b, std::vector<piece> &allMoves, Mode mode) { // , SDL_Renderer* renderer
 
     // sets variables of the piece
     auto Class = Piece.type;
@@ -62,7 +62,7 @@ void posMoves(piece Piece,board b, std::vector<piece> &allMoves, Mode mode) { //
                 int newRow = Row + 2;
                 int newCol = Col;
 
-                if (Board[newRow][newCol].type == NONE && mode != captures){
+                if (Board[newRow][newCol].type == NONE && mode != captures&& newRow < 8 && newRow >= 0 && newCol >= 0 && newCol < 8&& Board[Row+1][Col].type == NONE){
                     // there is no piece on the square (move is legal)
                     // false at the end since it's not capturing a piece
 
@@ -73,13 +73,16 @@ void posMoves(piece Piece,board b, std::vector<piece> &allMoves, Mode mode) { //
                     newPiece.nextCol = newCol;
                     newPiece.nextRow = newRow;
 
+                    // adds the temporary en passent
+                    b.passentMoves.emplace_back(Row + 1, newCol);
+
                     allMoves.push_back(newPiece);
                 }
             }
             row newRow = Row + 1;
             col newCol = Col;
 
-            if (Board[newRow][newCol].type == NONE && mode != captures){
+            if (Board[newRow][newCol].type == NONE && mode != captures&& newRow < 8 && newRow >= 0 && newCol >= 0 && newCol < 8){
                 // create a copy of the piece
                 piece newPiece = piece(Piece);
 
@@ -94,7 +97,7 @@ void posMoves(piece Piece,board b, std::vector<piece> &allMoves, Mode mode) { //
             newCol = Col + 1;
 
             // checks the attacks it can do
-            if (Board[newRow][newCol].color == white && Board[newRow][newCol].type != NONE && mode != nonCaptures){
+            if (Board[newRow][newCol].color == white && Board[newRow][newCol].type != NONE && mode != nonCaptures&& newRow < 8 && newRow >= 0 && newCol >= 0 && newCol < 8){
                 // create a copy of the piece
                 piece newPiece = piece(Piece);
 
@@ -109,7 +112,7 @@ void posMoves(piece Piece,board b, std::vector<piece> &allMoves, Mode mode) { //
 
             newRow = Row + 1;
             newCol = Col - 1;
-            if (Board[newRow][newCol].color == white && Board[newRow][newCol].type != NONE && mode != nonCaptures){
+            if (Board[newRow][newCol].color == white && Board[newRow][newCol].type != NONE && mode != nonCaptures&& newRow < 8 && newRow >= 0 && newCol >= 0 && newCol < 8){
                 // create a copy of the piece
                 piece newPiece = piece(Piece);
 
@@ -121,6 +124,44 @@ void posMoves(piece Piece,board b, std::vector<piece> &allMoves, Mode mode) { //
 
                 allMoves.push_back(newPiece);
             }
+            if (!b.passentMoves.empty()){
+                // en passant moves
+                newRow = Row + 1;
+                newCol = Col + 1;
+
+                if (Board[newRow][newCol].type == NONE && b.passentMoves[0].first == newRow && b.passentMoves[0].second == newCol && newRow < 8 && newRow >= 0 && newCol >= 0 && newCol < 8){
+                    // create a copy of the piece
+                    piece newPiece = piece(Piece);
+
+                    // adjust the new Piece
+                    newPiece.nextCol = newCol;
+                    newPiece.nextRow = newRow;
+
+                    newPiece.captured = true;
+
+                    newPiece.capRow = Row;
+                    newPiece.capCol = newCol;
+                    allMoves.push_back(newPiece);
+                }
+
+                newRow = Row + 1;
+                newCol = Col - 1;
+                if (Board[newRow][newCol].type == NONE && b.passentMoves[0].first == newRow && b.passentMoves[0].second == newCol && newRow < 8 && newRow >= 0 && newCol >= 0 && newCol < 8){
+                    // create a copy of the piece
+                    piece newPiece = piece(Piece);
+
+                    // adjust the new Piece
+                    newPiece.nextCol = newCol;
+                    newPiece.nextRow = newRow;
+
+                    newPiece.captured = true;
+
+                    newPiece.capRow = Row;
+                    newPiece.capCol = newCol;
+                    allMoves.push_back(newPiece);
+                }
+            }
+
         }
         // white
         else {
@@ -132,7 +173,7 @@ void posMoves(piece Piece,board b, std::vector<piece> &allMoves, Mode mode) { //
                 int newRow = Row - 2;
                 int newCol = Col;
 
-                if (Board[newRow][newCol].type == NONE && mode != captures){
+                if (Board[newRow][newCol].type == NONE && mode != captures&& newRow < 8 && newRow >= 0 && newCol >= 0 && newCol < 8 && Board[Row-1][Col].type == NONE){
                     // create a copy of the piece
                     piece newPiece = piece(Piece);
 
@@ -140,13 +181,16 @@ void posMoves(piece Piece,board b, std::vector<piece> &allMoves, Mode mode) { //
                     newPiece.nextCol = newCol;
                     newPiece.nextRow = newRow;
 
+                    // adds the temporary en passent
+                    b.passentMoves.emplace_back(Row-1, newCol);
+
                     allMoves.push_back(newPiece);
                 }
             }
             row newRow = Row - 1;
             col newCol = Col;
             // checks one square in front
-            if (Board[newRow][newCol].type == NONE && mode != captures){
+            if (Board[newRow][newCol].type == NONE && mode != captures && newRow < 8 && newRow >= 0 && newCol >= 0 && newCol < 8){
                 // create a copy of the piece
                 piece newPiece = piece(Piece);
 
@@ -160,7 +204,7 @@ void posMoves(piece Piece,board b, std::vector<piece> &allMoves, Mode mode) { //
             newRow = Row-1;
             newCol = Col + 1;
             // checks the attacks it can do
-            if (Board[newRow][newCol].color == black && Board[newRow][newCol].type != NONE && mode != nonCaptures){
+            if (Board[newRow][newCol].color == black && Board[newRow][newCol].type != NONE && mode != nonCaptures&& newRow < 8 && newRow >= 0 && newCol >= 0 && newCol < 8){
                 // create a copy of the piece
                 piece newPiece = piece(Piece);
 
@@ -175,7 +219,7 @@ void posMoves(piece Piece,board b, std::vector<piece> &allMoves, Mode mode) { //
 
             newRow = Row-1;
             newCol = Col-1;
-            if (Board[newRow][newCol].color == black && Board[newRow][newCol].type != NONE && mode != nonCaptures){
+            if (Board[newRow][newCol].color == black && Board[newRow][newCol].type != NONE && mode != nonCaptures && newRow < 8 && newRow >= 0 && newCol >= 0 && newCol < 8){
                 // create a copy of the piece
                 piece newPiece = piece(Piece);
 
@@ -186,6 +230,43 @@ void posMoves(piece Piece,board b, std::vector<piece> &allMoves, Mode mode) { //
                 newPiece.captured = true;
 
                 allMoves.push_back(newPiece);
+            }
+            if (!b.passentMoves.empty()){
+                // en passant attacks
+                newRow = Row-1;
+                newCol = Col + 1;
+                // checks if this move is an en passant move
+                if (Board[newRow][newCol].type == NONE && b.passentMoves[0].first == newRow && b.passentMoves[0].second == newCol && newRow < 8 && newRow >= 0 && newCol >= 0 && newCol < 8){
+                    // create a copy of the piece
+                    piece newPiece = piece(Piece);
+
+                    // adjust the new Piece
+                    newPiece.nextCol = newCol;
+                    newPiece.nextRow = newRow;
+
+                    newPiece.captured = true;
+
+                    newPiece.capRow = Row;
+                    newPiece.capCol = newCol;
+                    allMoves.push_back(newPiece);
+                }
+
+                newRow = Row-1;
+                newCol = Col-1;
+                if (Board[newRow][newCol].type == NONE && b.passentMoves[0].first == newRow && b.passentMoves[0].second == newCol && newRow < 8 && newRow >= 0 && newCol >= 0 && newCol < 8){
+                    // create a copy of the piece
+                    piece newPiece = piece(Piece);
+
+                    // adjust the new Piece
+                    newPiece.nextCol = newCol;
+                    newPiece.nextRow = newRow;
+
+                    newPiece.captured = true;
+
+                    newPiece.capRow = Row;
+                    newPiece.capCol = newCol;
+                    allMoves.push_back(newPiece);
+                }
             }
 
         }

@@ -4,11 +4,18 @@
 
 #include "ai.h"
 
-ai::ai(board b, int maxDepth) {
+ai::ai(const board& b, int maxDepth, Color color) {
 	// gets the max depth recursive function will go to (+1 is to make depth more accurate)
 	this->maxDepth = maxDepth;
 
-	auto c = perft(b, maxDepth, false, white);
+//    for (auto move:moves){
+//        i++;
+//        if (i != 2) continue;
+//        b.move(move);
+//        auto c = perft(b, maxDepth, true, black);
+//        std::cout << "==========================================" << c << std::endl;
+//    }
+	auto c = perft(b, maxDepth, true, color);
     std::cout << c;
 
 }
@@ -391,8 +398,8 @@ int ai::kingAttacks(board b, piece Piece) {
         bool legal = true;
 
         // if there is a piece on the square
-        if (Board[newRow][newCol].type == ROOK){
-            if (Board[newRow][newCol].color != color){
+        if (Board[newRow][newCol].type != NONE){
+            if (Board[newRow][newCol].color != color && Board[newRow][newCol].type == ROOK){
                 killingMoves++;
                 if (killingMoves >= 2) return 2;
             }
@@ -582,12 +589,11 @@ int ai::kingAttacks(board b, piece Piece) {
         bool legal = true;
 
         // if there is a piece on the square
-        if (Board[newRow][newCol].type == QUEEN){
-            if (Board[newRow][newCol].color != color){
+        if (Board[newRow][newCol].type != NONE){
+            if (Board[newRow][newCol].color != color && Board[newRow][newCol].type == QUEEN){
                 killingMoves++;
                 if (killingMoves >= 2) return 2;
             }
-
             legal = false;
         }
         if (!legal) {
@@ -666,12 +672,11 @@ int ai::kingAttacks(board b, piece Piece) {
         bool legal = true;
 
         // if there is a piece on the square
-        if (Board[newRow][newCol].type == BISHOP){
-            if (Board[newRow][newCol].color != color){
+        if (Board[newRow][newCol].type != NONE){
+            if (Board[newRow][newCol].color != color && Board[newRow][newCol].type == BISHOP){
                 killingMoves++;
                 if (killingMoves >= 2) return 2;
             }
-
             legal = false;
         }
         if (!legal) {
@@ -687,6 +692,8 @@ int ai::kingAttacks(board b, piece Piece) {
 }
 
 U64 ai::perft(board b, int depth, bool print, Color color) {
+    b.passentMoves.clear();
+
     // gets next color
     Color nextColor;
 
@@ -699,6 +706,7 @@ U64 ai::perft(board b, int depth, bool print, Color color) {
         return 1;
 
     auto moves = allPosMoves(b, color);
+
 
     // find the king piece
     piece kingPiece;
@@ -714,37 +722,41 @@ U64 ai::perft(board b, int depth, bool print, Color color) {
     // moves correlates to the amount of pieces that can kill the king
     int kingMoves = kingAttacks(b,kingPiece);
 
-    // looks for checkmate
-    bool checkMate = true;
     for (int i = 0; i < moves.size(); i++) {
 
         piece m = moves[i];
 
-
-        /// these are suedo-legal i havent implemented check yet
-
-        piece oldPiece = b.move(m);
-
-        if (!moveCheck(b, m, kingMoves)) continue;
-
-        checkMate = false;
-        U64 np = perft(b, depth - 1, false, nextColor);
-
-        if (print) {
-//            std::cout << move::toString(m) << " " << np << std::endl;
+        if (!moveCheck(b, m, kingMoves)){
+            continue;
         }
 
-        nodes += np;
-        b.undoMove(m, oldPiece);
+        if (depth == 1){
+            nodes ++;
+        }else{
+            piece oldPiece = b.move(m);
+
+            U64 np = perft(b, depth - 1, false, nextColor);
+
+            if (print) {
+
+                std::cout << m.toString() << " " << np << std::endl;
+            }
+
+            nodes += np;
+            b.undoMove(m, oldPiece);
+        }
+
 
     }
-    if (checkMate) return 1;
 
     return nodes;
 }
-bool ai::moveCheck(board b, piece Piece, int kingMoves) {
+bool ai::moveCheck(board b, const piece& Piece, int kingMoves) {
     // exceptions
-    if (Piece.Castle != none || kingMoves == 0) return true;
+    if (Piece.Castle != none) return false;
+
+    // here only the king is allowed to move
+    if (kingMoves == 2 && Piece.type != KING) return true;
 
     // does the move
     // changes the arrBoard
@@ -760,14 +772,19 @@ bool ai::moveCheck(board b, piece Piece, int kingMoves) {
         for (int j = 0; j < 8; j++){
             if (b.boardArr[i][j].type == KING && b.boardArr[i][j].color == Piece.color){
                 kingPiece = b.boardArr[i][j];
+                kingPiece.curCol = j;
+                kingPiece.curRow = i;
             }
         }
     }
 
     int kingMoves2 = kingAttacks(b,kingPiece);
 
-    if (kingMoves2 == 0) return false;
-    else return true;
+    if (kingMoves2 == 0){
+        return true;
+    }
+
+    else return false;
 }
 
 

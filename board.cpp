@@ -14,6 +14,23 @@ board::board( int width) { // SDL_Window* win, SDL_Renderer* renderer1,
     // interval
     inter = width/ 8;
 
+    for (int i = 0; i < 8; i++){
+        for (int j = 0; j < 8; j++){
+            boardArr[i][j].curRow = i;
+            boardArr[i][j].curCol = j;
+        }
+    }
+
+    // create the conversion map
+    conversion.insert({'a',0});
+    conversion.insert({'b',1});
+    conversion.insert({'c',2});
+    conversion.insert({'d',3});
+    conversion.insert({'e',4});
+    conversion.insert({'f',5});
+    conversion.insert({'g',6});
+    conversion.insert({'h',7});
+
     /*
     for zacky
     // gets the images
@@ -251,6 +268,12 @@ void board::createBoard() {
 }
 
 piece board::move(piece &Piece) {
+    // vars
+    row CurRow = Piece.curRow;
+    col CurCol = Piece.curCol;
+
+    row NextRow = Piece.nextRow;
+    col NextCol = Piece.nextCol;
 
     // looks to see if a rook got captured
     // if it did it will remove its side's right to castle
@@ -289,24 +312,338 @@ piece board::move(piece &Piece) {
             }
         }
     }
-    if (Piece.Castle != none) std::cout << 'f';
-    // saves the old piece
-    piece oldPiece = boardArr[Piece.nextRow][Piece.nextCol];
+    if (Piece.Castle != none) std::cout << "CASTLING" << std::endl;
 
-    // changes the arrBoard
-    boardArr[Piece.nextRow][Piece.nextCol] = Piece;
+    piece oldPiece;
+    if (Piece.capRow != -1){
+        // its an en passant move
+        // changes some variables
+        Piece.curRow = NextRow;
+        Piece.curCol = NextCol;
 
-    // makes it empty
-    boardArr[Piece.curRow][Piece.curCol] = piece();
+        Piece.oldRow = CurRow;
+        Piece.oldCol = CurCol;
+
+        oldPiece = boardArr[Piece.capRow][Piece.capCol];
+
+        // changes the arrBoard
+        boardArr[NextRow][NextCol] = Piece;
+
+        // makes it empty
+        boardArr[CurRow][CurCol] = piece();
+        boardArr[Piece.capRow][Piece.capCol] = piece();
+
+    }
+    else{
+        // changes some variables
+        Piece.curRow = NextRow;
+        Piece.curCol = NextCol;
+
+        Piece.oldRow = CurRow;
+        Piece.oldCol = CurCol;
+
+        // saves the old piece
+        oldPiece = boardArr[Piece.nextRow][Piece.nextCol];
+
+        // changes the arrBoard
+        boardArr[NextRow][NextCol] = Piece;
+
+        // makes it empty
+        boardArr[CurRow][CurCol] = piece();
+
+
+    }
+
 
     return oldPiece;
 }
-void board::undoMove(piece &Piece, piece oldPiece) {
+void board::undoMove(piece &Piece, const piece& oldPiece) {
+    // vars
+    row CurRow = Piece.curRow;
+    col CurCol = Piece.curCol;
 
-    // resets the arrBoard
-    boardArr[Piece.nextRow][Piece.nextCol] = Piece;
+    row OldRow = Piece.oldRow;
+    col OldCol = Piece.oldCol;
 
-    // makes it empty
-    boardArr[Piece.curRow][Piece.curCol] = piece();
+    if (Piece.capRow != -1){
+        // changes the arrBoard
+        boardArr[Piece.curRow][Piece.curCol] = piece();
+
+        // changes variables
+        Piece.curRow = OldRow;
+        Piece.oldCol = OldCol;
+
+        boardArr[Piece.oldRow][Piece.oldCol] = Piece;
+        boardArr[Piece.capRow][Piece.capCol] = oldPiece;
+
+        boardArr[Piece.capRow][Piece.capCol].curCol = Piece.capCol;
+        boardArr[Piece.capRow][Piece.capCol].curRow = Piece.capRow;
+
+        // so the next move will not be an en passant move
+        Piece.capRow = -1;
+        Piece.nextCol = -1;
+
+    }
+    else{
+        // resets the arrBoard
+        boardArr[CurRow][CurCol] = oldPiece;
+
+        // changes variables
+        Piece.curRow = OldRow;
+        Piece.curCol = OldCol;
+
+        // makes it empty
+        boardArr[Piece.oldRow][Piece.oldCol] = Piece;
+    }
+}
+void board::print() {
+    for (int I = 0; I < 8; I ++){
+        std::cout << "+---+---+---+---+---+---+---+---+" << std::endl;
+        for (int j = 0; j < 8; j++){
+            std::cout << '|' << " ";
+            if (boardArr[I][j].type != NONE){
+                switch (boardArr[I][j].type){
+                    case PAWN:
+                        std::cout << 'p';
+                        break;
+                    case KING:
+                        std::cout << 'k';
+                        break;
+                    case QUEEN:
+                        std::cout << 'q';
+                        break;
+                    case BISHOP:
+                        std::cout << 'b';
+                        break;
+                    case HORSE:
+                        std::cout << 'n';
+                        break;
+                    case ROOK:
+                        std::cout << 'r';
+                        break;
+                }
+            }else std::cout << " ";
+            std::cout << " ";
+            if (j == 7) std::cout << '|' << std::endl;
+
+
+        }
+    }
+}
+
+void board::FENboard(std::string FEN) {
+    // reset everything
+    for (int i = 0; i < 8; i++){
+        for (int j =0; j<8; j++){
+            boardArr[i][j].type = NONE;
+        }
+    }
+    int i = 1;
+    int j = 1;
+
+    bool Castle = true;
+    bool donePlacement = false;
+    bool fiftymoverule = false;
+    bool enPassant = false;
+
+    std::string currentFiftyRule;
+    std::string turns;
+    int II = -1;
+    for (char c: FEN){
+        II ++;
+        // done placement
+        if (c == ' '){
+            donePlacement = true;
+            continue;
+        }
+        if (donePlacement){
+            // total turns and 50 move rule
+            if (fiftymoverule){
+                if (!currentFiftyRule.empty()){
+                    if (c <= '9'){
+                        currentFiftyRule.push_back(c);
+                    }
+                    fiftymoverule = false;
+                }
+                if (c <= '9'){
+                    // its a number so we find out if it has a second digit then save it
+                    currentFiftyRule.push_back(c);
+                }
+            }
+            else{
+                // add the number to turns
+                if (c <= '9'){
+                    turns.push_back(c);
+                }
+            }
+
+            // looks for any enpassant
+            if (enPassant){
+                if (c == '-'){
+                    enPassant = false;
+                    fiftymoverule = true;
+                }
+                else if (c <= '9'){
+                    int num = c - '0';
+                    passentMoves.emplace_back(conversion[FEN[II-1]], num);
+                    enPassant = false;
+                    fiftymoverule = true;
+                }else{
+                    int num = FEN[II+1] - '0';
+                    passentMoves.emplace_back(conversion[c], num);
+                    enPassant = false;
+                    fiftymoverule = true;
+                }
+            }
+
+            // we dont have to change if its white since white is default start
+            if (Castle){
+                if (c == 'b'){
+                    playerTurn = black;
+                }
+                // castling rights
+                else if (c == 'Q') whiteCastleLeft = true;
+                else if (c == 'q') blackCastleLeft = true;
+                else if (c == 'k') blackCastleRight = true;
+                else if (c == 'K') whiteCastleRight = true;
+                else{
+                    enPassant = true;
+                    Castle = false;
+                }
+            }
+
+
+        }
+        else{
+            // next row
+            if (c == '/'){
+                i ++;
+                j = 1;
+            }
+
+            // skip some cols
+            if (c < '9' && c != '/'){
+                j += (c - '0');
+            }
+            else{
+                // its a piece
+
+                // determine if its white or black
+                if (isupper(c)) boardArr[i-1][j-1].color = white;
+                else boardArr[i-1][j-1].color = black;
+
+                switch (toupper(c)){
+                    case 'K':
+                        boardArr[i-1][j-1].type = KING;
+                        break;
+                    case 'Q':
+                        boardArr[i-1][j-1].type = QUEEN;
+                        break;
+                    case 'R':
+                        boardArr[i-1][j-1].type = ROOK;
+                        break;
+                    case 'B':
+                        boardArr[i-1][j-1].type = BISHOP;
+                        break;
+                    case 'N':
+                        boardArr[i-1][j-1].type = HORSE;
+                        break;
+                    case 'P':
+                        boardArr[i-1][j-1].type = PAWN;
+                        break;
+                }
+                if (c != '/') j++;
+            }
+        }
+
+    }
+    // find how many full turns there are
+
+    if (turns.size() == 1) fullTurns = turns[0] - '9';
+    else{
+        // two digit number
+        fullTurns = 10 * (turns[0] - '9') + (turns[1] - '9');
+    }
+
+    // 50 turn rule
+    if (currentFiftyRule.size() == 1) halfTurns = currentFiftyRule[0] - '9';
+    else{
+        // two digit number
+        halfTurns = 10 * (currentFiftyRule[0] - '9') + (currentFiftyRule[1] - '9');
+    }
+
+    for (i = 0; i < 8; i ++){
+        std::cout << "+---+---+---+---+---+---+---+---+" << std::endl;
+        for (j = 0; j < 8; j++){
+            std::cout << '|' << " ";
+            if (boardArr[i][j].type != NONE){
+                switch (boardArr[i][j].type){
+                    case PAWN:
+                        std::cout << 'p';
+                        break;
+                    case KING:
+                        std::cout << 'k';
+                        break;
+                    case QUEEN:
+                        std::cout << 'q';
+                        break;
+                    case BISHOP:
+                        std::cout << 'b';
+                        break;
+                    case HORSE:
+                        std::cout << 'n';
+                        break;
+                    case ROOK:
+                        std::cout << 'r';
+                        break;
+                }
+            }else std::cout << " ";
+            std::cout << " ";
+            if (j == 7) std::cout << '|' << std::endl;
+
+
+        }
+    }
+
+}
+
+board::board() {
+
+}
+
+board::board(const board &b) {
+    this->whiteCastleRight = b.whiteCastleRight;
+    this->whiteCastleLeft = b.whiteCastleLeft;
+    this->blackCastleLeft = b.blackCastleLeft;
+    this->blackCastleRight = b.blackCastleRight;
+    this->fullTurns = b.fullTurns;
+    this->halfTurns = b.halfTurns;
+    this->inter = b.inter;
+    for (int i = 0; i < 8; i ++){
+        for (int j = 0; j < 8; j++){
+            this->boardArr[i][j] = b.boardArr[i][j];
+        }
+    }
+    this->playerTurn = b.playerTurn;
+    this->castles = b.castles;
+
+}
+
+board &board::operator=(const board &b) {
+    this->whiteCastleRight = b.whiteCastleRight;
+    this->whiteCastleLeft = b.whiteCastleLeft;
+    this->blackCastleLeft = b.blackCastleLeft;
+    this->blackCastleRight = b.blackCastleRight;
+    this->fullTurns = b.fullTurns;
+    this->halfTurns = b.halfTurns;
+    this->castles = b.castles;
+    this->inter = b.inter;
+    for (int i = 0; i < 8; i ++){
+        for (int j = 0; j < 8; j++){
+            this->boardArr[i][j] = b.boardArr[i][j];
+        }
+    }
+    this->playerTurn = b.playerTurn;
+    return *this;
 }
 

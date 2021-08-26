@@ -28,7 +28,7 @@ private:
     bool CheckMate = false;
 public:
     // constructor (dont know what to put here yet)
-    ai(board Board, int maxDepth);
+    ai(const board& Board, int maxDepth, Color color);
 
 
     // main recursive function that gets moves and gets scores with minMax
@@ -45,7 +45,7 @@ public:
 
     // function to check if the move will stop the check
     // @return whether it is still check
-    bool moveCheck(board b, piece Piece, int kingMoves);
+    bool moveCheck(board b, const piece& Piece, int kingMoves);
 
     // function that looks at all squares that can attack the king and determines if the piece there can do the attack
     // @return number of pieces that can attack the king (0,1,2)
