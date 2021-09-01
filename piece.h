@@ -6,6 +6,7 @@
 #define CHESS_PIECE_H
 #include "types.h"
 #include "string"
+#include "iostream"
 class piece{
 private:
     // array to convert col nums to A-H uci format
@@ -40,9 +41,26 @@ public:
     row capRow = -1;
     col capCol = -1;
 
+    // for pawn piece moves
+    // if it has moved twice this value will be its en passant vulnerability
+    row rowPassant = -1;
+    col colPassant = -1;
+
+    // for removing/adding back castle rights
+    // if a rook/king moved this stores that data so it can readd castle rights
+    bool leftCastleChanged = false;
+    bool rightCastleChanged = false;
+
+    // if it was the other sides castle rights that were changed
+    bool oppositeLeftCastle = false;
+    bool oppositeRightCastle = false;
+
+    // during a pawn promotion, what type the piece will become
+    PieceTypes promotion = NONE;
+
     piece();
 
-    piece(col curCol, row curRow, PieceTypes type, Color color);
+    piece(row curRow, col curCol, PieceTypes type, Color color);
 
     // copy constructor
     piece(const piece& Piece);

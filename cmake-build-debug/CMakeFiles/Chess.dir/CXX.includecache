@@ -6,23 +6,9 @@
 
 #IncludeRegexTransform: 
 
-C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/ai.h
+C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/board.cpp
 board.h
 C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/board.h
-getPossibleMoves.h
-C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/getPossibleMoves.h
-piece.h
-C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/piece.h
-types.h
-C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/types.h
-bits/stdc++.h
--
-SDL2/SDL_image.h
--
-iostream
--
-set
--
 
 C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/board.h
 SDL2/SDL.h
@@ -48,45 +34,13 @@ C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/types.h
 piece.h
 C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/piece.h
 
-C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/getPossibleMoves.h
-vector
--
-iostream
--
-map
--
-types.h
-C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/types.h
-SDL2/SDL_image.h
--
-types.h
-C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/types.h
-board.h
-C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/board.h
-piece.h
-C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/piece.h
-
-C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/main.cpp
-iostream
--
-board.h
-C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/board.h
-ai.h
-C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/ai.h
-chrono
--
-bits/stdc++.h
--
-SDL2/SDL_image.h
--
-SDL_image.h
-C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/SDL_image.h
-
 C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/piece.h
 types.h
 C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/types.h
 string
 C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/string
+iostream
+C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/iostream
 
 C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/types.h
 stdint.h

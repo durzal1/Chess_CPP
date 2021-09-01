@@ -25,7 +25,6 @@ private:
     // if check against user
     //bool check = false;
 
-    bool CheckMate = false;
 public:
     // constructor (dont know what to put here yet)
     ai(const board& Board, int maxDepth, Color color);
@@ -45,11 +44,11 @@ public:
 
     // function to check if the move will stop the check
     // @return whether it is still check
-    bool moveCheck(board b, const piece& Piece, int kingMoves);
+    static bool moveCheck(board b, const piece& Piece, int kingMoves);
 
     // function that looks at all squares that can attack the king and determines if the piece there can do the attack
     // @return number of pieces that can attack the king (0,1,2)
-    int kingAttacks(board Board, piece Piece);
+    static int kingAttacks(board Board, const piece& Piece);
 
     U64 perft(board b, int depth, bool print, Color color);
 };

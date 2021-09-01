@@ -285,7 +285,7 @@ ai::ai(const board& b, int maxDepth, Color color) {
 //}
 //
 
-int ai::kingAttacks(board b, piece Piece) {
+int ai::kingAttacks(board b, const piece& Piece) {
 
 	// moves that can attack the king
 	int killingMoves = 0;
@@ -305,14 +305,14 @@ int ai::kingAttacks(board b, piece Piece) {
         col newCol = Col + 1;
 
         // checks the attacks it can do
-        if (Board[newRow][newCol].color == black && Board[newRow][newCol].type == PAWN ) {
+        if (Board[newRow][newCol].color == black && Board[newRow][newCol].type == PAWN &&newRow < 8 && newRow >= 0 && newCol >= 0 && newCol < 8 ) {
             killingMoves++;
             if (killingMoves >= 2) return 2;
         }
 
         newRow = Row - 1;
         newCol = Col - 1;
-        if (Board[newRow][newCol].color == black && Board[newRow][newCol].type == PAWN ) {
+        if (Board[newRow][newCol].color == black && Board[newRow][newCol].type == PAWN&&newRow < 8 && newRow >= 0 && newCol >= 0 && newCol < 8) {
             killingMoves++;
             if (killingMoves >= 2) return 2;
         }
@@ -322,14 +322,15 @@ int ai::kingAttacks(board b, piece Piece) {
         row newRow = Row + 1;
         row newCol = Col + 1;
         // checks the attacks it can do
-        if (Board[newRow][newCol].color == white && Board[newRow][newCol].type == PAWN ) {
+        if (Board[newRow][newCol].color == white && Board[newRow][newCol].type == PAWN &&newRow < 8 && newRow >= 0 && newCol >= 0 && newCol < 8) {
+
             killingMoves++;
             if (killingMoves >= 2) return 2;
         }
 
         newRow = Row + 1;
         newCol = Col - 1;
-        if (Board[newRow][newCol].color == white && Board[newRow][newCol].type == PAWN ) {
+        if (Board[newRow][newCol].color == white && Board[newRow][newCol].type == PAWN&&newRow < 8 && newRow >= 0 && newCol >= 0 && newCol < 8 ) {
             killingMoves++;
             if (killingMoves >= 2) return 2;
         }
@@ -442,8 +443,7 @@ int ai::kingAttacks(board b, piece Piece) {
     moves.emplace_back(row_right2, col_up1);
     moves.emplace_back(row_right2, col_down1);
 
-    newRow;
-    newCol;
+
     for (std::pair<int, int> pair : moves) {
         newRow = pair.first;
         newCol = pair.second;
@@ -480,8 +480,6 @@ int ai::kingAttacks(board b, piece Piece) {
     moves.emplace_back(new_row_left, new_col_down);
     moves.emplace_back(new_row_left, new_col_up);
 
-    newRow;
-    newCol;
     for (std::pair<int, int> pair : moves) {
         newRow = pair.first;
         newCol = pair.second;
@@ -692,7 +690,6 @@ int ai::kingAttacks(board b, piece Piece) {
 }
 
 U64 ai::perft(board b, int depth, bool print, Color color) {
-    b.passentMoves.clear();
 
     // gets next color
     Color nextColor;
@@ -701,12 +698,16 @@ U64 ai::perft(board b, int depth, bool print, Color color) {
     else nextColor = white;
 
     U64 nodes = 0;
+    if (depth == 0) return 1;
 
-    if (depth == 0)
-        return 1;
+    // also checks for en passant moves if there are any
 
-    auto moves = allPosMoves(b, color);
+    // todo i think i have to add pos again idk tho
+    std::vector<int> pos;
+    auto moves = allPosMoves(b, color,pos);
 
+    // resets old en passant moves and adds the new ones(if there are any)
+    b.passentMoves.clear();
 
     // find the king piece
     piece kingPiece;
@@ -718,27 +719,58 @@ U64 ai::perft(board b, int depth, bool print, Color color) {
             }
         }
     }
+
     // check all of opposite color's moves in case of check
     // moves correlates to the amount of pieces that can kill the king
     int kingMoves = kingAttacks(b,kingPiece);
 
+    b.castleRight = false;
+    b.castleLeft = false;
+    // checks if we can move the king one spot right or left if they are at the default position
+    // if we can move it then we can do the castle move on that side
+    if (moves[0].type == KING){
+        if (moveCheck(b,moves[0],kingMoves)){
+            // can do this move
+            if (moves[0].nextCol == 3){
+                // left
+                b.castleLeft = true;
+            }else{
+                b.castleRight = true;
+            }
+        }
+    }
+    if (moves[1].type == KING){
+        if (moveCheck(b,moves[1],kingMoves)){
+            // can do this move
+            if (moves[1].nextCol == 3){
+                // left
+                b.castleLeft = true;
+            }else{
+                b.castleRight = true;
+            }
+        }
+    }
+
     for (int i = 0; i < moves.size(); i++) {
 
         piece m = moves[i];
-
         if (!moveCheck(b, m, kingMoves)){
+
             continue;
         }
 
         if (depth == 1){
             nodes ++;
+            if (m.Castle != none)b.amountCastles ++;
+
         }else{
             piece oldPiece = b.move(m);
 
             U64 np = perft(b, depth - 1, false, nextColor);
 
             if (print) {
-
+//                std::cout << 'f' << std::endl;
+//                b.print();
                 std::cout << m.toString() << " " << np << std::endl;
             }
 
@@ -748,22 +780,74 @@ U64 ai::perft(board b, int depth, bool print, Color color) {
 
 
     }
-
     return nodes;
 }
 bool ai::moveCheck(board b, const piece& Piece, int kingMoves) {
-    // exceptions
-    if (Piece.Castle != none) return false;
 
     // here only the king is allowed to move
-    if (kingMoves == 2 && Piece.type != KING) return true;
+    if (kingMoves == 2 && (Piece.type != KING || Piece.Castle != none)) return true;
 
-    // does the move
-    // changes the arrBoard
-    b.boardArr[Piece.nextRow][Piece.nextCol] = Piece;
+    // castle restrictions because of check
+    else if (kingMoves == 1 && Piece.Castle != none) return false;
+    else if ((Piece.Castle == whiteCastleLeft || Piece.Castle == blackCastleLeft) && !b.castleLeft) return false;
+    else if ((Piece.Castle == whiteCastleRight || Piece.Castle == blackCastleRight) && !b.castleRight) return false;
 
-    // makes it empty
-    b.boardArr[Piece.curRow][Piece.curCol] = piece();
+    if (Piece.Castle != none){
+        // does a castle
+        if (Piece.Castle == whiteCastleLeft){
+            // removing pieces
+            b.boardArr[7][0] = piece();
+            b.boardArr[7][4] = piece();
+
+            // adding
+            b.boardArr[7][2] = piece(7,2,KING, white);
+            b.boardArr[7][3] = piece(7,3,ROOK, white);
+        }
+        else if (Piece.Castle == whiteCastleRight){
+            // removing pieces
+            b.boardArr[7][7] = piece();
+            b.boardArr[7][4] = piece();
+
+            // adding
+            b.boardArr[7][6] = piece(7,6,KING, white);
+            b.boardArr[7][5] = piece(7,5,ROOK, white);
+        }else if (Piece.Castle == blackCastleRight){
+            // removing pieces
+            b.boardArr[0][7] = piece();
+            b.boardArr[0][4] = piece();
+
+            // adding
+            b.boardArr[0][6] = piece(0,6,KING, black);
+            b.boardArr[0][5] = piece(0,5,ROOK, black);
+        }else if (Piece.Castle == blackCastleLeft){
+            // removing pieces
+            b.boardArr[0][0] = piece();
+            b.boardArr[0][4] = piece();
+
+            // adding
+            b.boardArr[0][2] = piece(0,2,KING, black);
+            b.boardArr[0][3] = piece(0,3,ROOK, black);
+        }else{
+            // something is wrong
+            std::cout << "FIX CASTLE==============================================" << std::endl;
+        }
+    }
+    else if (Piece.capRow != -1){
+        // does an en passant move
+        b.boardArr[Piece.nextRow][Piece.nextCol] = Piece;
+
+        b.boardArr[Piece.curRow][Piece.curCol] = piece();
+        b.boardArr[Piece.capRow][Piece.capCol] = piece();
+    }
+    else{
+        // does a regular move
+        // changes the arrBoard
+        b.boardArr[Piece.nextRow][Piece.nextCol] = Piece;
+
+        // makes it empty
+        b.boardArr[Piece.curRow][Piece.curCol] = piece();
+    }
+
 
     // find the king piece
     piece kingPiece;
@@ -771,7 +855,11 @@ bool ai::moveCheck(board b, const piece& Piece, int kingMoves) {
     for (int i = 0; i < 8; i++){
         for (int j = 0; j < 8; j++){
             if (b.boardArr[i][j].type == KING && b.boardArr[i][j].color == Piece.color){
+
                 kingPiece = b.boardArr[i][j];
+
+
+                // todo look into this
                 kingPiece.curCol = j;
                 kingPiece.curRow = i;
             }
@@ -783,8 +871,9 @@ bool ai::moveCheck(board b, const piece& Piece, int kingMoves) {
     if (kingMoves2 == 0){
         return true;
     }
-
-    else return false;
+    else{
+        return false;
+    }
 }
 
 

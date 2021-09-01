@@ -21,6 +21,18 @@ piece::piece(const piece &Piece) {
 
     this->nextCol = Piece.nextCol;
     this->nextRow = Piece.nextRow;
+    this->captured = Piece.captured;
+
+    this->capRow = Piece.capRow;
+    this->capCol = Piece.capCol;
+    this->Castle = Piece.Castle;
+    this->rowPassant = Piece.rowPassant;
+    this->colPassant = Piece.colPassant;
+    this->leftCastleChanged = Piece.leftCastleChanged;
+    this->rightCastleChanged = Piece.rightCastleChanged;
+    this->promotion = Piece.promotion;
+    this->oppositeLeftCastle = Piece.oppositeLeftCastle;
+    this->oppositeRightCastle = Piece.oppositeRightCastle;
 }
 
 piece &piece::operator=(const piece &Piece) {
@@ -34,6 +46,13 @@ piece &piece::operator=(const piece &Piece) {
     this->captured = Piece.captured;
     this->capRow = Piece.capRow;
     this->capCol = Piece.capCol;
+    this->rowPassant = Piece.rowPassant;
+    this->colPassant = Piece.colPassant;
+    this->leftCastleChanged = Piece.leftCastleChanged;
+    this->rightCastleChanged = Piece.rightCastleChanged;
+    this->oppositeLeftCastle = Piece.oppositeLeftCastle;
+    this->oppositeRightCastle = Piece.oppositeRightCastle;
+    this->promotion = Piece.promotion;
     return *this;
 }
 
@@ -43,6 +62,7 @@ piece::piece() {
 
 std::string piece::toString() {
     std::string uci;
+
 
     // the rows have to be subtracted by 8 because they are going up to down instead of down to up
     std::string newRow1 = std::to_string(8-oldRow);
@@ -54,6 +74,21 @@ std::string piece::toString() {
 
     uci.append(newCol1 + newRow1);
     uci.append(newCol2 + newRow2);
+
+    // for castling
+    if (Castle != none){
+        if (Castle == whiteCastleLeft) uci = "e1c1";
+        else if (Castle == whiteCastleRight) uci = "e1g1";
+        else if (Castle == blackCastleLeft) uci = "e8c8";
+        else if (Castle == blackCastleRight) uci = "e8g8";
+    }
+
+    // if its a promotion then we add what piece it promotes to
+    if (promotion == QUEEN) uci.push_back('q');
+    else if (promotion == ROOK) uci.push_back('r');
+    else if (promotion == BISHOP) uci.push_back('b');
+    else if (promotion == HORSE) uci.push_back('n');
+
     return uci;
 }
 

@@ -275,44 +275,197 @@ piece board::move(piece &Piece) {
     row NextRow = Piece.nextRow;
     col NextCol = Piece.nextCol;
 
+    // if the piece already has had a promotion it will not be getting demoted to pawn in these iterations
+    // therefore we will remove its promotion status and just say they're a regular queen to remove confusion
+    if (Piece.promotion != NONE && Piece.type != PAWN){
+        Piece.promotion = NONE;
+    }
+
+    // if its a pawn promotion
+    if (Piece.promotion != NONE){
+        Piece.type = Piece.promotion;
+    }
+
+    // checks to see if the king/rook moved
+    // if they did it will remove their right to castle
+
+    if (Piece.type == KING && CurCol == 4){
+        // makes sure it actually did a change and it wasnt already false
+        if ( (Piece.color == white && WhiteCastleRight )|| (Piece.color == black && BlackCastleRight )){
+            if (Piece.color == white){
+                WhiteCastleRight = false;
+            }else{
+                BlackCastleRight = false;
+            }
+            Piece.rightCastleChanged = true;
+        }
+        if ( (Piece.color == white && WhiteCastleLeft )|| (Piece.color == black && BlackCastleLeft)){
+            if (Piece.color == white){
+                WhiteCastleLeft = false;
+            }else{
+                BlackCastleLeft = false;
+            }
+            Piece.leftCastleChanged = true;
+        }
+
+    }
+    else if (Piece.type == ROOK){
+        if (Piece.color == white){
+            if (WhiteCastleLeft && Piece.curRow == 7 && Piece.curCol == 0){
+                WhiteCastleLeft = false;
+                Piece.leftCastleChanged = true;
+            }
+            else if (WhiteCastleRight && Piece.curRow == 7 && Piece.curCol == 7){
+                WhiteCastleRight = false;
+                Piece.rightCastleChanged = true;
+            }
+        }else{
+            if (BlackCastleLeft && Piece.curRow == 0 && Piece.curCol == 0){
+                BlackCastleLeft = false;
+                Piece.leftCastleChanged = true;
+            }
+            else if (BlackCastleRight && Piece.curRow == 0 && Piece.curCol == 7){
+                BlackCastleRight = false;
+                Piece.rightCastleChanged = true;
+            }
+        }
+    }
+
     // looks to see if a rook got captured
     // if it did it will remove its side's right to castle
-    castles.clear();
     if (Piece.captured){
         if (Piece.color == white){
             if (Piece.nextRow == 0 && Piece.nextCol == 4){
                 // removes both sides' rights
-                blackCastleLeft = false;
-                blackCastleRight = false;
-                castles.push_back(blackCastleLeft);
-                castles.push_back(blackCastleRight);
-            }else if (Piece.type == 0 && Piece.nextCol == 0){
-                blackCastleLeft = false;
-                castles.push_back(blackCastleLeft);
+                if (BlackCastleLeft){
+                    Piece.oppositeLeftCastle = true;
+                    BlackCastleLeft = false;
+                }
+                if (BlackCastleRight){
+                    Piece.oppositeRightCastle = true;
+                    BlackCastleRight = false;
+                }
+
+            }else if (Piece.nextRow == 0 && Piece.nextCol == 0){
+                if (BlackCastleLeft){
+                    Piece.oppositeLeftCastle = true;
+                    BlackCastleLeft = false;
+                }
             }
-            else if (Piece.type == 0 && Piece.nextCol == 7){
-                blackCastleRight = false;
-                castles.push_back(blackCastleRight);
+            else if (Piece.nextRow == 0 && Piece.nextCol == 7){
+                if (BlackCastleRight){
+                    Piece.oppositeRightCastle = true;
+                    BlackCastleRight = false;
+                }
             }
 
         }else{
             if (Piece.nextRow == 7 && Piece.nextCol == 4){
                 // removes both sides' rights
-                whiteCastleLeft = false;
-                whiteCastleRight = false;
-                castles.push_back(whiteCastleLeft);
-                castles.push_back(whiteCastleRight);
-            }else if (Piece.type == 7 && Piece.nextCol == 0){
-                whiteCastleLeft = false;
-                castles.push_back(whiteCastleLeft);
+                if (WhiteCastleLeft){
+                    Piece.oppositeLeftCastle = true;
+                    WhiteCastleLeft = false;
+                }
+                if (WhiteCastleRight){
+                    Piece.oppositeRightCastle = true;
+                    WhiteCastleRight = false;
+                }
+            }else if (Piece.nextRow == 7 && Piece.nextCol == 0){
+                if (WhiteCastleLeft){
+                    Piece.oppositeLeftCastle = true;
+                    WhiteCastleLeft = false;
+                }
             }
-            else if (Piece.type == 7 && Piece.nextCol == 7){
-                whiteCastleRight = false;
-                castles.push_back(whiteCastleRight);
+            else if (Piece.nextRow == 7 && Piece.nextCol == 7){
+                if (WhiteCastleRight){
+                    Piece.oppositeRightCastle = true;
+                    WhiteCastleRight = false;
+                }
             }
         }
     }
-    if (Piece.Castle != none) std::cout << "CASTLING" << std::endl;
+    if (Piece.Castle != none){
+
+        // does a castle
+        if (Piece.Castle == whiteCastleLeft){
+            // removing pieces
+            boardArr[7][0] = piece();
+            boardArr[7][4] = piece();
+
+            // adding
+            boardArr[7][2] = piece(7,2,KING, white);
+            boardArr[7][3] = piece(7,3,ROOK, white);
+
+            if (WhiteCastleRight){
+                WhiteCastleRight = false;
+                Piece.rightCastleChanged = true;
+            }
+            if (WhiteCastleLeft){
+                WhiteCastleLeft = false;
+                Piece.leftCastleChanged = true;
+            }
+
+        }
+        else if (Piece.Castle == whiteCastleRight){
+            // removing pieces
+            boardArr[7][7] = piece();
+            boardArr[7][4] = piece();
+
+            // adding
+            boardArr[7][6] = piece(7,6,KING, white);
+            boardArr[7][5] = piece(7,5,ROOK, white);
+
+            if (WhiteCastleRight){
+                WhiteCastleRight = false;
+                Piece.rightCastleChanged = true;
+            }
+            if (WhiteCastleLeft){
+                WhiteCastleLeft = false;
+                Piece.leftCastleChanged = true;
+            }
+
+        }else if (Piece.Castle == blackCastleRight){
+            // removing pieces
+            boardArr[0][7] = piece();
+            boardArr[0][4] = piece();
+
+            // adding
+            boardArr[0][6] = piece(0,6,KING, black);
+            boardArr[0][5] = piece(0,5,ROOK, black);
+
+            if (BlackCastleRight){
+                BlackCastleRight = false;
+                Piece.rightCastleChanged = true;
+            }
+            if (BlackCastleLeft){
+                BlackCastleLeft = false;
+                Piece.leftCastleChanged = true;
+            }
+        }else if (Piece.Castle == blackCastleLeft){
+            // removing pieces
+            boardArr[0][0] = piece();
+            boardArr[0][4] = piece();
+
+            // adding
+            boardArr[0][2] = piece(0,2,KING, black);
+            boardArr[0][3] = piece(0,3,ROOK, black);
+
+            if (BlackCastleRight){
+                BlackCastleRight = false;
+                Piece.rightCastleChanged = true;
+            }
+            if (BlackCastleLeft){
+                BlackCastleLeft = false;
+                Piece.leftCastleChanged = true;
+            }
+
+        }else{
+            // something is wrong
+            std::cout << "FIX CASTLE==============================================" << std::endl;
+        }
+        amountCastles ++;
+        return piece();
+    }
 
     piece oldPiece;
     if (Piece.capRow != -1){
@@ -353,11 +506,44 @@ piece board::move(piece &Piece) {
 
 
     }
+    // if this piece resulted in an en passant possibility we will add that to the board passantMoves
+    if (Piece.colPassant != -1){
+        this->passentMoves.emplace_back(Piece.rowPassant, Piece.colPassant);
+    }
 
 
     return oldPiece;
 }
 void board::undoMove(piece &Piece, const piece& oldPiece) {
+    // undos promotion
+    if (Piece.promotion != NONE){
+
+        Piece.type = PAWN;
+        Piece.promotion = NONE;
+    }
+
+    // if there were any castle rights removed add them back
+    if (Piece.rightCastleChanged){
+        Piece.rightCastleChanged = false;
+        if (Piece.color == white) WhiteCastleRight = true;
+        else BlackCastleRight = true;
+    }else if (Piece.oppositeRightCastle){
+        Piece.oppositeRightCastle = false;
+        if (Piece.color == white) BlackCastleRight = true;
+        else WhiteCastleRight = true;
+    }
+
+    if (Piece.leftCastleChanged){
+        Piece.leftCastleChanged = false;
+        if (Piece.color == white) WhiteCastleLeft = true;
+        else BlackCastleLeft = true;
+    }else if (Piece.oppositeLeftCastle){
+        Piece.oppositeLeftCastle = false;
+        if (Piece.color == white)BlackCastleLeft = true;
+        else WhiteCastleLeft = true;
+    }
+
+
     // vars
     row CurRow = Piece.curRow;
     col CurCol = Piece.curCol;
@@ -366,6 +552,7 @@ void board::undoMove(piece &Piece, const piece& oldPiece) {
     col OldCol = Piece.oldCol;
 
     if (Piece.capRow != -1){
+        // undos en passant
         // changes the arrBoard
         boardArr[Piece.curRow][Piece.curCol] = piece();
 
@@ -383,6 +570,56 @@ void board::undoMove(piece &Piece, const piece& oldPiece) {
         Piece.capRow = -1;
         Piece.nextCol = -1;
 
+    }else if (Piece.Castle != none){
+        // undos castle
+        if (Piece.Castle == whiteCastleLeft){
+            // removing pieces
+            boardArr[7][2] = piece();
+            boardArr[7][3] = piece();
+
+            // adding
+            boardArr[7][0] = piece(7,0,ROOK, white);
+            boardArr[7][4] = piece(7,4,KING, white);
+
+            WhiteCastleLeft = true;
+            WhiteCastleRight = true;
+        }
+        else if (Piece.Castle == whiteCastleRight){
+            // removing pieces
+            boardArr[7][6] = piece();
+            boardArr[7][5] = piece();
+
+            // adding
+            boardArr[7][7] = piece(7,7,ROOK, white);
+            boardArr[7][4] = piece(7,4,KING, white);
+
+            WhiteCastleRight = true;
+            WhiteCastleLeft = true;
+
+        }else if (Piece.Castle == blackCastleRight){
+            // removing pieces
+            boardArr[0][6] = piece();
+            boardArr[0][5] = piece();
+
+            // adding
+            boardArr[0][7] = piece(0,7,ROOK, black);
+            boardArr[0][4] = piece(0,4,KING, black);
+
+            BlackCastleLeft = true;
+            BlackCastleRight = true;
+
+        }else if (Piece.Castle == blackCastleLeft){
+            // removing pieces
+            boardArr[0][2] = piece();
+            boardArr[0][3] = piece();
+
+            // adding
+            boardArr[0][0] = piece(0,0,ROOK, black);
+            boardArr[0][4] = piece(0,4,KING, black);
+
+            BlackCastleLeft = true;
+            BlackCastleRight = true;
+        }
     }
     else{
         // resets the arrBoard
@@ -392,9 +629,20 @@ void board::undoMove(piece &Piece, const piece& oldPiece) {
         Piece.curRow = OldRow;
         Piece.curCol = OldCol;
 
-        // makes it empty
+        Piece.nextRow = -999;
+        Piece.nextCol = -999;
+
         boardArr[Piece.oldRow][Piece.oldCol] = Piece;
     }
+
+    // if this piece resulted in an en passant possibility we will remove it so it does not get used again
+    if (Piece.colPassant != -1){
+        this->passentMoves.clear();
+
+        Piece.rowPassant = -1;
+        Piece.colPassant = -1;
+    }
+
 }
 void board::print() {
     for (int I = 0; I < 8; I ++){
@@ -404,22 +652,46 @@ void board::print() {
             if (boardArr[I][j].type != NONE){
                 switch (boardArr[I][j].type){
                     case PAWN:
-                        std::cout << 'p';
+                        if (boardArr[I][j].color == black){
+                            std::cout << 'p';
+                        }else{
+                            std::cout << 'P';
+                        }
                         break;
                     case KING:
-                        std::cout << 'k';
+                        if (boardArr[I][j].color == black){
+                            std::cout << 'k';
+                        }else{
+                            std::cout << 'K';
+                        }
                         break;
                     case QUEEN:
-                        std::cout << 'q';
+                        if (boardArr[I][j].color == black){
+                            std::cout << 'q';
+                        }else{
+                            std::cout << 'Q';
+                        }
                         break;
                     case BISHOP:
-                        std::cout << 'b';
+                        if (boardArr[I][j].color == black){
+                            std::cout << 'b';
+                        }else{
+                            std::cout << 'B';
+                        }
                         break;
                     case HORSE:
-                        std::cout << 'n';
+                        if (boardArr[I][j].color == black){
+                            std::cout << 'n';
+                        }else{
+                            std::cout << 'N';
+                        }
                         break;
                     case ROOK:
-                        std::cout << 'r';
+                        if (boardArr[I][j].color == black){
+                            std::cout << 'r';
+                        }else{
+                            std::cout << 'R';
+                        }
                         break;
                 }
             }else std::cout << " ";
@@ -446,6 +718,7 @@ void board::FENboard(std::string FEN) {
     bool fiftymoverule = false;
     bool enPassant = false;
 
+    int times = 0;
     std::string currentFiftyRule;
     std::string turns;
     int II = -1;
@@ -477,6 +750,29 @@ void board::FENboard(std::string FEN) {
                 }
             }
 
+            // we dont have to change if its white since white is default start
+            if (Castle){
+                if (c == 'b'){
+                    playerTurn = black;
+                }else if (c == 'w');
+                // castling rights
+                else if (c == 'Q') WhiteCastleLeft = true;
+                else if (c == 'q') BlackCastleLeft = true;
+                else if (c == 'k') BlackCastleRight = true;
+                else if (c == 'K') WhiteCastleRight = true;
+                else if (c == '-'){
+                    times ++;
+                    if (times == 2){
+                        enPassant = true;
+                        Castle = false;
+                    }
+
+                }
+                else{
+                    enPassant = true;
+                    Castle = false;
+                }
+            }
             // looks for any enpassant
             if (enPassant){
                 if (c == '-'){
@@ -484,34 +780,17 @@ void board::FENboard(std::string FEN) {
                     fiftymoverule = true;
                 }
                 else if (c <= '9'){
-                    int num = c - '0';
+                    int num =8 - ( c - '0');
                     passentMoves.emplace_back(conversion[FEN[II-1]], num);
                     enPassant = false;
                     fiftymoverule = true;
                 }else{
-                    int num = FEN[II+1] - '0';
-                    passentMoves.emplace_back(conversion[c], num);
+                    int num = 8 - (FEN[II+1] - '0');
+                    passentMoves.emplace_back(num,conversion[c]);
                     enPassant = false;
                     fiftymoverule = true;
                 }
             }
-
-            // we dont have to change if its white since white is default start
-            if (Castle){
-                if (c == 'b'){
-                    playerTurn = black;
-                }
-                // castling rights
-                else if (c == 'Q') whiteCastleLeft = true;
-                else if (c == 'q') blackCastleLeft = true;
-                else if (c == 'k') blackCastleRight = true;
-                else if (c == 'K') whiteCastleRight = true;
-                else{
-                    enPassant = true;
-                    Castle = false;
-                }
-            }
-
 
         }
         else{
@@ -523,7 +802,8 @@ void board::FENboard(std::string FEN) {
 
             // skip some cols
             if (c < '9' && c != '/'){
-                j += (c - '0');
+                int val = c - '0';
+                j += val;
             }
             else{
                 // its a piece
@@ -572,38 +852,7 @@ void board::FENboard(std::string FEN) {
         halfTurns = 10 * (currentFiftyRule[0] - '9') + (currentFiftyRule[1] - '9');
     }
 
-    for (i = 0; i < 8; i ++){
-        std::cout << "+---+---+---+---+---+---+---+---+" << std::endl;
-        for (j = 0; j < 8; j++){
-            std::cout << '|' << " ";
-            if (boardArr[i][j].type != NONE){
-                switch (boardArr[i][j].type){
-                    case PAWN:
-                        std::cout << 'p';
-                        break;
-                    case KING:
-                        std::cout << 'k';
-                        break;
-                    case QUEEN:
-                        std::cout << 'q';
-                        break;
-                    case BISHOP:
-                        std::cout << 'b';
-                        break;
-                    case HORSE:
-                        std::cout << 'n';
-                        break;
-                    case ROOK:
-                        std::cout << 'r';
-                        break;
-                }
-            }else std::cout << " ";
-            std::cout << " ";
-            if (j == 7) std::cout << '|' << std::endl;
-
-
-        }
-    }
+    print();
 
 }
 
@@ -612,10 +861,10 @@ board::board() {
 }
 
 board::board(const board &b) {
-    this->whiteCastleRight = b.whiteCastleRight;
-    this->whiteCastleLeft = b.whiteCastleLeft;
-    this->blackCastleLeft = b.blackCastleLeft;
-    this->blackCastleRight = b.blackCastleRight;
+    this->WhiteCastleRight = b.WhiteCastleRight;
+    this->WhiteCastleLeft = b.WhiteCastleLeft;
+    this->BlackCastleLeft = b.BlackCastleLeft;
+    this->BlackCastleRight = b.BlackCastleRight;
     this->fullTurns = b.fullTurns;
     this->halfTurns = b.halfTurns;
     this->inter = b.inter;
@@ -626,14 +875,19 @@ board::board(const board &b) {
     }
     this->playerTurn = b.playerTurn;
     this->castles = b.castles;
+    this->passentMoves = b.passentMoves;
+    this->castleRight = b.castleRight;
+    this->castleLeft = b.castleLeft;
 
 }
 
 board &board::operator=(const board &b) {
-    this->whiteCastleRight = b.whiteCastleRight;
-    this->whiteCastleLeft = b.whiteCastleLeft;
-    this->blackCastleLeft = b.blackCastleLeft;
-    this->blackCastleRight = b.blackCastleRight;
+    this->WhiteCastleRight = b.WhiteCastleRight;
+    this->WhiteCastleLeft = b.WhiteCastleLeft;
+    this->BlackCastleLeft = b.BlackCastleLeft;
+    this->BlackCastleRight = b.BlackCastleRight;
+    this->castleRight = b.castleRight;
+    this->castleLeft = b.castleLeft;
     this->fullTurns = b.fullTurns;
     this->halfTurns = b.halfTurns;
     this->castles = b.castles;
@@ -644,6 +898,7 @@ board &board::operator=(const board &b) {
         }
     }
     this->playerTurn = b.playerTurn;
+    this->passentMoves = b.passentMoves;
     return *this;
 }
 

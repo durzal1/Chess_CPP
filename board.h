@@ -56,26 +56,34 @@ private:
 //    // vector of textures
 //    std::vector<SDL_Texture*> textures;
 
-    // vector of castle bool vars that it has done recently(and will have to undo)
-    std::vector<bool> castles;
+    // vector of castle string vars that it has done recently(and will have to undo)
+    std::vector<castle> castles;
 
     // converts letters to numbers for the col
     std::map<char, int> conversion;
 
 public:
+    // secondary check if the user can do a castle on either direction
+    bool castleRight = false;
+    bool castleLeft = false;
+
+
+    // amount of castles (useful for perft)
+    int amountCastles = 0;
+
     // all castle rights are false by default
     // if right has the  right to castle (right rook and king hasnt moved)
-    bool whiteCastleRight = false;
+    bool WhiteCastleRight = false;
 
     // if right has the  right to castle (left rook and king hasnt moved)
-    bool whiteCastleLeft = false;
+    bool WhiteCastleLeft = false;
 
 
     // if right has the  right to castle (rightrook hasnt moved)
-    bool blackCastleRight = false;
+    bool BlackCastleRight = false;
 
     // if right has the  right to castle (left rook hasnt moved)
-    bool blackCastleLeft = false;
+    bool BlackCastleLeft = false;
 
     // full turns that have been made the entire game
     int fullTurns = 0;

@@ -4,43 +4,47 @@
 ////
 //
 #include "getPossibleMoves.h"
-std::vector<piece> allPosMoves(board b, Color color){
+std::vector<piece> allPosMoves(const board& b, Color color,std::vector<int> &pos){
     std::vector<piece> moves;
+
     for (int i = 0; i < 8 ; i++){
         for (int j = 0; j < 8; j++){
             piece type = b.boardArr[j][i];
-            if (type.color == color && type.type != NONE) posMoves(type, b, moves,everything);
+
+            type.curCol = i;
+            type.curRow = j;
+            if (type.color == color && type.type != NONE) posMoves(type, b, moves,everything, pos);
         }
     }
     return moves;
 }
 
 // only gets the captures
-std::vector<piece> allCaptures(board b, Color color){
+std::vector<piece> allCaptures(const board& b, Color color,std::vector<int> &pos){
     std::vector<piece> moves;
     for (int i = 0; i < 8 ; i++){
         for (int j = 0; j < 8; j++){
             piece type = b.boardArr[i][j];
-            posMoves(type, b, moves, captures);
+            posMoves(type, b, moves, captures, pos);
         }
     }
     return moves;
 }
 
 // only gets nonCaptures
-std::vector<piece> noCaptures(board b, Color color){
+std::vector<piece> noCaptures(const board& b, Color color,std::vector<int> &pos){
     std::vector<piece> moves;
     for (int i = 0; i < 8 ; i++){
         for (int j = 0; j < 8; j++){
             piece type = b.boardArr[i][j];
-            posMoves(type, b, moves, nonCaptures);
+            posMoves(type, b, moves, nonCaptures, pos);
         }
     }
     return moves;
 }
 
 // directly adds moves to the moves vector in allPosMoves
-void posMoves(const piece& Piece,board b, std::vector<piece> &allMoves, Mode mode) { // , SDL_Renderer* renderer
+void posMoves(const piece& Piece,const board& b, std::vector<piece> &allMoves, Mode mode,std::vector<int> &pos ) { // , SDL_Renderer* renderer
 
     // sets variables of the piece
     auto Class = Piece.type;
@@ -74,11 +78,16 @@ void posMoves(const piece& Piece,board b, std::vector<piece> &allMoves, Mode mod
                     newPiece.nextRow = newRow;
 
                     // adds the temporary en passent
-                    b.passentMoves.emplace_back(Row + 1, newCol);
+                    newPiece.rowPassant = Row + 1;
+                    newPiece.colPassant = newCol;
 
                     allMoves.push_back(newPiece);
                 }
             }
+            // if any of these have a row of 7 they are going to promote
+            // therefore we add four of them (horse, queen, rook, and bishop)
+            // idk why we need rook and bishop but the pro programs do that so yea lol
+
             row newRow = Row + 1;
             col newCol = Col;
 
@@ -89,6 +98,16 @@ void posMoves(const piece& Piece,board b, std::vector<piece> &allMoves, Mode mod
                 // adjust the new Piece
                 newPiece.nextCol = newCol;
                 newPiece.nextRow = newRow;
+
+                if (newRow == 7){
+                    newPiece.promotion = QUEEN;
+                    allMoves.push_back(newPiece);
+                    newPiece.promotion = HORSE;
+                    allMoves.push_back(newPiece);
+                    newPiece.promotion = BISHOP;
+                    allMoves.push_back(newPiece);
+                    newPiece.promotion = ROOK;
+                }
 
                 allMoves.push_back(newPiece);
             }
@@ -107,6 +126,16 @@ void posMoves(const piece& Piece,board b, std::vector<piece> &allMoves, Mode mod
 
                 newPiece.captured = true;
 
+                if (newRow == 7){
+                    newPiece.promotion = QUEEN;
+                    allMoves.push_back(newPiece);
+                    newPiece.promotion = HORSE;
+                    allMoves.push_back(newPiece);
+                    newPiece.promotion = BISHOP;
+                    allMoves.push_back(newPiece);
+                    newPiece.promotion = ROOK;
+                }
+
                 allMoves.push_back(newPiece);
             }
 
@@ -122,6 +151,16 @@ void posMoves(const piece& Piece,board b, std::vector<piece> &allMoves, Mode mod
 
                 newPiece.captured = true;
 
+                if (newRow == 7){
+                    newPiece.promotion = QUEEN;
+                    allMoves.push_back(newPiece);
+                    newPiece.promotion = HORSE;
+                    allMoves.push_back(newPiece);
+                    newPiece.promotion = BISHOP;
+                    allMoves.push_back(newPiece);
+                    newPiece.promotion = ROOK;
+                }
+
                 allMoves.push_back(newPiece);
             }
             if (!b.passentMoves.empty()){
@@ -129,7 +168,7 @@ void posMoves(const piece& Piece,board b, std::vector<piece> &allMoves, Mode mod
                 newRow = Row + 1;
                 newCol = Col + 1;
 
-                if (Board[newRow][newCol].type == NONE && b.passentMoves[0].first == newRow && b.passentMoves[0].second == newCol && newRow < 8 && newRow >= 0 && newCol >= 0 && newCol < 8){
+                if (Board[newRow][newCol].type == NONE && Board[Row][newCol].type == PAWN &&Board[Row][newCol].color != color && b.passentMoves[0].first == newRow && b.passentMoves[0].second == newCol && newRow < 8 && newRow >= 0 && newCol >= 0 && newCol < 8){
                     // create a copy of the piece
                     piece newPiece = piece(Piece);
 
@@ -142,11 +181,12 @@ void posMoves(const piece& Piece,board b, std::vector<piece> &allMoves, Mode mod
                     newPiece.capRow = Row;
                     newPiece.capCol = newCol;
                     allMoves.push_back(newPiece);
+
                 }
 
                 newRow = Row + 1;
                 newCol = Col - 1;
-                if (Board[newRow][newCol].type == NONE && b.passentMoves[0].first == newRow && b.passentMoves[0].second == newCol && newRow < 8 && newRow >= 0 && newCol >= 0 && newCol < 8){
+                if (Board[newRow][newCol].type == NONE && Board[Row][newCol].type == PAWN &&Board[Row][newCol].color != color && b.passentMoves[0].first == newRow && b.passentMoves[0].second == newCol && newRow < 8 && newRow >= 0 && newCol >= 0 && newCol < 8){
                     // create a copy of the piece
                     piece newPiece = piece(Piece);
 
@@ -159,6 +199,7 @@ void posMoves(const piece& Piece,board b, std::vector<piece> &allMoves, Mode mod
                     newPiece.capRow = Row;
                     newPiece.capCol = newCol;
                     allMoves.push_back(newPiece);
+
                 }
             }
 
@@ -182,7 +223,8 @@ void posMoves(const piece& Piece,board b, std::vector<piece> &allMoves, Mode mod
                     newPiece.nextRow = newRow;
 
                     // adds the temporary en passent
-                    b.passentMoves.emplace_back(Row-1, newCol);
+                    newPiece.rowPassant = Row - 1;
+                    newPiece.colPassant = newCol;
 
                     allMoves.push_back(newPiece);
                 }
@@ -197,6 +239,16 @@ void posMoves(const piece& Piece,board b, std::vector<piece> &allMoves, Mode mod
                 // adjust the new Piece
                 newPiece.nextCol = newCol;
                 newPiece.nextRow = newRow;
+
+                if (newRow == 0){
+                    newPiece.promotion = QUEEN;
+                    allMoves.push_back(newPiece);
+                    newPiece.promotion = HORSE;
+                    allMoves.push_back(newPiece);
+                    newPiece.promotion = BISHOP;
+                    allMoves.push_back(newPiece);
+                    newPiece.promotion = ROOK;
+                }
 
                 allMoves.push_back(newPiece);
             }
@@ -214,6 +266,16 @@ void posMoves(const piece& Piece,board b, std::vector<piece> &allMoves, Mode mod
 
                 newPiece.captured = true;
 
+                if (newRow == 0){
+                    newPiece.promotion = QUEEN;
+                    allMoves.push_back(newPiece);
+                    newPiece.promotion = HORSE;
+                    allMoves.push_back(newPiece);
+                    newPiece.promotion = BISHOP;
+                    allMoves.push_back(newPiece);
+                    newPiece.promotion = ROOK;
+                }
+
                 allMoves.push_back(newPiece);
             }
 
@@ -229,6 +291,16 @@ void posMoves(const piece& Piece,board b, std::vector<piece> &allMoves, Mode mod
 
                 newPiece.captured = true;
 
+                if (newRow == 0){
+                    newPiece.promotion = QUEEN;
+                    allMoves.push_back(newPiece);
+                    newPiece.promotion = HORSE;
+                    allMoves.push_back(newPiece);
+                    newPiece.promotion = BISHOP;
+                    allMoves.push_back(newPiece);
+                    newPiece.promotion = ROOK;
+                }
+
                 allMoves.push_back(newPiece);
             }
             if (!b.passentMoves.empty()){
@@ -236,7 +308,7 @@ void posMoves(const piece& Piece,board b, std::vector<piece> &allMoves, Mode mod
                 newRow = Row-1;
                 newCol = Col + 1;
                 // checks if this move is an en passant move
-                if (Board[newRow][newCol].type == NONE && b.passentMoves[0].first == newRow && b.passentMoves[0].second == newCol && newRow < 8 && newRow >= 0 && newCol >= 0 && newCol < 8){
+                if (Board[newRow][newCol].type == NONE && Board[Row][newCol].type == PAWN &&Board[Row][newCol].color != color &&  b.passentMoves[0].first == newRow && b.passentMoves[0].second == newCol && newRow < 8 && newRow >= 0 && newCol >= 0 && newCol < 8){
                     // create a copy of the piece
                     piece newPiece = piece(Piece);
 
@@ -248,12 +320,13 @@ void posMoves(const piece& Piece,board b, std::vector<piece> &allMoves, Mode mod
 
                     newPiece.capRow = Row;
                     newPiece.capCol = newCol;
+
                     allMoves.push_back(newPiece);
                 }
 
                 newRow = Row-1;
                 newCol = Col-1;
-                if (Board[newRow][newCol].type == NONE && b.passentMoves[0].first == newRow && b.passentMoves[0].second == newCol && newRow < 8 && newRow >= 0 && newCol >= 0 && newCol < 8){
+                if (Board[newRow][newCol].type == NONE && Board[Row][newCol].type == PAWN &&Board[Row][newCol].color != color && b.passentMoves[0].first == newRow && b.passentMoves[0].second == newCol && newRow < 8 && newRow >= 0 && newCol >= 0 && newCol < 8){
                     // create a copy of the piece
                     piece newPiece = piece(Piece);
 
@@ -265,7 +338,11 @@ void posMoves(const piece& Piece,board b, std::vector<piece> &allMoves, Mode mod
 
                     newPiece.capRow = Row;
                     newPiece.capCol = newCol;
+
+
                     allMoves.push_back(newPiece);
+
+
                 }
             }
 
@@ -273,6 +350,7 @@ void posMoves(const piece& Piece,board b, std::vector<piece> &allMoves, Mode mod
     }
     // rooks
     if (Class == ROOK) {
+
         // loop through all the possible moves a rook can move up/down/left/right
         int newRow;
         int newCol;
@@ -343,6 +421,32 @@ void posMoves(const piece& Piece,board b, std::vector<piece> &allMoves, Mode mod
                 newPiece.nextCol = newCol;
                 newPiece.nextRow = newRow;
 
+                // looks for castles
+                if (color == white){
+                    // valid castles
+                    if (b.WhiteCastleLeft && newCol == 3 && newRow == 7 && Row == 7 && Col == 0){
+                        allMoves.push_back(newPiece);
+                        newPiece.Castle = whiteCastleLeft;
+                        newPiece.nextCol = 999;
+                    }
+                    else if (b.WhiteCastleRight && newCol == 5 && newRow == 7 && Row == 7 && Col == 7){
+                        allMoves.push_back(newPiece);
+                        newPiece.Castle = whiteCastleRight;
+                        newPiece.nextCol = 999;
+                    }
+                }else{
+                    if (b.BlackCastleLeft && newCol == 3 && newRow == 0 && Row == 0 && Col == 0){
+                        allMoves.push_back(newPiece);
+                        newPiece.Castle = blackCastleLeft;
+                        newPiece.nextCol = 999;
+                    }
+                    else if (b.BlackCastleRight && newCol == 5 && newRow == 0 && Row == 0 && Col == 7){
+                        allMoves.push_back(newPiece);
+                        newPiece.Castle = blackCastleRight;
+                        newPiece.nextCol = 999;
+                    }
+                }
+
                 allMoves.push_back(newPiece);
             }
             // if there is a piece on the square
@@ -370,98 +474,7 @@ void posMoves(const piece& Piece,board b, std::vector<piece> &allMoves, Mode mod
                 else if (dir == Left) goLeft = false;
             }
         }
-        // castling
 
-        // for white
-        if (color == white){
-            // left
-            if (b.whiteCastleLeft){
-                // check if both pieces haven't been captured
-                bool first = Board[7][0].color == white && Board[7][0].type == ROOK ;
-                bool second = Board[7][4].color == white && Board[7][4].type == KING;
-
-                // two squares between them are empty
-                bool third = Board[7][1].type == NONE;
-                bool fourth = Board[7][2].type == NONE;
-                bool fifth = Board[7][3].type == NONE;
-
-                // if all are true
-                if (first && second && third && fourth && fifth){
-                    // create a copy of the piece
-                    piece newPiece = piece(Piece);
-
-                    // adjust the new Piece
-                    newPiece.Castle = whiteCastleLeft;
-
-                    allMoves.push_back(newPiece);
-                }
-            }
-            if (b.whiteCastleRight){
-                // check if both pieces haven't been captured
-                bool first = Board[7][7].color == white && Board[7][7].type == ROOK ;
-                bool second = Board[7][4].color == white && Board[7][4].type == KING;
-
-                // two squares between them are empty
-                bool third = Board[7][5].type == NONE;
-                bool fourth = Board[7][6].type == NONE;
-
-                // if all are true
-                if (first && second && third && fourth){
-                    // create a copy of the piece
-                    piece newPiece = piece(Piece);
-
-                    // adjust the new Piece
-                    newPiece.Castle = whiteCastleRight;
-
-                    allMoves.push_back(newPiece);
-                }
-            }
-        }
-        // black
-        else{
-            // left
-            if (b.blackCastleLeft){
-                // check if both pieces haven't been captured
-                bool first = Board[0][0].color == black && Board[0][0].type == ROOK ;
-                bool second = Board[0][4].color == black && Board[0][4].type == KING;
-
-                // two squares between them are empty
-                bool third = Board[0][1].type == NONE;
-                bool fourth = Board[0][2].type == NONE;
-                bool fifth = Board[0][3].type == NONE;
-
-                // if all are true
-                if (first && second && third && fourth && fifth){
-                    // create a copy of the piece
-                    piece newPiece = piece(Piece);
-
-                    // adjust the new Piece
-                    newPiece.Castle = blackCastleLeft;
-
-                    allMoves.push_back(newPiece);
-                }
-            }
-            if (b.blackCastleRight){
-                // check if both pieces haven't been captured
-                bool first = Board[0][7].color == black && Board[0][7].type == ROOK ;
-                bool second = Board[0][4].color == black && Board[0][4].type == KING;
-
-                // two squares between them are empty
-                bool third = Board[0][5].type == NONE;
-                bool fourth = Board[0][6].type == NONE;
-
-                // if all are true
-                if (first && second && third && fourth){
-                    // create a copy of the piece
-                    piece newPiece = piece(Piece);
-
-                    // adjust the new Piece
-                    newPiece.Castle = blackCastleRight;
-
-                    allMoves.push_back(newPiece);
-                }
-            }
-        }
     }
     else if (Class == HORSE) {
         // vector of all possible moves here (could be illegal)
@@ -561,6 +574,19 @@ void posMoves(const piece& Piece,board b, std::vector<piece> &allMoves, Mode mod
 
             // checks if the move is legal
 
+            // bool for castle parameter
+            // checks if it can move left or right successfully if its in the default spot
+            bool castleParam = false;
+
+            if (color == white){
+                if (newCol == 3 && newRow == 7 && Col == 4 && Row == 7){
+                    castleParam = true;
+                }else if (newCol == 5 && newRow == 7&& Col == 4 && Row == 7 ) castleParam = true;
+            }else{
+                if (newCol == 3 && newRow == 0 && Col == 4 && Row == 0){
+                    castleParam = true;
+                }else if (newCol == 5 && newRow == 0 && Col == 4 && Row == 0 ) castleParam = true;
+            }
 
             if (Board[newRow][newCol].type == NONE && mode != captures){
                 // create a copy of the piece
@@ -570,7 +596,8 @@ void posMoves(const piece& Piece,board b, std::vector<piece> &allMoves, Mode mod
                 newPiece.nextCol = newCol;
                 newPiece.nextRow = newRow;
 
-                allMoves.push_back(newPiece);
+                if (castleParam) allMoves.insert(allMoves.begin(),newPiece);
+                else allMoves.push_back(newPiece);
             }
             if (Board[newRow][newCol].color != color && Board[newRow][newCol].type != NONE && mode != nonCaptures){
                 // create a copy of the piece
@@ -582,7 +609,8 @@ void posMoves(const piece& Piece,board b, std::vector<piece> &allMoves, Mode mod
 
                 newPiece.captured = true;
 
-                allMoves.push_back(newPiece);
+                if (castleParam) allMoves.insert(allMoves.begin(),newPiece);
+                else allMoves.push_back(newPiece);
             }
         }
 

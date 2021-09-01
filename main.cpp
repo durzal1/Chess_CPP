@@ -31,7 +31,7 @@ for kevin
 //target_link_libraries(Chess mingw32 SDL2main SDL2 SDL2_Image)
 
 std::string Default = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-std::string FEN = "rnbqkbnr/ppp1pppp/8/1B1p4/8/4P3/PPPP1PPP/RNBQK1NR b QKqk - 1 1";
+std::string FEN = "8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - ";
 int main() {
 
     // const
@@ -46,10 +46,10 @@ int main() {
 //    win = SDL_CreateWindow("Hello World", posX, posY, width, height, 0);
 //    renderer = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED);
     board Board = board(width); // win, renderer,
-    Board.FENboard(Default);
+    Board.FENboard(FEN);
     auto start = std::chrono::high_resolution_clock::now();
 
-    ai AI = ai(Board, 5, white);
+    ai AI = ai(Board, 5, Board.playerTurn);
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
     std::cout << " moves took " << duration.count() << " ms.";
