@@ -176,6 +176,30 @@ board.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\Chess.dir\build.make CMakeFiles/Chess.dir/board.cpp.s
 .PHONY : board.cpp.s
 
+evaluate.obj: evaluate.cpp.obj
+.PHONY : evaluate.obj
+
+# target to build an object file
+evaluate.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Chess.dir\build.make CMakeFiles/Chess.dir/evaluate.cpp.obj
+.PHONY : evaluate.cpp.obj
+
+evaluate.i: evaluate.cpp.i
+.PHONY : evaluate.i
+
+# target to preprocess a source file
+evaluate.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Chess.dir\build.make CMakeFiles/Chess.dir/evaluate.cpp.i
+.PHONY : evaluate.cpp.i
+
+evaluate.s: evaluate.cpp.s
+.PHONY : evaluate.s
+
+# target to generate assembly for a file
+evaluate.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Chess.dir\build.make CMakeFiles/Chess.dir/evaluate.cpp.s
+.PHONY : evaluate.cpp.s
+
 getPossibleMoves.obj: getPossibleMoves.cpp.obj
 .PHONY : getPossibleMoves.obj
 
@@ -248,6 +272,30 @@ piece.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\Chess.dir\build.make CMakeFiles/Chess.dir/piece.cpp.s
 .PHONY : piece.cpp.s
 
+uci.obj: uci.cpp.obj
+.PHONY : uci.obj
+
+# target to build an object file
+uci.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Chess.dir\build.make CMakeFiles/Chess.dir/uci.cpp.obj
+.PHONY : uci.cpp.obj
+
+uci.i: uci.cpp.i
+.PHONY : uci.i
+
+# target to preprocess a source file
+uci.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Chess.dir\build.make CMakeFiles/Chess.dir/uci.cpp.i
+.PHONY : uci.cpp.i
+
+uci.s: uci.cpp.s
+.PHONY : uci.s
+
+# target to generate assembly for a file
+uci.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Chess.dir\build.make CMakeFiles/Chess.dir/uci.cpp.s
+.PHONY : uci.cpp.s
+
 # Help Target
 help:
 	@echo The following are some of the valid targets for this Makefile:
@@ -263,6 +311,9 @@ help:
 	@echo ... board.obj
 	@echo ... board.i
 	@echo ... board.s
+	@echo ... evaluate.obj
+	@echo ... evaluate.i
+	@echo ... evaluate.s
 	@echo ... getPossibleMoves.obj
 	@echo ... getPossibleMoves.i
 	@echo ... getPossibleMoves.s
@@ -272,6 +323,9 @@ help:
 	@echo ... piece.obj
 	@echo ... piece.i
 	@echo ... piece.s
+	@echo ... uci.obj
+	@echo ... uci.i
+	@echo ... uci.s
 .PHONY : help
 
 

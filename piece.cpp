@@ -33,6 +33,10 @@ piece::piece(const piece &Piece) {
     this->promotion = Piece.promotion;
     this->oppositeLeftCastle = Piece.oppositeLeftCastle;
     this->oppositeRightCastle = Piece.oppositeRightCastle;
+    this->oldRow = Piece.oldRow;
+    this->oldCol = Piece.oldCol;
+    this->Value = Piece.Value;
+
 }
 
 piece &piece::operator=(const piece &Piece) {
@@ -53,6 +57,9 @@ piece &piece::operator=(const piece &Piece) {
     this->oppositeLeftCastle = Piece.oppositeLeftCastle;
     this->oppositeRightCastle = Piece.oppositeRightCastle;
     this->promotion = Piece.promotion;
+    this->oldRow = Piece.oldRow;
+    this->oldCol = Piece.oldCol;
+    this->Value = Piece.Value;
     return *this;
 }
 
@@ -63,6 +70,14 @@ piece::piece() {
 std::string piece::toString() {
     std::string uci;
 
+    // for castling
+    if (Castle != none){
+        if (Castle == whiteCastleLeft) uci = "e1c1";
+        else if (Castle == whiteCastleRight) uci = "e1g1";
+        else if (Castle == blackCastleLeft) uci = "e8c8";
+        else if (Castle == blackCastleRight) uci = "e8g8";
+        return  uci;
+    }
 
     // the rows have to be subtracted by 8 because they are going up to down instead of down to up
     std::string newRow1 = std::to_string(8-oldRow);
@@ -75,13 +90,7 @@ std::string piece::toString() {
     uci.append(newCol1 + newRow1);
     uci.append(newCol2 + newRow2);
 
-    // for castling
-    if (Castle != none){
-        if (Castle == whiteCastleLeft) uci = "e1c1";
-        else if (Castle == whiteCastleRight) uci = "e1g1";
-        else if (Castle == blackCastleLeft) uci = "e8c8";
-        else if (Castle == blackCastleRight) uci = "e8g8";
-    }
+
 
     // if its a promotion then we add what piece it promotes to
     if (promotion == QUEEN) uci.push_back('q');

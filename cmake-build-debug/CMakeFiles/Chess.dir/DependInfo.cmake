@@ -10,9 +10,11 @@ set(CMAKE_DEPENDS_LANGUAGES
 set(CMAKE_DEPENDS_CHECK_CXX
   "C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/ai.cpp" "C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/cmake-build-debug/CMakeFiles/Chess.dir/ai.cpp.obj"
   "C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/board.cpp" "C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/cmake-build-debug/CMakeFiles/Chess.dir/board.cpp.obj"
+  "C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/evaluate.cpp" "C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/cmake-build-debug/CMakeFiles/Chess.dir/evaluate.cpp.obj"
   "C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/getPossibleMoves.cpp" "C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/cmake-build-debug/CMakeFiles/Chess.dir/getPossibleMoves.cpp.obj"
   "C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/main.cpp" "C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/cmake-build-debug/CMakeFiles/Chess.dir/main.cpp.obj"
   "C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/piece.cpp" "C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/cmake-build-debug/CMakeFiles/Chess.dir/piece.cpp.obj"
+  "C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/uci.cpp" "C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/cmake-build-debug/CMakeFiles/Chess.dir/uci.cpp.obj"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 

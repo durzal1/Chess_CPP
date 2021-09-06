@@ -4,286 +4,128 @@
 
 #include "ai.h"
 
-ai::ai(const board& b, int maxDepth, Color color) {
-	// gets the max depth recursive function will go to (+1 is to make depth more accurate)
+ai::ai(const board& b, int maxDepth, Color color, int timeLimit) {
+    // honestly i dont even need this anymore lol
+
+	// gets the max depth recursive function will go to
 	this->maxDepth = maxDepth;
 
-//    for (auto move:moves){
-//        i++;
-//        if (i != 2) continue;
-//        b.move(move);
-//        auto c = perft(b, maxDepth, true, black);
-//        std::cout << "==========================================" << c << std::endl;
-//    }
-	auto c = perft(b, maxDepth, true, color);
-    std::cout << c;
-
+	this->timeLimit = timeLimit;
 }
 
 
-//void ai::getScores(board Board, int index, std::string color, int depth, int Row, int Col, bool captured, int& totalMoves, std::string castle) {
-//
-//	// get next color
-//	std::string nextColor;
-//
-//	auto pieces = Board.whitePieces; // pieces store current color pieces being searched, white by default
-//	auto opposingPieces = Board.blackPieces;
-//	if (color == "black") {
-//		nextColor = "white";
-//		if (captured) { // black piece was captured on the last turn by white since it is black's turn now
-//			// gets index of black piece
-//			int ind = Board.BoardLoc[{Row, Col}];
-//
-//			if (Row == 7 && Col == 0) { // if captures a rook, cant castle on that side
-//				Board.whiteCastleLeft = false;
-//			}
-//			else if (Row == 7 && Col == 7) Board.whiteCastleRight = false;
-//
-//			// erases it
-//			Board.whitePieces.erase(ind);
-//
-//			//			Board.blackPieces.erase(Board.blackPieces.begin() + Board.BoardLoc[{Row, Col}] - 2);
-//		}
-//		pieces = Board.blackPieces;
-//		opposingPieces = Board.whitePieces;
-//	}
-//	else {
-//		nextColor = "black";
-//		if (captured) { // white piece was captured on the last turn by black since it is white's turn now
-//			// gets index of white piece and erases it
-//			int ind = Board.BoardLoc[{Row, Col}];
-//
-//			if (Row == 0 && Col == 0) { // if captures a rook, cant castle on that side
-//				Board.blackCastleLeft = false;
-//			}
-//			else if (Row == 0 && Col == 7) Board.blackCastleRight = false;
-//
-//			// erases it
-//			Board.whitePieces.erase(ind);
-//		}
-//	}
-//	// checks if the move is a castle
-//	if (!castle.empty()) {
-//
-//		// checks where the castle is located
-//		if (castle == "whiteLeft") {
-//			// deletes the old positions of king and rook
-//			Board.BoardLoc.erase({ 7, 4 });
-//			Board.BoardLoc.erase({ 7, 0 });
-//
-//			// update the row and column in data classes
-//			Board.PieceLoc[17] = { 7, 3 };
-//			Board.BoardLoc[{7, 3}] = 17;
-//
-//			Board.PieceLoc[21] = { 7, 2 };
-//			Board.BoardLoc[{7, 2}] = 21;
-//
-//		}
-//		else if (castle == "whiteRight") {
-//			// deletes the old positions of king and rook
-//			Board.BoardLoc.erase({ 7, 4 });
-//			Board.BoardLoc.erase({ 7, 7 });
-//
-//			// update the row and column in data classes
-//			Board.PieceLoc[24] = { 7, 5 };
-//			Board.BoardLoc[{7, 5}] = 24;
-//
-//			Board.PieceLoc[21] = { 7, 6 };
-//			Board.BoardLoc[{7, 6}] = 21;
-//		}
-//		else if (castle == "blackLeft") {
-//			// deletes the old positions of king and rook
-//			Board.BoardLoc.erase(std::pair<int, int>{ 0, 0 });
-//			Board.BoardLoc.erase({ 0, 4 });
-//
-//			// update the row and column in data classes
-//			Board.PieceLoc[1] = { 0, 3 };
-//			Board.BoardLoc[{0, 3}] = 1;
-//
-//			Board.PieceLoc[5] = { 0, 2 };
-//			Board.BoardLoc[{0, 2}] = 5;
-//		}
-//		else if (castle == "blackRight") {
-//			// deletes the old positions of king and rook
-//			Board.BoardLoc.erase({ 0, 7 });
-//			Board.BoardLoc.erase({ 0, 4 });
-//
-//			// update the row and column in data classes
-//			Board.PieceLoc[7] = { 0, 5 };
-//			Board.BoardLoc[{0, 5}] = 7;
-//
-//			Board.PieceLoc[5] = { 0, 6 };
-//			Board.BoardLoc[{0, 6}] = 5;
-//		}
-//		else {
-//			std::cout << "broken fix castle";
-//		}
-//		std::cout << "F";
-//	}
-//	// not a castle move
-//	else {
-//		// set the old cord to have no piece inside of it
-//		std::pair<int, int> oldCords = Board.PieceLoc[index];
-//
-//		// deletes the key
-//		Board.BoardLoc.erase({ oldCords.first, oldCords.second });
-//
-//		// update the row and column in data classes
-//		Board.PieceLoc[index] = { Row, Col };
-//		Board.BoardLoc[{Row, Col}] = index;
-//	}
-//
-//
-//	//// REMOVE THIS LATER IT IS FOR TESTING ONLY AND USES A LOT OF MEMORY
-//	//	Board.createBoard();
-//
-//	// puts the base case later so it can the piece can do the move before it ends returns
-//	if (depth == 0) {
-//		totalMoves++;
-//		return;
-//	}
-//
-//	// if its a king that moved or one of rooks then player or ai lost their right to castle
-//	if (Board.IndClass[index - 1] == "king") {
-//		if (color == "white") {
-//			Board.whiteCastleRight = false;
-//			Board.whiteCastleLeft = false;
-//		}
-//		else {
-//			Board.blackCastleRight = false;
-//			Board.blackCastleLeft = false;
-//		}
-//	}
-//	else if (Board.IndClass[index - 1] == "rook") {
-//		if (color == "white") {
-//			// check which side it is on
-//			if (index == 17) Board.whiteCastleLeft = false;
-//			else if (index == 24) Board.whiteCastleRight = false;
-//		}
-//		else {
-//			if (index == 1) Board.blackCastleLeft = false;
-//			else if (index == 7)Board.blackCastleRight = false;
-//		}
-//	}
-//	/// if there is check i am not going to look to see if castle can help it
-//
-//	// index of king
-//	int kingInd;
-//	if (color == "black") kingInd = 5;
-//	else kingInd = 21;
-//
-//
-//	// gets its row and column
-//	std::pair<int, int> newCords = Board.PieceLoc[kingInd];
-//	int row = newCords.first;
-//	int col = newCords.second;
-//
-//	// check all of opposite color's moves in case of check
-//	// moves correlates to the amount of pieces that can kill the king
-//	int moves = kingAttacks(Board, color, row, col);
-//
-//	//     here any move can help get out of check
-//	if (moves == 1) {
-//		bool checkMate = true;
-//		// iterate through each piece
-//		for (int piece : pieces) {
-//			std::string className = Board.IndClass[piece - 1];
-//
-//			// gets its row and column
-//			std::pair<int, int> NewCords = Board.PieceLoc[piece];
-//
-//			int Row_ = NewCords.first;
-//			int Col_ = NewCords.second;
-//
-//			std::vector<std::tuple<int, int, bool, std::string>> Moves = posMoves(className, Row_, Col_, color, Board); // Board.renderer
-//
-//
-//			for (auto move : Moves) {
-//
-//				int row_ = std::get<0>(move);
-//				int col_ = std::get<1>(move);
-//				bool Captured = std::get<2>(move);
-//				std::string Castle = std::get<3>(move);
-//
-//				// cannot castle
-//				if (!Castle.empty()) continue;
-//
-//				if (!moveCheck(Board, color, piece, row_, col_, Captured)) { // if not in check after move (valid)
-//					checkMate = false;
-//					getScores(Board, piece, nextColor, depth - 1, row_, col_, Captured, totalMoves, "");
-//				}
-//			}
-//		}
-//		if (checkMate) {
-//			// add one to moves and return since the game is over
-//			totalMoves++;
-//			return;
-//		}
-//	}
-//
-//	// here only the king is allowed to move
-//	else if (moves == 2) {
-//		std::string className = Board.IndClass[kingInd - 1];
-//
-//		// gets its row and column
-//		std::pair<int, int> newCords = Board.PieceLoc[kingInd];
-//
-//		int row = newCords.first;
-//		int col = newCords.second;
-//
-//		std::vector<std::tuple<int, int, bool, std::string>> moves = posMoves(className, row, col, color, Board);
-//
-//		bool checkMate = true;
-//		for (auto move : moves) {
-//			int row_ = std::get<0>(move);
-//			int col_ = std::get<1>(move);
-//			bool Captured = std::get<2>(move);
-//			std::string Castle = std::get<3>(move);
-//
-//			// cannot castle
-//			if (!Castle.empty()) continue;
-//
-//			if (!moveCheck(Board, color, kingInd, row_, col_, Captured)) { // if not in check after move (valid)
-//				checkMate = false;
-//				getScores(Board, kingInd, nextColor, depth - 1, row_, col_, Captured, totalMoves, "");
-//			}
-//		}
-//		if (checkMate) {
-//			// add one to moves and return since the game is over
-//			totalMoves++;
-//			return;
-//		}
-//	}
-//	//     no check to worry about
-//	else {
-//
-//		// class of piece
-//		for (auto piece : pieces) {
-//			std::string className = Board.IndClass[piece - 1];
-//
-//			// gets its row and column
-//			std::pair<int, int> NewCords = Board.PieceLoc[piece];
-//
-//			int row1 = NewCords.first;
-//			int col1 = NewCords.second;
-//
-//			std::vector<std::tuple<int, int, bool, std::string>> Moves = posMoves(className, row1, col1, color, Board); // , Board.renderer
-//
-//			// iterate through all of the moves
-//			for (auto move : Moves) {
-//				int row_ = std::get<0>(move);
-//				int col_ = std::get<1>(move);
-//				bool Captured = std::get<2>(move);
-//				std::string Castle = std::get<3>(move);
-//
-//				getScores(Board, piece, nextColor, depth - 1, row_, col_, Captured, totalMoves, Castle);
-//
-//			}
-//		}
-//	}
-//
-//}
-//
+int ai::minMax(board b, int depth, Color color, int alpha, int beta, int &nodes, piece &bestMove, std::chrono::time_point<std::chrono::system_clock> start, std::vector<piece> &allMoves) {
+    // checks to see if time ran out
+    auto stop = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
+
+    // if time has ran out we set beta to -inf and alpha to inf to exit the recursive call
+    if (duration.count() > timeLimit){
+        if (color == black){
+            alpha = 9999999;
+            return alpha;
+        }else{
+            beta = -9999999;
+            return beta;
+        }
+    }
+    // gets next color
+    Color nextColor;
+
+    if (color == white) nextColor = black;
+    else nextColor = white;
+
+    if (depth == 0){
+        // evaluate the move
+        auto eval = evaluate();
+
+        // sets value
+        int whiteVal = 0;
+        int blackVal = 0;
+        for (int i = 0; i < 8; i++){
+            for (int j = 0; j < 8; j++){
+                if (b.boardArr[i][j].type != NONE){
+                    if (b.boardArr[i][j].color == white){
+                        whiteVal += b.getVal[b.boardArr[i][j].type];
+                    }else{
+                        blackVal += b.getVal[b.boardArr[i][j].type];
+                    }
+                }
+            }
+        }
+        int val = whiteVal - blackVal;
+
+        int valuation = eval.evaluateFunc(b,nextColor, val);
+
+//        if (b.boardArr[3][6].type == PAWN && b.boardArr[2][7].type == NONE){
+//            b.print();
+//            std::cout << 'f';
+//        }
+        if (valuation == 240){
+            b.print();
+            std::cout << 'f';
+        }
+        // sets the last move to this value
+        allMoves[allMoves.size()-1].Value = valuation;
+
+        return valuation;
+    }
+
+    // also checks for en passant moves if there are any
+
+    auto moves = allPosMoves(b, color);
+
+    // resets old en passant moves and adds the new ones(if there are any)
+    b.passentMoves.clear();
+
+    U64 kingMoves = getKingMoves(b, color, moves[0], moves[1]);
+
+    // for setting the best values gotten (minMax)
+    int bestVal;
+    if (color == white) bestVal = -9999999;
+    else bestVal = 99999999;
+
+    for (auto m : moves) {
+        if (!moveCheck(b, m, kingMoves)){
+            continue;
+        }
+        nodes ++;
+        piece oldPiece = b.move(m);
+        if (depth == 1) allMoves.push_back(m);
+
+        int value = minMax(b, depth - 1, nextColor, alpha, beta, nodes, bestMove,start, allMoves);
+
+        // changes the best if the new value is greater/less depending on color
+        if (color == white){
+            // the bestVal at depth 1 will be where the move takes place, if its depth maxDepth we keep updating the best move
+            if (depth == maxDepth && value > bestVal){
+                // reset the bestMove
+                bestMove = m;
+            }
+            bestVal = std::max(value, bestVal);
+            alpha = std::max(alpha, value);
+            if (beta <= alpha)break;
+        }
+        else{
+            if (depth == maxDepth && value < bestVal){
+                // reset the bestMove
+                bestMove = m;
+            }
+            bestVal = std::min(value, bestVal);
+            beta = std::min(bestVal, value);
+            if (beta <= alpha) break;
+        }
+        b.undoMove(m, oldPiece);
+    }
+    // this means there was a checkmate so we just return the opposite so it doesnt get picked no matter what
+    if (bestVal == 99999999){
+        return -99999999;
+    }else if (bestVal == -99999999){
+        return 99999999;
+    }else{
+        return bestVal;
+    }
+}
 
 int ai::kingAttacks(board b, const piece& Piece) {
 
@@ -688,27 +530,7 @@ int ai::kingAttacks(board b, const piece& Piece) {
 
 	return killingMoves;
 }
-
-U64 ai::perft(board b, int depth, bool print, Color color) {
-
-    // gets next color
-    Color nextColor;
-
-    if (color == white) nextColor = black;
-    else nextColor = white;
-
-    U64 nodes = 0;
-    if (depth == 0) return 1;
-
-    // also checks for en passant moves if there are any
-
-    // todo i think i have to add pos again idk tho
-    std::vector<int> pos;
-    auto moves = allPosMoves(b, color,pos);
-
-    // resets old en passant moves and adds the new ones(if there are any)
-    b.passentMoves.clear();
-
+U64 ai::getKingMoves(board &b, Color color, const piece& moves1, const piece& moves2){
     // find the king piece
     piece kingPiece;
 
@@ -722,16 +544,16 @@ U64 ai::perft(board b, int depth, bool print, Color color) {
 
     // check all of opposite color's moves in case of check
     // moves correlates to the amount of pieces that can kill the king
-    int kingMoves = kingAttacks(b,kingPiece);
+    U64 kingMoves = kingAttacks(b,kingPiece);
 
     b.castleRight = false;
     b.castleLeft = false;
     // checks if we can move the king one spot right or left if they are at the default position
     // if we can move it then we can do the castle move on that side
-    if (moves[0].type == KING){
-        if (moveCheck(b,moves[0],kingMoves)){
+    if (moves1.type == KING){
+        if (moveCheck(b,moves1,kingMoves)){
             // can do this move
-            if (moves[0].nextCol == 3){
+            if (moves1.nextCol == 3){
                 // left
                 b.castleLeft = true;
             }else{
@@ -739,10 +561,10 @@ U64 ai::perft(board b, int depth, bool print, Color color) {
             }
         }
     }
-    if (moves[1].type == KING){
-        if (moveCheck(b,moves[1],kingMoves)){
+    if (moves2.type == KING){
+        if (moveCheck(b,moves2,kingMoves)){
             // can do this move
-            if (moves[1].nextCol == 3){
+            if (moves2.nextCol == 3){
                 // left
                 b.castleLeft = true;
             }else{
@@ -750,12 +572,32 @@ U64 ai::perft(board b, int depth, bool print, Color color) {
             }
         }
     }
+    return (kingMoves);
+}
+U64 ai::perft(board b, int depth, bool print, Color color) {
+
+    // gets next color
+    Color nextColor;
+
+    if (color == white) nextColor = black;
+    else nextColor = white;
+
+    U64 nodes = 0;
+    if (depth == 0) return 1;
+
+    // also checks for en passant moves if there are any
+
+    auto moves = allPosMoves(b, color);
+
+    // resets old en passant moves and adds the new ones(if there are any)
+    b.passentMoves.clear();
+
+    U64 kingMoves = getKingMoves(b, color, moves[0], moves[1]);
 
     for (int i = 0; i < moves.size(); i++) {
 
         piece m = moves[i];
         if (!moveCheck(b, m, kingMoves)){
-
             continue;
         }
 
@@ -769,11 +611,8 @@ U64 ai::perft(board b, int depth, bool print, Color color) {
             U64 np = perft(b, depth - 1, false, nextColor);
 
             if (print) {
-//                std::cout << 'f' << std::endl;
-//                b.print();
                 std::cout << m.toString() << " " << np << std::endl;
             }
-
             nodes += np;
             b.undoMove(m, oldPiece);
         }
@@ -785,7 +624,7 @@ U64 ai::perft(board b, int depth, bool print, Color color) {
 bool ai::moveCheck(board b, const piece& Piece, int kingMoves) {
 
     // here only the king is allowed to move
-    if (kingMoves == 2 && (Piece.type != KING || Piece.Castle != none)) return true;
+    if (kingMoves == 2 && (Piece.type != KING || Piece.Castle != none)) return false;
 
     // castle restrictions because of check
     else if (kingMoves == 1 && Piece.Castle != none) return false;
@@ -875,6 +714,8 @@ bool ai::moveCheck(board b, const piece& Piece, int kingMoves) {
         return false;
     }
 }
+
+
 
 
 

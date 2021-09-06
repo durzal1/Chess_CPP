@@ -76,12 +76,7 @@ board::board( int width) { // SDL_Window* win, SDL_Renderer* renderer1,
     // creates the pieces and board
     this->createPieces();
 
-    /// TESTING POSITIONS
-//    BoardLoc{};
-
-
     this->createBoard();
-//    posMoves("queen", 4,4, "white", BoardLoc, inter, renderer);
 }
 
 // inits the pieces in their respective data classes
@@ -504,7 +499,6 @@ piece board::move(piece &Piece) {
         // makes it empty
         boardArr[CurRow][CurCol] = piece();
 
-
     }
     // if this piece resulted in an en passant possibility we will add that to the board passantMoves
     if (Piece.colPassant != -1){
@@ -517,7 +511,6 @@ piece board::move(piece &Piece) {
 void board::undoMove(piece &Piece, const piece& oldPiece) {
     // undos promotion
     if (Piece.promotion != NONE){
-
         Piece.type = PAWN;
         Piece.promotion = NONE;
     }
@@ -569,6 +562,7 @@ void board::undoMove(piece &Piece, const piece& oldPiece) {
         // so the next move will not be an en passant move
         Piece.capRow = -1;
         Piece.nextCol = -1;
+
 
     }else if (Piece.Castle != none){
         // undos castle
@@ -633,6 +627,7 @@ void board::undoMove(piece &Piece, const piece& oldPiece) {
         Piece.nextCol = -999;
 
         boardArr[Piece.oldRow][Piece.oldCol] = Piece;
+
     }
 
     // if this piece resulted in an en passant possibility we will remove it so it does not get used again
@@ -645,49 +640,49 @@ void board::undoMove(piece &Piece, const piece& oldPiece) {
 
 }
 void board::print() {
-    for (int I = 0; I < 8; I ++){
+    for (auto & I : boardArr){
         std::cout << "+---+---+---+---+---+---+---+---+" << std::endl;
         for (int j = 0; j < 8; j++){
             std::cout << '|' << " ";
-            if (boardArr[I][j].type != NONE){
-                switch (boardArr[I][j].type){
+            if (I[j].type != NONE){
+                switch (I[j].type){
                     case PAWN:
-                        if (boardArr[I][j].color == black){
+                        if (I[j].color == black){
                             std::cout << 'p';
                         }else{
                             std::cout << 'P';
                         }
                         break;
                     case KING:
-                        if (boardArr[I][j].color == black){
+                        if (I[j].color == black){
                             std::cout << 'k';
                         }else{
                             std::cout << 'K';
                         }
                         break;
                     case QUEEN:
-                        if (boardArr[I][j].color == black){
+                        if (I[j].color == black){
                             std::cout << 'q';
                         }else{
                             std::cout << 'Q';
                         }
                         break;
                     case BISHOP:
-                        if (boardArr[I][j].color == black){
+                        if (I[j].color == black){
                             std::cout << 'b';
                         }else{
                             std::cout << 'B';
                         }
                         break;
                     case HORSE:
-                        if (boardArr[I][j].color == black){
+                        if (I[j].color == black){
                             std::cout << 'n';
                         }else{
                             std::cout << 'N';
                         }
                         break;
                     case ROOK:
-                        if (boardArr[I][j].color == black){
+                        if (I[j].color == black){
                             std::cout << 'r';
                         }else{
                             std::cout << 'R';
@@ -851,9 +846,6 @@ void board::FENboard(std::string FEN) {
         // two digit number
         halfTurns = 10 * (currentFiftyRule[0] - '9') + (currentFiftyRule[1] - '9');
     }
-
-    print();
-
 }
 
 board::board() {
@@ -878,6 +870,7 @@ board::board(const board &b) {
     this->passentMoves = b.passentMoves;
     this->castleRight = b.castleRight;
     this->castleLeft = b.castleLeft;
+    this->conversion = b.conversion;
 
 }
 
@@ -899,6 +892,7 @@ board &board::operator=(const board &b) {
     }
     this->playerTurn = b.playerTurn;
     this->passentMoves = b.passentMoves;
+    this->conversion = b.conversion;
     return *this;
 }
 

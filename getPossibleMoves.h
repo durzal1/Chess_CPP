@@ -27,11 +27,11 @@ for kevin
 // @param int, col of the move
 // @param bool, if the move captures another piece
 // @param string, either empty or castle location ex. "whiteLeft"
-void posMoves(const piece& Piece, const board& b, std::vector<piece> &moves, Mode mode,std::vector<int> &pos); //, SDL_Renderer* renderer
+void posMoves(const piece& Piece, const board& b, std::vector<piece> &moves, Mode mode); //, SDL_Renderer* renderer
 
-std::vector<piece> allPosMoves(const board& b, Color color,std::vector<int> &pos);
+std::vector<piece> allPosMoves(const board& b, Color color);
 
-std::vector<piece> allCaptures(const board& b, Color color,std::vector<int> &pos);
+std::vector<piece> allCaptures(const board& b, Color color);
 
-std::vector<piece> noCaptures(const board& b, Color color,std::vector<int> &pos);
+std::vector<piece> noCaptures(const board& b, Color color);
 #endif //CHESS_GETPOSSIBLEMOVES_H

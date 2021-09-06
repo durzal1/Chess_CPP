@@ -58,6 +58,9 @@ public:
     // during a pawn promotion, what type the piece will become
     PieceTypes promotion = NONE;
 
+    // value of a piece
+    int Value;
+
     piece();
 
     piece(row curRow, col curCol, PieceTypes type, Color color);

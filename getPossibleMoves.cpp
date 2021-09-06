@@ -4,7 +4,7 @@
 ////
 //
 #include "getPossibleMoves.h"
-std::vector<piece> allPosMoves(const board& b, Color color,std::vector<int> &pos){
+std::vector<piece> allPosMoves(const board& b, Color color){
     std::vector<piece> moves;
 
     for (int i = 0; i < 8 ; i++){
@@ -13,38 +13,38 @@ std::vector<piece> allPosMoves(const board& b, Color color,std::vector<int> &pos
 
             type.curCol = i;
             type.curRow = j;
-            if (type.color == color && type.type != NONE) posMoves(type, b, moves,everything, pos);
+            if (type.color == color && type.type != NONE) posMoves(type, b, moves,everything);
         }
     }
     return moves;
 }
 
 // only gets the captures
-std::vector<piece> allCaptures(const board& b, Color color,std::vector<int> &pos){
+std::vector<piece> allCaptures(const board& b, Color color){
     std::vector<piece> moves;
     for (int i = 0; i < 8 ; i++){
         for (int j = 0; j < 8; j++){
             piece type = b.boardArr[i][j];
-            posMoves(type, b, moves, captures, pos);
+            posMoves(type, b, moves, captures);
         }
     }
     return moves;
 }
 
 // only gets nonCaptures
-std::vector<piece> noCaptures(const board& b, Color color,std::vector<int> &pos){
+std::vector<piece> noCaptures(const board& b, Color color){
     std::vector<piece> moves;
     for (int i = 0; i < 8 ; i++){
         for (int j = 0; j < 8; j++){
             piece type = b.boardArr[i][j];
-            posMoves(type, b, moves, nonCaptures, pos);
+            posMoves(type, b, moves, nonCaptures);
         }
     }
     return moves;
 }
 
 // directly adds moves to the moves vector in allPosMoves
-void posMoves(const piece& Piece,const board& b, std::vector<piece> &allMoves, Mode mode,std::vector<int> &pos ) { // , SDL_Renderer* renderer
+void posMoves(const piece& Piece,const board& b, std::vector<piece> &allMoves, Mode mode) { // , SDL_Renderer* renderer
 
     // sets variables of the piece
     auto Class = Piece.type;

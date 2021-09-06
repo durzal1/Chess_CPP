@@ -5,12 +5,19 @@ CMakeFiles/Chess.dir/ai.cpp.obj: \
  ../ai.cpp \
  ../ai.h \
  ../board.h \
+ ../evaluate.h \
  ../getPossibleMoves.h \
  ../piece.h \
  ../types.h
 CMakeFiles/Chess.dir/board.cpp.obj: \
  ../board.cpp \
  ../board.h \
+ ../piece.h \
+ ../types.h
+CMakeFiles/Chess.dir/evaluate.cpp.obj: \
+ ../board.h \
+ ../evaluate.cpp \
+ ../evaluate.h \
  ../piece.h \
  ../types.h
 CMakeFiles/Chess.dir/getPossibleMoves.cpp.obj: \
@@ -22,11 +29,22 @@ CMakeFiles/Chess.dir/getPossibleMoves.cpp.obj: \
 CMakeFiles/Chess.dir/main.cpp.obj: \
  ../ai.h \
  ../board.h \
+ ../evaluate.h \
  ../getPossibleMoves.h \
  ../main.cpp \
  ../piece.h \
- ../types.h
+ ../types.h \
+ ../uci.h
 CMakeFiles/Chess.dir/piece.cpp.obj: \
  ../piece.cpp \
  ../piece.h \
  ../types.h
+CMakeFiles/Chess.dir/uci.cpp.obj: \
+ ../ai.h \
+ ../board.h \
+ ../evaluate.h \
+ ../getPossibleMoves.h \
+ ../piece.h \
+ ../types.h \
+ ../uci.cpp \
+ ../uci.h

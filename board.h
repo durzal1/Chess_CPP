@@ -59,10 +59,28 @@ private:
     // vector of castle string vars that it has done recently(and will have to undo)
     std::vector<castle> castles;
 
+    // all constant values that we will need to evaluate the board and piece values
+    const int P = 100;
+    const int N = 320;
+    const int B = 330;
+    const int R = 500;
+    const int Q = 900;
+    const int K = 20000;
+
+public:
+    // we put all these values in a hash map to make it easier to call
+    std::map<PieceTypes,int> getVal = {
+            {PAWN,P},
+            {HORSE,N},
+            {BISHOP,B},
+            {ROOK,R},
+            {QUEEN,Q},
+            {KING,K},
+            };
+
     // converts letters to numbers for the col
     std::map<char, int> conversion;
 
-public:
     // secondary check if the user can do a castle on either direction
     bool castleRight = false;
     bool castleLeft = false;
