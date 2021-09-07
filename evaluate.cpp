@@ -32,61 +32,61 @@ int evaluate::evaluateFunc(const board &b, Color color, int val) {
                         case KING:
                             if (mg){
                                 if (color == white) val += mg_king_table[pos];
-                                else val -= mg_king_table[pos];
+                                else val += mg_king_table[pos];
 
                                 vals.push_back(mg_king_table[pos]);
                             }else{
                                 if (color == white)  val += eg_king_table[pos];
-                                else val -= eg_king_table[pos];
+                                else val += eg_king_table[pos];
                             }
                             break;
 
                         case QUEEN:
                             if (mg){
                                 if (color == white) val += mg_queen_table[pos];
-                                else val -= mg_queen_table[pos];
+                                else val += mg_queen_table[pos];
 
                                 vals.push_back(mg_queen_table[pos]);
                             }else{
                                 if (color == white) val += eg_queen_table[pos];
-                                else val -= eg_queen_table[pos];
+                                else val += eg_queen_table[pos];
                             }
                             break;
 
                         case ROOK:
                             if (mg){
                                 if (color == white) val += mg_rook_table[pos];
-                                else val -= mg_rook_table[pos];
+                                else val += mg_rook_table[pos];
 
                                 vals.push_back(mg_rook_table[pos]);
                             }else{
                                 if (color == white) val += eg_rook_table[pos];
-                                else val -= eg_rook_table[pos];
+                                else val += eg_rook_table[pos];
                             }
                             break;
 
                         case BISHOP:
                             if (mg){
                                 if (color == white) val += mg_bishop_table[pos];
-                                else val -= mg_bishop_table[pos];
+                                else val += mg_bishop_table[pos];
 
                                 vals.push_back(mg_bishop_table[pos]);
 
                             }else{
                                 if (color == white) val += eg_bishop_table[pos];
-                                else val -= eg_bishop_table[pos];
+                                else val += eg_bishop_table[pos];
                             }
                             break;
 
                         case HORSE:
                             if (mg){
                                 if (color == white) val += mg_knight_table[pos];
-                                else val -= mg_knight_table[pos];
+                                else val += mg_knight_table[pos];
 
                                 vals.push_back(mg_knight_table[pos]);
                             }else{
                                 if (color == white) val += eg_knight_table[pos];
-                                else val -= eg_knight_table[pos];
+                                else val += eg_knight_table[pos];
 
                             }
                             break;
@@ -94,12 +94,12 @@ int evaluate::evaluateFunc(const board &b, Color color, int val) {
                         case (PAWN):
                             if (mg){
                                 if (color == white) val += mg_pawn_table[pos];
-                                else val -= mg_pawn_table[pos];
+                                else val += mg_pawn_table[pos];
 
                                 vals.push_back(mg_pawn_table[pos]);
                             }else{
                                 if (color == white) val += eg_pawn_table[pos];
-                                else val -= eg_pawn_table[pos];
+                                else val += eg_pawn_table[pos];
                             }
                             break;
                     }

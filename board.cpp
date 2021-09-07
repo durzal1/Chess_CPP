@@ -640,6 +640,7 @@ void board::undoMove(piece &Piece, const piece& oldPiece) {
 
 }
 void board::print() {
+    std::cout << "" << std::endl;
     for (auto & I : boardArr){
         std::cout << "+---+---+---+---+---+---+---+---+" << std::endl;
         for (int j = 0; j < 8; j++){

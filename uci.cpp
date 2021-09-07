@@ -170,6 +170,7 @@ void uci::go(int depth, int timeLimit) {
     // does iterative deepening and if it runs out of time it will set beta to -inf and alpha to inf
     // then it will use best move from the last iteration
     auto start = std::chrono::high_resolution_clock::now();
+    timeLimit = 20000000;
 
     ai AI = ai(Board, 1, Board.playerTurn, timeLimit);
 
@@ -190,7 +191,9 @@ void uci::go(int depth, int timeLimit) {
 
         int score = AI.minMax(Board, i, Board.playerTurn,-999999, 999999, nodes, bestMove, start, allMoves);
 
-
+        for (piece m:allMoves){
+            std::cout << "f";
+        }
         // checks to makes sure it didnt leave too early
         auto stop = std::chrono::high_resolution_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);

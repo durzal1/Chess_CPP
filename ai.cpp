@@ -54,21 +54,24 @@ int ai::minMax(board b, int depth, Color color, int alpha, int beta, int &nodes,
             }
         }
         int val = whiteVal - blackVal;
-
+        if (nextColor == black) val = blackVal - whiteVal;
+//        b.print();
         int valuation = eval.evaluateFunc(b,nextColor, val);
 
 //        if (b.boardArr[3][6].type == PAWN && b.boardArr[2][7].type == NONE){
 //            b.print();
 //            std::cout << 'f';
 //        }
-        if (valuation == 240){
-            b.print();
+//        if (valuation == 240){
+//            b.print();
+//            std::cout << 'f';
+//        }
+        // sets the last move to this value
+//        allMoves[allMoves.size()-1].Value = valuation;
+        if (valuation == -280 && b.boardArr[6][3].type == PAWN){
             std::cout << 'f';
         }
-        // sets the last move to this value
-        allMoves[allMoves.size()-1].Value = valuation;
-
-        return valuation;
+        return -valuation;
     }
 
     // also checks for en passant moves if there are any
@@ -81,50 +84,49 @@ int ai::minMax(board b, int depth, Color color, int alpha, int beta, int &nodes,
     U64 kingMoves = getKingMoves(b, color, moves[0], moves[1]);
 
     // for setting the best values gotten (minMax)
-    int bestVal;
-    if (color == white) bestVal = -9999999;
-    else bestVal = 99999999;
-
-    for (auto m : moves) {
+    int bestSoFar = -999999;
+    bool go = false;
+    for (int i = 0; i < moves.size(); i++) {
+        auto &m = moves[i];
         if (!moveCheck(b, m, kingMoves)){
+
             continue;
         }
         nodes ++;
         piece oldPiece = b.move(m);
-        if (depth == 1) allMoves.push_back(m);
 
-        int value = minMax(b, depth - 1, nextColor, alpha, beta, nodes, bestMove,start, allMoves);
+//        if (b.boardArr[3][6].type == PAWN && b.boardArr[2][7].type == NONE && b.boardArr[4][4].type == NONE && color == white){
+//            b.print();
+//            allMoves.push_back(m);
+//        }
+        int value = -minMax(b, depth - 1, nextColor, -beta, -alpha, nodes, bestMove,start, allMoves);
+        m.Value = value;
 
-        // changes the best if the new value is greater/less depending on color
-        if (color == white){
-            // the bestVal at depth 1 will be where the move takes place, if its depth maxDepth we keep updating the best move
-            if (depth == maxDepth && value > bestVal){
-                // reset the bestMove
-                bestMove = m;
-            }
-            bestVal = std::max(value, bestVal);
-            alpha = std::max(alpha, value);
-            if (beta <= alpha)break;
+        if (depth == maxDepth && value > bestSoFar){
+            // reset the bestMove
+            bestMove = m;
         }
-        else{
-            if (depth == maxDepth && value < bestVal){
-                // reset the bestMove
-                bestMove = m;
-            }
-            bestVal = std::min(value, bestVal);
-            beta = std::min(bestVal, value);
-            if (beta <= alpha) break;
+        bestSoFar = std::max(value, bestSoFar);
+        if (bestSoFar > beta){
+//            if (b.boardArr[3][6].type == PAWN && b.boardArr[2][7].type == NONE && b.boardArr[4][4].type == NONE && color == white){
+//                b.print();
+//                allMoves.push_back(m);
+//                go = true;
+//            }
+            return bestSoFar;
         }
+
+        alpha = std::max(alpha, bestSoFar);
+//        if (b.boardArr[3][6].type == PAWN && b.boardArr[2][7].type == NONE && b.boardArr[4][4].type == NONE && color == black){
+//            b.print();
+//            allMoves.push_back(m);
+//            go = true;
+//        }
         b.undoMove(m, oldPiece);
+
     }
-    // this means there was a checkmate so we just return the opposite so it doesnt get picked no matter what
-    if (bestVal == 99999999){
-        return -99999999;
-    }else if (bestVal == -99999999){
-        return 99999999;
-    }else{
-        return bestVal;
-    }
+    return bestSoFar;
+
 }
 
 int ai::kingAttacks(board b, const piece& Piece) {
