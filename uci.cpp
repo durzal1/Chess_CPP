@@ -208,7 +208,7 @@ void uci::go(int depth, int timeLimit) {
 
             double time = double(du) / 1000;
             int nps = nodes / time;
-            std::cout << "info depth " << i << " cp "  << score << " nodes " << nodes - lastNode <<  " nps " << nps << " time " << duration.count() << std::endl;
+            std::cout << "info depth " << i << " score cp "  << score << " nodes " << nodes - lastNode <<  " nps " << nps << " time " << duration.count() << std::endl;
             lastBestMove = bestMove;
             lastNode = nodes;
         }

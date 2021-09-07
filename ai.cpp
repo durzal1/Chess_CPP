@@ -86,6 +86,10 @@ int ai::minMax(board b, int depth, Color color, int alpha, int beta, int &nodes,
         zobVal zob = zobVal();
         U64 zobristKey = zob.getZob(b.boardArr, b.zobVals);
 
+        if (b.boardArr[5][0].type == PAWN && b.boardArr[5][1].type == PAWN &&  b.boardArr[2][0].type == PAWN){
+            b.print();
+            std::cout << 'f';
+        }
         // score that the move will eventually lead to
         int value;
 
@@ -93,8 +97,9 @@ int ai::minMax(board b, int depth, Color color, int alpha, int beta, int &nodes,
         if (b.transpositionTable.count(zobristKey)){
             // key exists so we just make value the score(aka what it would have computed)
             auto val = b.transpositionTable.find(zobristKey);
-
+            nodes --;
             value = val->second.score;
+            std::cout << 'yeee';
         }else{
             // here no key exists so we manually compute the value and add it to the table
             value = -minMax(b, depth - 1, nextColor, -beta, -alpha, nodes, bestMove,start, allMoves);
