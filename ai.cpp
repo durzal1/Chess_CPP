@@ -29,6 +29,7 @@ int ai::minMax(board b, int depth, Color color, int alpha, int beta, int &nodes,
             return beta;
         }
     }
+
     // gets next color
     Color nextColor;
 
@@ -55,22 +56,10 @@ int ai::minMax(board b, int depth, Color color, int alpha, int beta, int &nodes,
         }
         int val = whiteVal - blackVal;
         if (nextColor == black) val = blackVal - whiteVal;
-//        b.print();
+
         int valuation = eval.evaluateFunc(b,nextColor, val);
 
-//        if (b.boardArr[3][6].type == PAWN && b.boardArr[2][7].type == NONE){
-//            b.print();
-//            std::cout << 'f';
-//        }
-//        if (valuation == 240){
-//            b.print();
-//            std::cout << 'f';
-//        }
-        // sets the last move to this value
-//        allMoves[allMoves.size()-1].Value = valuation;
-        if (valuation == -280 && b.boardArr[6][3].type == PAWN){
-            std::cout << 'f';
-        }
+
         return -valuation;
     }
 
@@ -85,43 +74,45 @@ int ai::minMax(board b, int depth, Color color, int alpha, int beta, int &nodes,
 
     // for setting the best values gotten (minMax)
     int bestSoFar = -999999;
-    bool go = false;
     for (int i = 0; i < moves.size(); i++) {
         auto &m = moves[i];
         if (!moveCheck(b, m, kingMoves)){
-
             continue;
         }
         nodes ++;
         piece oldPiece = b.move(m);
 
-//        if (b.boardArr[3][6].type == PAWN && b.boardArr[2][7].type == NONE && b.boardArr[4][4].type == NONE && color == white){
-//            b.print();
-//            allMoves.push_back(m);
-//        }
-        int value = -minMax(b, depth - 1, nextColor, -beta, -alpha, nodes, bestMove,start, allMoves);
-        m.Value = value;
+        // zobrist key of the current board
+        zobVal zob = zobVal();
+        U64 zobristKey = zob.getZob(b.boardArr, b.zobVals);
 
+        // score that the move will eventually lead to
+        int value;
+
+        // check if this move has already been computed.
+        if (b.transpositionTable.count(zobristKey)){
+            // key exists so we just make value the score(aka what it would have computed)
+            auto val = b.transpositionTable.find(zobristKey);
+
+            value = val->second.score;
+        }else{
+            // here no key exists so we manually compute the value and add it to the table
+            value = -minMax(b, depth - 1, nextColor, -beta, -alpha, nodes, bestMove,start, allMoves);
+            m.Value = value;
+
+            b.transpositionTable.insert({zobristKey, TranspositionTable(zobristKey, value, depth, m)});
+        }
         if (depth == maxDepth && value > bestSoFar){
             // reset the bestMove
             bestMove = m;
         }
         bestSoFar = std::max(value, bestSoFar);
         if (bestSoFar > beta){
-//            if (b.boardArr[3][6].type == PAWN && b.boardArr[2][7].type == NONE && b.boardArr[4][4].type == NONE && color == white){
-//                b.print();
-//                allMoves.push_back(m);
-//                go = true;
-//            }
             return bestSoFar;
         }
 
         alpha = std::max(alpha, bestSoFar);
-//        if (b.boardArr[3][6].type == PAWN && b.boardArr[2][7].type == NONE && b.boardArr[4][4].type == NONE && color == black){
-//            b.print();
-//            allMoves.push_back(m);
-//            go = true;
-//        }
+
         b.undoMove(m, oldPiece);
 
     }

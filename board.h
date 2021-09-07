@@ -5,20 +5,7 @@
 #ifndef CHESS_CPP_BOARD_H
 #define CHESS_CPP_BOARD_H
 
-/*
-for zacky
-
-
-#include "SDL2/SDL.h"
-#include <bits/stdc++.h>
-#include <SDL2/SDL_image.h>
-*/
-/*
-for kevin
-  #include "SDL.h"
-#include "SDL_image.h"
-*/
-
+#include "TranspositionTable.h"
 #include <iostream>
 #include <map>
 #include <vector>
@@ -68,6 +55,12 @@ private:
     const int K = 20000;
 
 public:
+    // the zoborist values of each square in the boardArray
+    zobVal zobVals[8][8];
+
+    // the current transposition table
+    std::map<U64, TranspositionTable> transpositionTable;
+
     // we put all these values in a hash map to make it easier to call
     std::map<PieceTypes,int> getVal = {
             {PAWN,P},

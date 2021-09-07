@@ -18,6 +18,9 @@ board::board( int width) { // SDL_Window* win, SDL_Renderer* renderer1,
         for (int j = 0; j < 8; j++){
             boardArr[i][j].curRow = i;
             boardArr[i][j].curCol = j;
+
+            // sets zobrist values for each square
+            zobVals[i][j] = zobVal();
         }
     }
 
@@ -30,6 +33,7 @@ board::board( int width) { // SDL_Window* win, SDL_Renderer* renderer1,
     conversion.insert({'f',5});
     conversion.insert({'g',6});
     conversion.insert({'h',7});
+
 
     /*
     for zacky

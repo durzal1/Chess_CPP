@@ -1,15 +1,6 @@
 #include "uci.h"
-/*
-for zacky
+
 #include <bits/stdc++.h>
-  #include <SDL2/SDL_image.h>
-
-*/
-/*
-for kevin
-  #include "SDL_image.h"
-*/
-
 
 //cmake_minimum_required(VERSION 3.17)
 //project(Chess)
@@ -27,6 +18,9 @@ for kevin
 //target_link_libraries(Chess mingw32 SDL2main SDL2 SDL2_Image)
 
 int main() {
+    // for random
+    srand(time(NULL));
+
     uci Uci = uci();
 
     Uci.mainloop();
@@ -35,7 +29,6 @@ int main() {
 //    auto stop = std::chrono::high_resolution_clock::now();
 //    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
 //    std::cout << " moves took " << duration.count() << " ms.";
-    //SDL_Delay(90200);
-   
+
     return 0;
 }
