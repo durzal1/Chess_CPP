@@ -54,9 +54,31 @@ private:
     const int Q = 900;
     const int K = 20000;
 
+protected:
+
+    std::array<std::array<U64, 8>, 8> wPawn{};
+    std::array<std::array<U64, 8>, 8> bPawn{};
+
+    std::array<std::array<U64, 8>, 8> wQueen{};
+    std::array<std::array<U64, 8>, 8> bQueen{};
+
+    std::array<std::array<U64, 8>, 8> wBishop{};
+    std::array<std::array<U64, 8>, 8> bBishop{};
+
+    std::array<std::array<U64, 8>, 8> wKing{};
+    std::array<std::array<U64, 8>, 8> bKing{};
+
+    std::array<std::array<U64, 8>, 8> wHorse{};
+    std::array<std::array<U64, 8>, 8> bHorse{};
+
+    std::array<std::array<U64, 8>, 8> wRook{};
+    std::array<std::array<U64, 8>, 8> bRook{};
+
+
 public:
+
     // the zoborist values of each square in the boardArray
-    zobVal zobVals[8][8];
+    std::array <std::array<std::array<U64, 8>, 8> , 12> zobvals{};
 
     // the current transposition table
     std::map<U64, TranspositionTable> transpositionTable;

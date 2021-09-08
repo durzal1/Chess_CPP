@@ -7,7 +7,7 @@
 void uci::mainloop() {
     std::cout << "Durzal's Master Piece" << std::endl;
 
-    std::string line;
+    std::string line = "go";
     while (std::getline(std::cin, line)){
         uci::processCommand(line);
     }
@@ -15,7 +15,6 @@ void uci::mainloop() {
 void uci::processCommand(std::string str) {
     // get each part of the string seperated
     std::vector<std::string> split = uci::getSeperate(str);
-
 
     if (split[0] == "go"){
         // here im only going to do this for wtime etc
@@ -173,6 +172,7 @@ void uci::go(int depth, int timeLimit) {
     timeLimit = 20000000;
 
     ai AI = ai(Board, 1, Board.playerTurn, timeLimit);
+    AI.perft(Board,3,true, Board.playerTurn);
 
     // the last best move (for when we run out of time and stop the current one)
     piece lastBestMove = piece();

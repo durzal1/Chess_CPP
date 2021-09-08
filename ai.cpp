@@ -29,7 +29,6 @@ int ai::minMax(board b, int depth, Color color, int alpha, int beta, int &nodes,
             return beta;
         }
     }
-
     // gets next color
     Color nextColor;
 
@@ -56,9 +55,7 @@ int ai::minMax(board b, int depth, Color color, int alpha, int beta, int &nodes,
         }
         int val = whiteVal - blackVal;
         if (nextColor == black) val = blackVal - whiteVal;
-
         int valuation = eval.evaluateFunc(b,nextColor, val);
-
 
         return -valuation;
     }
@@ -74,9 +71,11 @@ int ai::minMax(board b, int depth, Color color, int alpha, int beta, int &nodes,
 
     // for setting the best values gotten (minMax)
     int bestSoFar = -999999;
+    bool go = false;
     for (int i = 0; i < moves.size(); i++) {
         auto &m = moves[i];
         if (!moveCheck(b, m, kingMoves)){
+
             continue;
         }
         nodes ++;
@@ -84,10 +83,11 @@ int ai::minMax(board b, int depth, Color color, int alpha, int beta, int &nodes,
 
         // zobrist key of the current board
         zobVal zob = zobVal();
-        U64 zobristKey = zob.getZob(b.boardArr, b.zobVals);
+
+        U64 zobristKey = zob.getZob(b.boardArr, b.zobvals);
 
         if (b.boardArr[5][0].type == PAWN && b.boardArr[5][1].type == PAWN &&  b.boardArr[2][0].type == PAWN){
-            b.print();
+//            b.print();
             std::cout << 'f';
         }
         // score that the move will eventually lead to
@@ -122,7 +122,6 @@ int ai::minMax(board b, int depth, Color color, int alpha, int beta, int &nodes,
 
     }
     return bestSoFar;
-
 }
 
 int ai::kingAttacks(board b, const piece& Piece) {
@@ -695,8 +694,6 @@ bool ai::moveCheck(board b, const piece& Piece, int kingMoves) {
 
                 kingPiece = b.boardArr[i][j];
 
-
-                // todo look into this
                 kingPiece.curCol = j;
                 kingPiece.curRow = i;
             }
