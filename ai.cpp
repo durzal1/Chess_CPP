@@ -14,7 +14,7 @@ ai::ai(const board& b, int maxDepth, Color color, int timeLimit) {
 }
 
 
-int ai::minMax(board b, int depth, Color color, int alpha, int beta, int &nodes, piece &bestMove, std::chrono::time_point<std::chrono::system_clock> start, std::vector<piece> &allMoves) {
+int ai::minMax(board b, int depth, Color color, int alpha, int beta, int &nodes, piece &bestMove, std::chrono::time_point<std::chrono::system_clock> start, std::vector<piece> &allMoves,std::vector <piece> moveList, std::map<U64, TranspositionTable> &transpositionTable){
     // checks to see if time ran out
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
@@ -82,30 +82,29 @@ int ai::minMax(board b, int depth, Color color, int alpha, int beta, int &nodes,
         piece oldPiece = b.move(m);
 
         // zobrist key of the current board
-        zobVal zob = zobVal();
+        U64 zobristKey = b.zobKeys.getZob(b.boardArr, b.zobVals);
 
-        U64 zobristKey = zob.getZob(b.boardArr, b.zobvals);
-
-        if (b.boardArr[5][0].type == PAWN && b.boardArr[5][1].type == PAWN &&  b.boardArr[2][0].type == PAWN){
-//            b.print();
-            std::cout << 'f';
-        }
         // score that the move will eventually lead to
         int value;
 
+        auto val = transpositionTable.find(zobristKey);
+
         // check if this move has already been computed.
-        if (b.transpositionTable.count(zobristKey)){
+        if (transpositionTable.count(zobristKey) && val->second.depth == depth){
             // key exists so we just make value the score(aka what it would have computed)
-            auto val = b.transpositionTable.find(zobristKey);
+            auto val1 = transpositionTable.find(zobristKey);
             nodes --;
-            value = val->second.score;
-            std::cout << 'yeee';
+            value = val1->second.score;
         }else{
+            moveList.push_back(m);
             // here no key exists so we manually compute the value and add it to the table
-            value = -minMax(b, depth - 1, nextColor, -beta, -alpha, nodes, bestMove,start, allMoves);
+            value = -minMax(b, depth - 1, nextColor, -beta, -alpha, nodes, bestMove,start, allMoves, moveList, transpositionTable);
+            moveList.pop_back();
+
             m.Value = value;
 
-            b.transpositionTable.insert({zobristKey, TranspositionTable(zobristKey, value, depth, m)});
+            transpositionTable.insert({zobristKey, TranspositionTable(zobristKey, value, depth, m)});
+
         }
         if (depth == maxDepth && value > bestSoFar){
             // reset the bestMove

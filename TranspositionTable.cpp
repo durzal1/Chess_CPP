@@ -4,42 +4,8 @@
 
 #include "TranspositionTable.h"
 #include "random.h"
-zobVal::zobVal() {
-    // idk what to do with this
+zobVal::zobVal() = default;
 
-    // generate each value
-    this->bPawn = randomint(0,pow(2,63) - 2);
-    this->wPawn = randomint(0,pow(2,62) - 2);
-
-    wPawn = randomint(0,pow(2,63) - 2);
-    bPawn = randomint(0,pow(2,63) - 2);
-
-    wQueen = randomint(0,pow(2,63) - 2);
-    bQueen = randomint(0,pow(2,63) - 2);
-
-    wBishop = randomint(0,pow(2,63) - 2);
-    bBishop = randomint(0,pow(2,63) - 2);
-
-    wKing = randomint(0,pow(2,63) - 2);
-    bKing = randomint(0,pow(2,63) - 2);
-
-    wHorse = randomint(0,pow(2,63) - 2);
-    bHorse = randomint(0,pow(2,63) - 2);
-
-    wRook = randomint(0,pow(2,63) - 2);
-    bRook = randomint(0,pow(2,63) - 2);
-}
-std::array<std::array<U64 , 8>, 8> zobVal::getvals(PieceTypes type, Color color){
-    std::array<std::array<U64, 8>, 8> arr{};
-
-    // generate each value
-    for (int i = 0; i < 8; i++){
-        for (int j = 0; j < 8; j++){
-            arr[8][8] = randomint(0,pow(2,63) - 2);
-        }
-    }
-    return arr;
-}
 
 zobVal::zobVal(const zobVal &z) {
     this->wPawn = z.wPawn;
@@ -83,79 +49,109 @@ zobVal &zobVal::operator=(const zobVal &z) {
     return *this;
 }
 
-U64 zobVal::getZob(piece (*boardArr)[8], std::array <std::array<std::array<U64, 8>, 8> , 12> zobvals) {
+U64 zobVal::getZob(piece (*boardArr)[8], zobVal (*zobVals)[8]) {
     U64 zobKey = 0;
 
-//    for (int i = 0; i < 8; i++){
-//        for (int j = 0; j < 8; j++){
-//            auto square = boardArr[i][j];
-//
-//            if (square.type != NONE){
-//                // checks the value of it
-//                switch (square.type){
-//                    case ROOK:
-//                        if (square.color == white){
-//                            if (zobKey == 0) zobKey = zobVals[i][j].wRook;
-//                            else zobKey ^= zobVals[i][j].wRook;
-//                        }else{
-//                            if (zobKey == 0) zobKey = zobVals[i][j].bRook;
-//                            else zobKey ^= zobVals[i][j].bRook;
-//                        }
-//                        break;
-//
-//                    case BISHOP:
-//                        if (square.color == white){
-//                            if (zobKey == 0) zobKey = zobVals[i][j].wBishop;
-//                            else zobKey ^= zobVals[i][j].wBishop;
-//                        }else{
-//                            if (zobKey == 0) zobKey = zobVals[i][j].bBishop;
-//                            else zobKey ^= zobVals[i][j].bBishop;
-//                        }
-//                        break;
-//
-//                    case HORSE:
-//                        if (square.color == white){
-//                            if (zobKey == 0) zobKey = zobVals[i][j].wHorse;
-//                            else zobKey ^= zobVals[i][j].wHorse;
-//                        }else{
-//                            if (zobKey == 0) zobKey = zobVals[i][j].bHorse;
-//                            else zobKey ^= zobVals[i][j].bHorse;
-//                        }
-//                        break;
-//
-//                    case QUEEN:
-//                        if (square.color == white){
-//                            if (zobKey == 0) zobKey = zobVals[i][j].wQueen;
-//                            else zobKey ^= zobVals[i][j].wQueen;
-//                        }else{
-//                            if (zobKey == 0) zobKey = zobVals[i][j].bQueen;
-//                            else zobKey ^= zobVals[i][j].bQueen;
-//                        }
-//                        break;
-//
-//                    case KING:
-//                        if (square.color == white){
-//                            if (zobKey == 0) zobKey = zobVals[i][j].wKing;
-//                            else zobKey ^= zobVals[i][j].wKing;
-//                        }else{
-//                            if (zobKey == 0) zobKey = zobVals[i][j].bKing;
-//                            else zobKey ^= zobVals[i][j].bKing;
-//                        }
-//                        break;
-//                    case PAWN:
-//                        if (square.color == white){
-//                            if (zobKey == 0) zobKey = zobVals[i][j].wPawn;
-//                            else zobKey ^= zobVals[i][j].wPawn;
-//                        }else{
-//                            if (zobKey == 0) zobKey = zobVals[i][j].bPawn;
-//                            else zobKey ^= zobVals[i][j].bPawn;
-//                        }
-//                        break;
-//                }
-//            }
-//        }
-//    }
+    for (int i = 0; i < 8; i++){
+        for (int j = 0; j < 8; j++){
+            auto square = boardArr[i][j];
+
+            if (square.type != NONE){
+                // checks the value of it
+                switch (square.type){
+                    case ROOK:
+                        if (square.color == white){
+                            if (zobKey == 0) zobKey = zobVals[i][j].wRook;
+                            else zobKey ^= zobVals[i][j].wRook;
+                        }else{
+                            if (zobKey == 0) zobKey = zobVals[i][j].bRook;
+                            else zobKey ^= zobVals[i][j].bRook;
+                        }
+                        break;
+
+                        case BISHOP:
+                            if (square.color == white){
+                                if (zobKey == 0) zobKey = zobVals[i][j].wBishop;
+                                else zobKey ^= zobVals[i][j].wBishop;
+                            }else{
+                                if (zobKey == 0) zobKey = zobVals[i][j].bBishop;
+                                else zobKey ^= zobVals[i][j].bBishop;
+                            }
+                            break;
+
+                            case HORSE:
+                                if (square.color == white){
+                                    if (zobKey == 0) zobKey = zobVals[i][j].wHorse;
+                                    else zobKey ^= zobVals[i][j].wHorse;
+                                }else{
+                                    if (zobKey == 0) zobKey = zobVals[i][j].bHorse;
+                                    else zobKey ^= zobVals[i][j].bHorse;
+                                }
+                                break;
+
+                                case QUEEN:
+                                    if (square.color == white){
+                                        if (zobKey == 0) zobKey = zobVals[i][j].wQueen;
+                                        else zobKey ^= zobVals[i][j].wQueen;
+                                    }else{
+                                        if (zobKey == 0) zobKey = zobVals[i][j].bQueen;
+                                        else zobKey ^= zobVals[i][j].bQueen;
+                                    }
+                                    break;
+
+                                    case KING:
+                                        if (square.color == white){
+                                            if (zobKey == 0) zobKey = zobVals[i][j].wKing;
+                                            else zobKey ^= zobVals[i][j].wKing;
+                                        }else{
+                                            if (zobKey == 0) zobKey = zobVals[i][j].bKing;
+                                            else zobKey ^= zobVals[i][j].bKing;
+                                        }
+                                        break;
+                                        case PAWN:
+                                            if (square.color == white){
+                                                if (zobKey == 0) zobKey = zobVals[i][j].wPawn;
+                                                else zobKey ^= zobVals[i][j].wPawn;
+                                            }else{
+                                                if (zobKey == 0) zobKey = zobVals[i][j].bPawn;
+                                                else zobKey ^= zobVals[i][j].bPawn;
+                                            }
+                                            break;
+                }
+            }
+        }
+    }
     return zobKey;
+}
+
+zobVal zobVal::setup() {
+    auto z = zobVal();
+
+    // generate each value
+    z.bPawn = randomint(0,pow(2,63) - 2);
+    z.wPawn = randomint(0,pow(2,62) - 2);
+
+    z.wPawn = randomint(0,pow(2,63) - 2);
+    z.bPawn = randomint(0,pow(2,63) - 2);
+
+    z.wQueen = randomint(0,pow(2,63) - 2);
+    z.bQueen = randomint(0,pow(2,63) - 2);
+
+    z.wBishop = randomint(0,pow(2,63) - 2);
+    z.bBishop = randomint(0,pow(2,63) - 2);
+
+    z.wKing = randomint(0,pow(2,63) - 2);
+    z.bKing = randomint(0,pow(2,63) - 2);
+
+    z.wHorse = randomint(0,pow(2,63) - 2);
+    z.bHorse = randomint(0,pow(2,63) - 2);
+
+    z.wRook = randomint(0,pow(2,63) - 2);
+    z.bRook = randomint(0,pow(2,63) - 2);
+
+    //    std::array<U64, 12> arr {bPawn, wPawn, wQueen, bQueen, wBishop, bBishop, wKing, bKing, wHorse, bHorse, wRook, bRook};
+
+    return z;
 }
 
 

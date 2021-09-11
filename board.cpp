@@ -14,36 +14,13 @@ board::board( int width) { // SDL_Window* win, SDL_Renderer* renderer1,
     // interval
     inter = width/ 8;
 
-    // set zobrist values for each square
-    auto z = zobVal();
-    wPawn = z.getvals(PAWN, white);
-    bPawn = z.getvals(PAWN, black);
-
-    wQueen= z.getvals(QUEEN, white);
-    bQueen= z.getvals(QUEEN, black);
-
-    wBishop= z.getvals(BISHOP, white);
-    bBishop= z.getvals(BISHOP, black);
-
-    wKing= z.getvals(KING, white);
-    bKing= z.getvals(KING, black);
-
-    wHorse= z.getvals(HORSE, white);
-    bHorse= z.getvals(HORSE, black);
-
-    wRook= z.getvals(ROOK, white);
-    bRook= z.getvals(ROOK, black);
-
-    // zobvals just has everything inside it
-    zobvals = {wPawn, bPawn, wQueen, bQueen, wBishop, bBishop, wKing, bKing, wHorse, bHorse, wRook, bRook};
-
-    // todo implement get
-    //  each move has to udpdate zobvals
     for (int i = 0; i < 8; i++){
         for (int j = 0; j < 8; j++){
             boardArr[i][j].curRow = i;
             boardArr[i][j].curCol = j;
 
+            // sets zobrist values for each square
+            zobVals[i][j] = zobKeys.setup();
         }
     }
 
@@ -900,6 +877,12 @@ board::board(const board &b) {
     this->castleLeft = b.castleLeft;
     this->conversion = b.conversion;
 
+    this->zobKeys = b.zobKeys;
+    for (int i = 0; i < 8; i ++){
+        for (int j = 0; j < 8; j++){
+            this->zobVals[i][j] = b.zobVals[i][j];
+        }
+    }
 }
 
 board &board::operator=(const board &b) {
@@ -921,6 +904,12 @@ board &board::operator=(const board &b) {
     this->playerTurn = b.playerTurn;
     this->passentMoves = b.passentMoves;
     this->conversion = b.conversion;
+    this->zobKeys = b.zobKeys;
+    for (int i = 0; i < 8; i ++){
+        for (int j = 0; j < 8; j++){
+            this->zobVals[i][j] = b.zobVals[i][j];
+        }
+    }
     return *this;
 }
 

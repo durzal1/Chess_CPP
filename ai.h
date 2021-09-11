@@ -44,7 +44,8 @@ public:
     static U64 getKingMoves(board &b, Color color, const piece& moves1, const piece& moves2);
 
     // function that does the minMax algorithm
-    int minMax(board b, int depth, Color color, int alpha, int beta, int &nodes, piece &bestMove,std::chrono::time_point<std::chrono::system_clock> start, std::vector<piece> &allMoves);
+
+    int minMax(board b, int depth, Color color, int alpha, int beta, int &nodes, piece &bestMove,std::chrono::time_point<std::chrono::system_clock> start, std::vector<piece> &allMoves, std::vector <piece> moveList,     std::map<U64, TranspositionTable> &transpositionTable);
 
     // function that looks at all squares that can attack the king and determines if the piece there can do the attack
     // @return number of pieces that can attack the king (0,1,2)

@@ -172,7 +172,6 @@ void uci::go(int depth, int timeLimit) {
     timeLimit = 20000000;
 
     ai AI = ai(Board, 1, Board.playerTurn, timeLimit);
-    AI.perft(Board,3,true, Board.playerTurn);
 
     // the last best move (for when we run out of time and stop the current one)
     piece lastBestMove = piece();
@@ -188,12 +187,18 @@ void uci::go(int depth, int timeLimit) {
         /// DEBUGGING ONLY
         /// USED TO GET THE MOVES AND SEE WHAT I DID WRONG. REMOVE LATER
         std::vector<piece> allMoves;
+        std::vector<piece> moveList;
+        std::map<U64, TranspositionTable> transpositionTable;
+        // todo make it so that it only stops when there is no captures left
+        //  its going to get all the possible moves from the last search and create new vectors
+        //  One with captures and one with non captures (will add more later)
+        //  both will then be sorted in descending order and added to the moveList which will be used
+        //  the first priority will be hash moves(top 3/5 moves from last search)
+        int score = AI.minMax(Board, i, Board.playerTurn,-999999, 999999, nodes, bestMove, start, allMoves, moveList, transpositionTable);
 
-        int score = AI.minMax(Board, i, Board.playerTurn,-999999, 999999, nodes, bestMove, start, allMoves);
-
-        for (piece m:allMoves){
-            std::cout << "f";
-        }
+//        for (piece m:allMoves){
+//            std::cout << "f";
+//        }
         // checks to makes sure it didnt leave too early
         auto stop = std::chrono::high_resolution_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);

@@ -6,39 +6,41 @@
 #define CHESS_TRANSPOSITIONTABLE_H
 #include "piece.h"
 #include "cmath"
-#include <array>
+#include "array"
+
 // stores what each square is worth (randomly generated at the beginning of the program)
 struct zobVal{
     // give a value for each piece that could occupy the square
-    U64 wPawn;
-    U64 bPawn;
+    U64 wPawn{};
+    U64 bPawn{};
 
-    U64 wQueen;
-    U64 bQueen;
+    U64 wQueen{};
+    U64 bQueen{};
 
-    U64 wBishop;
-    U64 bBishop;
+    U64 wBishop{};
+    U64 bBishop{};
 
-    U64 wKing;
-    U64 bKing;
+    U64 wKing{};
+    U64 bKing{};
 
-    U64 wHorse;
-    U64 bHorse;
+    U64 wHorse{};
+    U64 bHorse{};
 
-    U64 wRook;
-    U64 bRook;
+    U64 wRook{};
+    U64 bRook{};
 
     zobVal();
-
-    std::array<std::array<U64 , 8>, 8> getvals(PieceTypes type, Color color);
 
     // copy constructor
     zobVal(const zobVal& z);
 
     zobVal& operator=(const zobVal& z);
 
+    // set up the zob values per each square
+    static zobVal setup();
+
     // gets the zobrist key of a board
-    U64 getZob(piece boardArr[8][8], std::array <std::array<std::array<U64, 8>, 8> , 12> zobvals);
+    U64 getZob(piece boardArr[8][8], zobVal zobVals[8][8]);
 };
 
 // used in the universal transposition table to store the data
