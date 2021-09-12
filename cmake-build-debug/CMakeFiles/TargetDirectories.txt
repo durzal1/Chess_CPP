@@ -1,3 +1,0 @@
-C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/cmake-build-debug/CMakeFiles/Chess.dir
-C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/cmake-build-debug/CMakeFiles/edit_cache.dir
-C:/Users/zacky/Desktop/Coding/c++/games/chess/Chess_CPP/cmake-build-debug/CMakeFiles/rebuild_cache.dir
