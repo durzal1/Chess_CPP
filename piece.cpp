@@ -36,7 +36,8 @@ piece::piece(const piece &Piece) {
     this->oldRow = Piece.oldRow;
     this->oldCol = Piece.oldCol;
     this->Value = Piece.Value;
-
+    this->moveOrdGrad = Piece.moveOrdGrad;
+    this->moveType = Piece.moveType;
 }
 
 piece &piece::operator=(const piece &Piece) {
@@ -60,6 +61,9 @@ piece &piece::operator=(const piece &Piece) {
     this->oldRow = Piece.oldRow;
     this->oldCol = Piece.oldCol;
     this->Value = Piece.Value;
+    this->moveOrdGrad = Piece.moveOrdGrad;
+    this->moveType = Piece.moveType;
+
     return *this;
 }
 

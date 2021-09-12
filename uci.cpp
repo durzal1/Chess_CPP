@@ -178,27 +178,33 @@ void uci::go(int depth, int timeLimit) {
 
     // used to subtract from the last node amount (to get an accurate node amount)
     int lastNode = 0;
+
+    // move list that was made from the previous iteration (1 ply will have a default move list)
+    std::vector<piece> moveList = allPosMoves(Board, Board.playerTurn);
+
+    // the next move list that is being made in the current iteration
+    std::map<std::pair<int,int>, piece> nextMoveList;
+
+
     for (int i = 1; i <= depth; i++){
         int nodes = 0;
 
         AI.maxDepth = i;
         piece bestMove = piece();
 
-        /// DEBUGGING ONLY
-        /// USED TO GET THE MOVES AND SEE WHAT I DID WRONG. REMOVE LATER
-        std::vector<piece> allMoves;
-        std::vector<piece> moveList;
         std::map<U64, TranspositionTable> transpositionTable;
+
+        // this is going to be the first move made to help indexing the moveList
+        piece firstMove;
+
         // todo make it so that it only stops when there is no captures left
         //  its going to get all the possible moves from the last search and create new vectors
         //  One with captures and one with non captures (will add more later)
         //  both will then be sorted in descending order and added to the moveList which will be used
-        //  the first priority will be hash moves(top 3/5 moves from last search)
-        int score = AI.minMax(Board, i, Board.playerTurn,-999999, 999999, nodes, bestMove, start, allMoves, moveList, transpositionTable);
+        //  the first priority will be lastBestMove
+        int score = AI.minMax(Board, i, Board.playerTurn,-999999, 999999, nodes, bestMove, start, nextMoveList, moveList, transpositionTable, firstMove);
 
-//        for (piece m:allMoves){
-//            std::cout << "f";
-//        }
+
         // checks to makes sure it didnt leave too early
         auto stop = std::chrono::high_resolution_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);

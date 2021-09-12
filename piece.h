@@ -61,6 +61,12 @@ public:
     // value of a piece
     int Value;
 
+    // grading value that will be used in move ordering
+    int moveOrdGrad;
+
+    // move ordering type(capture, noncapture, killer, etc)
+    moveOrdering moveType;
+
     piece();
 
     piece(row curRow, col curCol, PieceTypes type, Color color);

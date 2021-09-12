@@ -14,7 +14,7 @@ ai::ai(const board& b, int maxDepth, Color color, int timeLimit) {
 }
 
 
-int ai::minMax(board b, int depth, Color color, int alpha, int beta, int &nodes, piece &bestMove, std::chrono::time_point<std::chrono::system_clock> start, std::vector<piece> &allMoves,std::vector <piece> moveList, std::map<U64, TranspositionTable> &transpositionTable){
+int ai::minMax(board b, int depth, Color color, int alpha, int beta, int &nodes, piece &bestMove,std::chrono::time_point<std::chrono::system_clock> start,std::map<std::pair<int,int>, piece> nextMoveList, std::vector <piece> moveList, std::map<U64, TranspositionTable> &transpositionTable, piece firstMove){
     // checks to see if time ran out
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
@@ -62,7 +62,9 @@ int ai::minMax(board b, int depth, Color color, int alpha, int beta, int &nodes,
 
     // also checks for en passant moves if there are any
 
-    auto moves = allPosMoves(b, color);
+    auto moves = moveList;
+
+    if (depth != maxDepth) moves = allPosMoves(b, color);
 
     // resets old en passant moves and adds the new ones(if there are any)
     b.passentMoves.clear();
@@ -74,6 +76,10 @@ int ai::minMax(board b, int depth, Color color, int alpha, int beta, int &nodes,
     bool go = false;
     for (int i = 0; i < moves.size(); i++) {
         auto &m = moves[i];
+
+        // if this is the first move then it will make it the first move Var
+        if (depth == maxDepth) firstMove = m;
+
         if (!moveCheck(b, m, kingMoves)){
 
             continue;
@@ -96,15 +102,28 @@ int ai::minMax(board b, int depth, Color color, int alpha, int beta, int &nodes,
             nodes --;
             value = val1->second.score;
         }else{
-            moveList.push_back(m);
             // here no key exists so we manually compute the value and add it to the table
-            value = -minMax(b, depth - 1, nextColor, -beta, -alpha, nodes, bestMove,start, allMoves, moveList, transpositionTable);
-            moveList.pop_back();
+            value = -minMax(b, depth - 1, nextColor, -beta, -alpha, nodes, bestMove,start, nextMoveList, moveList, transpositionTable, firstMove);
 
             m.Value = value;
+            m.moveOrdGrad = value;
 
             transpositionTable.insert({zobristKey, TranspositionTable(zobristKey, value, depth, m)});
+        }
+        // if its a capture we will add it to the nextMoveList as a priority
+        if (m.captured){
+            // we check to see if it already is in the set
+            int s = nextMoveList.size();
 
+            firstMove.moveOrdGrad = value + 100;
+            firstMove.moveType = capture;
+
+            std::pair<std::pair<int,int>,piece> thing {{firstMove.oldRow, firstMove.oldCol}, firstMove};
+            nextMoveList.insert(thing);
+
+            // todo if this does not work well create an array 8x8 that will hold the best val of each pos capture
+            //  honestly tho idk if this would even do anything
+            //  also add killer moves (if they cause cutoff add)
         }
         if (depth == maxDepth && value > bestSoFar){
             // reset the bestMove
@@ -112,6 +131,12 @@ int ai::minMax(board b, int depth, Color color, int alpha, int beta, int &nodes,
         }
         bestSoFar = std::max(value, bestSoFar);
         if (bestSoFar > beta){
+            // killer move
+            firstMove.moveType = killer;
+
+            std::pair<std::pair<int,int>,piece> thing {{firstMove.oldRow, firstMove.oldCol}, firstMove};
+            nextMoveList.insert(thing);
+
             return bestSoFar;
         }
 

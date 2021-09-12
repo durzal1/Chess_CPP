@@ -46,11 +46,11 @@ enum castle{
     blackCastleLeft = 3,
     blackCastleRight = 4
 };
-// for en passant
-enum pawnMove{
-    NA = 0,
-    move1 = 1,
-    move2 = 2
+// type for move ordering
+enum moveOrdering{
+    capture = 1,
+    nonCapture = 2,
+    killer = 3
 };
 typedef uint64_t U64;
 typedef uint8_t U8;
