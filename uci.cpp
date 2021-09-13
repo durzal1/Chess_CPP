@@ -4,10 +4,13 @@
 
 #include "uci.h"
 #include "math.h"
+#include "algorithm"
 void uci::mainloop() {
     std::cout << "Durzal's Master Piece" << std::endl;
 
-    std::string line = "go";
+    std::string line = "go depth 6";
+    uci::processCommand(line);
+
     while (std::getline(std::cin, line)){
         uci::processCommand(line);
     }
@@ -185,8 +188,12 @@ void uci::go(int depth, int timeLimit) {
     // the next move list that is being made in the current iteration
     std::map<std::pair<int,int>, piece> nextMoveList;
 
+    // the moves that have been done in the current recursive iteration
+    std::vector<piece> movesDone;
 
     for (int i = 1; i <= depth; i++){
+        nextMoveList.clear();
+
         int nodes = 0;
 
         AI.maxDepth = i;
@@ -194,7 +201,6 @@ void uci::go(int depth, int timeLimit) {
 
         std::map<U64, TranspositionTable> transpositionTable;
 
-        // this is going to be the first move made to help indexing the moveList
         piece firstMove;
 
         // todo make it so that it only stops when there is no captures left
@@ -209,6 +215,10 @@ void uci::go(int depth, int timeLimit) {
         auto stop = std::chrono::high_resolution_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
 
+
+        // sort the moveList
+        moveList = Sort(nextMoveList, bestMove);
+
         // didnt leave to early so we replace the lastBestMove
         if (duration.count() <= timeLimit){
             auto du = duration.count();
@@ -219,7 +229,11 @@ void uci::go(int depth, int timeLimit) {
 
             double time = double(du) / 1000;
             int nps = nodes / time;
-            std::cout << "info depth " << i << " score cp "  << score << " nodes " << nodes - lastNode <<  " nps " << nps << " time " << duration.count() << std::endl;
+            std::cout << "info depth " << i << " score cp "  << score << " nodes " << nodes - lastNode <<  " nps " << nps << " time " << duration.count() << " ";
+            std::cout << "PV ";
+            for (piece p:bestMove.pastMoves) std::cout << p.toString() << " ";
+            std::cout << "" << std::endl;
+
             lastBestMove = bestMove;
             lastNode = nodes;
         }
@@ -228,6 +242,77 @@ void uci::go(int depth, int timeLimit) {
     }
     std::cout << "bestmove" << " " << lastBestMove.toString() << std::endl;
 
+}
+
+std::vector<piece> uci::Sort(std::map<std::pair<int, int>, piece> moveList, piece bestMove) {
+    // do not try to understand this. its so ugly but it does the job and happens so once per iteration
+    // so it doesnt have to be efficent
+
+    std::vector<piece> sorted;
+
+    // vectors that hold each type
+    std::vector<piece> captures;
+    std::vector<piece> killers;
+    std::vector<piece> nonCaptures;
+
+    std::vector<piece> captures1;
+    std::vector<piece> killers1;
+    std::vector<piece> nonCaptures1;
+
+    std::vector<int> capturesVal;
+    std::vector<int> killersVal;
+    std::vector<int> nonCapturesVal;
+
+    int j = 0;
+
+    std::map<std::pair<int,int>, piece>::iterator it;
+    for (it = moveList.begin() ; it != moveList.end(); it++,j++){
+        if (it->first.first == bestMove.oldRow && it->first.second == bestMove.oldCol){
+//            continue;
+        }
+
+
+        if (it->second.moveType == capture){
+            captures.push_back(it->second);
+            captures1.push_back(it->second);
+            capturesVal.push_back(it->second.moveOrdGrad);
+        }
+        else if (it->second.moveType == nonCapture){
+            nonCaptures.push_back(it->second);
+            nonCaptures1.push_back(it->second);
+            nonCapturesVal.push_back(it->second.moveOrdGrad);
+        }
+        else if (it->second.moveType == killer){
+            killers.push_back(it->second);
+            killers1.push_back(it->second);
+            killersVal.push_back(it->second.moveOrdGrad);
+        }
+    }
+    std::sort(capturesVal.begin(), capturesVal.end(), std::greater<int>());
+    std::sort(killersVal.begin(), killersVal.end(), std::greater<int>());
+    std::sort(nonCapturesVal.begin(), nonCapturesVal.end(), std::greater<int>());
+
+    for (int i = 0; i < captures.size(); i++){
+        for (j = 0; j < captures.size(); j++){
+            if (captures[j].moveOrdGrad == capturesVal[i]) captures1[i] = captures[j];
+        }
+    }
+    for (int i = 0; i < nonCaptures.size(); i++){
+        for (j = 0; j < nonCaptures.size(); j++){
+            if (nonCaptures[j].moveOrdGrad == nonCapturesVal[i]) nonCaptures1[i] = nonCaptures[j];
+        }
+    }
+    for (int i = 0; i < killers.size(); i++){
+        for (j = 0; j < killers.size(); j++){
+            if (killers[j].moveOrdGrad == killersVal[i]) killers1[i] = killers[j];
+        }
+    }
+    for (piece& cap:captures1) sorted.push_back(cap);
+    for (piece& cap:killers1) sorted.push_back(cap);
+    for (piece& cap:nonCaptures1) sorted.push_back(cap);
+
+//    sorted.insert(sorted.begin(), bestMove);
+    return sorted;
 }
 void uci::set_option(std::string &name, std::string &value) {
 
@@ -338,3 +423,5 @@ void uci::moves(std::string moves) {
 
     Board.move(Piece);
 }
+
+

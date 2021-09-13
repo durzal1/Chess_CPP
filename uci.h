@@ -48,6 +48,11 @@ public:
 
     void set_option(std::string& name, std::string& value);
 
+    // sorts the moveList
+    std::vector<piece> Sort(std::map<std::pair<int,int>, piece>, piece);
+
     board Board;
 };
+
+
 #endif //CHESS_UCI_H

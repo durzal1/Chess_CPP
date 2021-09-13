@@ -7,6 +7,7 @@
 #include "types.h"
 #include "string"
 #include "iostream"
+#include <vector>
 class piece{
 private:
     // array to convert col nums to A-H uci format
@@ -66,6 +67,9 @@ public:
 
     // move ordering type(capture, noncapture, killer, etc)
     moveOrdering moveType;
+
+    // the past moves that led to this piece move
+    std::vector<piece> pastMoves;
 
     piece();
 

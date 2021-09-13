@@ -128,26 +128,26 @@ zobVal zobVal::setup() {
     auto z = zobVal();
 
     // generate each value
-    z.bPawn = randomint(0,pow(2,63) - 2);
-    z.wPawn = randomint(0,pow(2,62) - 2);
+    z.bPawn = randomint(0,922337204000000000);
+    z.wPawn = randomint(0,922337204000000000);
 
-    z.wPawn = randomint(0,pow(2,63) - 2);
-    z.bPawn = randomint(0,pow(2,63) - 2);
+    z.wPawn = randomint(0,922337204000000000);
+    z.bPawn = randomint(0,922337204000000000);
 
-    z.wQueen = randomint(0,pow(2,63) - 2);
-    z.bQueen = randomint(0,pow(2,63) - 2);
+    z.wQueen = randomint(0,922337204000000000);
+    z.bQueen = randomint(0,922337204000000000);
 
-    z.wBishop = randomint(0,pow(2,63) - 2);
-    z.bBishop = randomint(0,pow(2,63) - 2);
+    z.wBishop = randomint(0,922337204000000000);
+    z.bBishop = randomint(0,922337204000000000);
 
-    z.wKing = randomint(0,pow(2,63) - 2);
-    z.bKing = randomint(0,pow(2,63) - 2);
+    z.wKing = randomint(0,922337204000000000);
+    z.bKing = randomint(0,922337204000000000);
 
-    z.wHorse = randomint(0,pow(2,63) - 2);
-    z.bHorse = randomint(0,pow(2,63) - 2);
+    z.wHorse = randomint(0,922337204000000000);
+    z.bHorse = randomint(0,922337204000000000);
 
-    z.wRook = randomint(0,pow(2,63) - 2);
-    z.bRook = randomint(0,pow(2,63) - 2);
+    z.wRook = randomint(0,922337204000000000);
+    z.bRook = randomint(0,922337204000000000);
 
     //    std::array<U64, 12> arr {bPawn, wPawn, wQueen, bQueen, wBishop, bBishop, wKing, bKing, wHorse, bHorse, wRook, bRook};
 

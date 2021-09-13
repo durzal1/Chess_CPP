@@ -48,9 +48,9 @@ enum castle{
 };
 // type for move ordering
 enum moveOrdering{
-    capture = 1,
-    nonCapture = 2,
-    killer = 3
+    capture = 3,
+    killer = 2,
+    nonCapture = 1,
 };
 typedef uint64_t U64;
 typedef uint8_t U8;

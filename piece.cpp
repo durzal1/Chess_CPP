@@ -38,9 +38,11 @@ piece::piece(const piece &Piece) {
     this->Value = Piece.Value;
     this->moveOrdGrad = Piece.moveOrdGrad;
     this->moveType = Piece.moveType;
+    this->pastMoves = Piece.pastMoves;
 }
 
 piece &piece::operator=(const piece &Piece) {
+    this->pastMoves = Piece.pastMoves;
     this->type = Piece.type;
     this->curRow = Piece.curRow;
     this->curCol = Piece.curCol;
