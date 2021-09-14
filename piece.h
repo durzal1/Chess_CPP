@@ -71,6 +71,9 @@ public:
     // the past moves that led to this piece move
     std::vector<piece> pastMoves;
 
+    // if its a bestMove this determines if we should ignore that
+    bool ignoreBest = false;
+
     piece();
 
     piece(row curRow, col curCol, PieceTypes type, Color color);

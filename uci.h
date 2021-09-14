@@ -14,6 +14,7 @@ private:
     // constants that are useful such as fen strings and such
     std::string Default = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
     const int posX =450, posY = 30, width = 1000, height = 1000;
+
 public:
     uci();
 
@@ -42,14 +43,14 @@ public:
     void position_fen(std::string fen);
     void moves(std::string moves);
 
-    void go(int depth, int timeLimit);
+    void go(int depth, long long timeLimit);
 
     void print();
 
     void set_option(std::string& name, std::string& value);
 
     // sorts the moveList
-    std::vector<piece> Sort(std::map<std::pair<int,int>, piece>, piece);
+    std::vector<piece> Sort(std::map<std::pair<std::pair<row, col>, std::pair<row,col>>, piece>, piece);
 
     board Board;
 };

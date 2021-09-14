@@ -8,8 +8,8 @@
 void uci::mainloop() {
     std::cout << "Durzal's Master Piece" << std::endl;
 
-    std::string line = "go depth 6";
-    uci::processCommand(line);
+    std::string line = "go depth 3";
+//    uci::processCommand(line);
 
     while (std::getline(std::cin, line)){
         uci::processCommand(line);
@@ -40,7 +40,7 @@ void uci::processCommand(std::string str) {
         int turns = 40;
 
         // time will be 5 seconds by default
-        int timeLimit = 5000;
+        long long timeLimit = 5000;
 
         if (split.size() > 1){
             if (split[1] == "depth") depth = split[2][0] - '0';
@@ -168,13 +168,15 @@ void uci::processCommand(std::string str) {
         Board = board(width);
     }
 }
-void uci::go(int depth, int timeLimit) {
+void uci::go(int depth, long long timeLimit) {
     // does iterative deepening and if it runs out of time it will set beta to -inf and alpha to inf
     // then it will use best move from the last iteration
     auto start = std::chrono::high_resolution_clock::now();
-    timeLimit = 20000000;
+
+    timeLimit = 999999999999;
 
     ai AI = ai(Board, 1, Board.playerTurn, timeLimit);
+
 
     // the last best move (for when we run out of time and stop the current one)
     piece lastBestMove = piece();
@@ -184,9 +186,10 @@ void uci::go(int depth, int timeLimit) {
 
     // move list that was made from the previous iteration (1 ply will have a default move list)
     std::vector<piece> moveList = allPosMoves(Board, Board.playerTurn);
+    ;
 
     // the next move list that is being made in the current iteration
-    std::map<std::pair<int,int>, piece> nextMoveList;
+    std::map<std::pair<std::pair<row, col>, std::pair<row,col>>, piece> nextMoveList;
 
     // the moves that have been done in the current recursive iteration
     std::vector<piece> movesDone;
@@ -215,7 +218,6 @@ void uci::go(int depth, int timeLimit) {
         auto stop = std::chrono::high_resolution_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
 
-
         // sort the moveList
         moveList = Sort(nextMoveList, bestMove);
 
@@ -231,7 +233,9 @@ void uci::go(int depth, int timeLimit) {
             int nps = nodes / time;
             std::cout << "info depth " << i << " score cp "  << score << " nodes " << nodes - lastNode <<  " nps " << nps << " time " << duration.count() << " ";
             std::cout << "PV ";
-            for (piece p:bestMove.pastMoves) std::cout << p.toString() << " ";
+            for (piece p:bestMove.pastMoves){
+                std::cout << p.toString() << " ";
+            }
             std::cout << "" << std::endl;
 
             lastBestMove = bestMove;
@@ -244,7 +248,9 @@ void uci::go(int depth, int timeLimit) {
 
 }
 
-std::vector<piece> uci::Sort(std::map<std::pair<int, int>, piece> moveList, piece bestMove) {
+std::vector<piece> uci::Sort(std::map<std::pair<std::pair<row, col>, std::pair<row,col>>, piece> moveList, piece bestMove) {
+    // todo ensure the hash map is the first move
+
     // do not try to understand this. its so ugly but it does the job and happens so once per iteration
     // so it doesnt have to be efficent
 
@@ -265,13 +271,11 @@ std::vector<piece> uci::Sort(std::map<std::pair<int, int>, piece> moveList, piec
 
     int j = 0;
 
-    std::map<std::pair<int,int>, piece>::iterator it;
-    for (it = moveList.begin() ; it != moveList.end(); it++,j++){
-        if (it->first.first == bestMove.oldRow && it->first.second == bestMove.oldCol){
-//            continue;
+    for (auto it=moveList.begin(); it!=moveList.end(); ++it){
+        if (it->first.first.first == bestMove.oldRow && it->first.first.second == bestMove.oldCol && it->first.second.first == bestMove.nextRow && it->first.second.second == bestMove.nextCol && !bestMove.ignoreBest){
+            continue;
         }
-
-
+        j++;
         if (it->second.moveType == capture){
             captures.push_back(it->second);
             captures1.push_back(it->second);
@@ -288,30 +292,44 @@ std::vector<piece> uci::Sort(std::map<std::pair<int, int>, piece> moveList, piec
             killersVal.push_back(it->second.moveOrdGrad);
         }
     }
+
     std::sort(capturesVal.begin(), capturesVal.end(), std::greater<int>());
     std::sort(killersVal.begin(), killersVal.end(), std::greater<int>());
     std::sort(nonCapturesVal.begin(), nonCapturesVal.end(), std::greater<int>());
 
     for (int i = 0; i < captures.size(); i++){
         for (j = 0; j < captures.size(); j++){
-            if (captures[j].moveOrdGrad == capturesVal[i]) captures1[i] = captures[j];
+            if (captures[j].moveOrdGrad == capturesVal[i]){
+                captures1[i] = captures[j];
+                capturesVal[i] = -999999;
+                captures[j].moveOrdGrad = -999900999;
+            }
         }
     }
     for (int i = 0; i < nonCaptures.size(); i++){
         for (j = 0; j < nonCaptures.size(); j++){
-            if (nonCaptures[j].moveOrdGrad == nonCapturesVal[i]) nonCaptures1[i] = nonCaptures[j];
+            if (nonCaptures[j].moveOrdGrad == nonCapturesVal[i]){
+                nonCaptures1[i] = nonCaptures[j];
+                nonCapturesVal[i] = -999999;
+                nonCaptures[j].moveOrdGrad = -999900999;
+            }
         }
     }
     for (int i = 0; i < killers.size(); i++){
         for (j = 0; j < killers.size(); j++){
-            if (killers[j].moveOrdGrad == killersVal[i]) killers1[i] = killers[j];
+            if (killers[j].moveOrdGrad == killersVal[i]){
+                killers1[i] = killers[j];
+                killersVal[i] = -9999999;
+                killers[j].moveOrdGrad = -999900999;
+            }
         }
     }
-    for (piece& cap:captures1) sorted.push_back(cap);
     for (piece& cap:killers1) sorted.push_back(cap);
+    for (piece& cap:captures1) sorted.push_back(cap);
     for (piece& cap:nonCaptures1) sorted.push_back(cap);
 
-//    sorted.insert(sorted.begin(), bestMove);
+    if (!bestMove.ignoreBest) sorted.insert(sorted.begin(), bestMove);
+
     return sorted;
 }
 void uci::set_option(std::string &name, std::string &value) {

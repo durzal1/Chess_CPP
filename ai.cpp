@@ -4,9 +4,7 @@
 
 #include "ai.h"
 
-ai::ai(const board& b, int maxDepth, Color color, int timeLimit) {
-    // honestly i dont even need this anymore lol
-
+ai::ai(const board& b, int maxDepth, Color color, long long timeLimit) {
 	// gets the max depth recursive function will go to
 	this->maxDepth = maxDepth;
 
@@ -14,7 +12,7 @@ ai::ai(const board& b, int maxDepth, Color color, int timeLimit) {
 }
 
 
-int ai::minMax(board b, int depth, Color color, int alpha, int beta, int &nodes, piece &bestMove,std::chrono::time_point<std::chrono::system_clock> start,std::map<std::pair<int,int>, piece> &nextMoveList, const std::vector <piece>& moveList, std::map<U64, TranspositionTable> &transpositionTable, piece firstMove){
+int ai::minMax(board b, int depth, Color color, int alpha, int beta, int &nodes, piece &bestMove,std::chrono::time_point<std::chrono::system_clock> start,std::map<std::pair<std::pair<row, col>, std::pair<row,col>>, piece> &nextMoveList, const std::vector <piece>& moveList, std::map<U64, TranspositionTable> &transpositionTable, piece firstMove){
     // checks to see if time ran out
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
@@ -55,6 +53,7 @@ int ai::minMax(board b, int depth, Color color, int alpha, int beta, int &nodes,
         }
         int val = whiteVal - blackVal;
         if (nextColor == black) val = blackVal - whiteVal;
+
         int valuation = eval.evaluateFunc(b,nextColor, val);
 
         return -valuation;
@@ -65,6 +64,21 @@ int ai::minMax(board b, int depth, Color color, int alpha, int beta, int &nodes,
     auto moves = moveList;
 
     if (depth != maxDepth) moves = allPosMoves(b, color);
+    else{
+//        std::cout << moves.size() << std::endl;
+        for (auto &move:moves){
+            /// NOTE: make this depth != 1 if removing move list
+            if (depth == 1){
+                move.oldRow = move.curRow;
+                move.oldCol = move.curCol;
+            }else{
+                move.curCol = move.oldCol;
+                move.curRow = move.oldRow;
+            }
+
+//            std::cout << move.toString() << std::endl;
+        }
+    }
 
     // resets old en passant moves and adds the new ones(if there are any)
     b.passentMoves.clear();
@@ -73,6 +87,10 @@ int ai::minMax(board b, int depth, Color color, int alpha, int beta, int &nodes,
 
     // for setting the best values gotten (minMax)
     int bestSoFar = -999999;
+
+    // if there are more than 3 moves with the same score at the maxDepth then we dont use hash move for move ordering
+    int countHash = 0;
+
     bool go = false;
     for (int i = 0; i < moves.size(); i++) {
         auto &m = moves[i];
@@ -81,7 +99,6 @@ int ai::minMax(board b, int depth, Color color, int alpha, int beta, int &nodes,
         if (depth == maxDepth) firstMove = m;
 
         if (!moveCheck(b, m, kingMoves)){
-
             continue;
         }
         nodes ++;
@@ -101,22 +118,18 @@ int ai::minMax(board b, int depth, Color color, int alpha, int beta, int &nodes,
             auto val1 = transpositionTable.find(zobristKey);
             nodes --;
             value = val1->second.score;
+
         }else{
             // todo figure out to store the moves
             // here no key exists so we manually compute the value and add it to the table
             value = -minMax(b, depth - 1, nextColor, -beta, -alpha, nodes, bestMove,start, nextMoveList, moveList, transpositionTable, firstMove);
-            if (maxDepth == 6 && value == 37){
-                b.print();
-//                std::cout << 'f';
-            }
+
             m.Value = value;
             m.moveOrdGrad = value;
 
             transpositionTable.insert({zobristKey, TranspositionTable(zobristKey, value, depth, m)});
 
-            if (depth == maxDepth){
-                m.toString();
-            }
+
         }
         // if its a capture we will add it to the nextMoveList as a priority
         if (m.captured){
@@ -126,19 +139,17 @@ int ai::minMax(board b, int depth, Color color, int alpha, int beta, int &nodes,
 
             firstMove.moveType = capture;
 
-            std::pair<std::pair<int,int>,piece> thing {{firstMove.curRow, firstMove.curCol}, firstMove};
+            std::pair<row, col> first {firstMove.curRow, firstMove.curCol};
+            std::pair<row, col> second {firstMove.nextRow, firstMove.nextCol};
+            std::pair< std::pair<std::pair<row, col>, std::pair<row,col>>, piece> thing { {first, second}, firstMove};
 
-            if (nextMoveList.find({firstMove.curRow, firstMove.curCol}) == nextMoveList.end()) nextMoveList.insert(thing);
+            if (nextMoveList.find({first,second}) == nextMoveList.end()) nextMoveList.insert(thing);
             else{
                 // compare values
-                if (firstMove.moveOrdGrad > nextMoveList[{firstMove.curRow, firstMove.curCol}].moveOrdGrad){
-                    nextMoveList[{firstMove.curRow, firstMove.curCol}] = firstMove;
+                if (firstMove.moveOrdGrad > nextMoveList[{first, second}].moveOrdGrad){
+                    nextMoveList[{first, second}] = firstMove;
                 }
             }
-        }
-        if (depth == maxDepth && value > bestSoFar){
-            // reset the bestMove
-            bestMove = m;
         }
 
         // if its the first move and no capture/killer move happened we make this move a regular move(noCapture)
@@ -146,19 +157,30 @@ int ai::minMax(board b, int depth, Color color, int alpha, int beta, int &nodes,
             firstMove.moveOrdGrad = value;
             firstMove.moveType = nonCapture;
 
-            std::pair<std::pair<int,int>,piece> thing {{firstMove.curRow, firstMove.curCol}, firstMove};
+            std::pair<row, col> first {firstMove.curRow, firstMove.curCol};
+            std::pair<row, col> second {firstMove.nextRow, firstMove.nextCol};
+            std::pair< std::pair<std::pair<row, col>, std::pair<row,col>>, piece> thing { {first, second}, firstMove};
 
-            if (nextMoveList.find({firstMove.curRow, firstMove.curCol}) == nextMoveList.end()) nextMoveList.insert(thing);
+            if (nextMoveList.find({first,second}) == nextMoveList.end()) nextMoveList.insert(thing);
             else{
-                auto move_ = nextMoveList[{firstMove.curRow, firstMove.curCol}];
-
                 // compare values
-                if ( (firstMove.moveOrdGrad > move_.moveOrdGrad) && firstMove.moveType >= move_.moveOrdGrad){
-                    nextMoveList[{firstMove.curRow, firstMove.curCol}] = firstMove;
+                if (firstMove.moveOrdGrad > nextMoveList[{first, second}].moveOrdGrad){
+                    nextMoveList[{first, second}] = firstMove;
                 }
             }
         }
+        if (depth == maxDepth){
+            if (value >= bestSoFar){
+                countHash++;
+                if (countHash >= 5){
+                    m.ignoreBest = true;
+                }
+
+                bestMove = m;
+            }
+        }
         bestSoFar = std::max(value, bestSoFar);
+
         if (bestSoFar > beta){
             // killer move
             firstMove.moveOrdGrad = value;
@@ -167,15 +189,16 @@ int ai::minMax(board b, int depth, Color color, int alpha, int beta, int &nodes,
 
             firstMove.moveType = killer;
 
-            std::pair<std::pair<int,int>,piece> thing {{firstMove.curRow, firstMove.curCol}, firstMove};
 
-            if (nextMoveList.find({firstMove.curRow, firstMove.curCol}) == nextMoveList.end()) nextMoveList.insert(thing);
+            std::pair<row, col> first {firstMove.curRow, firstMove.curCol};
+            std::pair<row, col> second {firstMove.nextRow, firstMove.nextCol};
+            std::pair< std::pair<std::pair<row, col>, std::pair<row,col>>, piece> thing { {first, second}, firstMove};
+
+            if (nextMoveList.find({first,second}) == nextMoveList.end()) nextMoveList.insert(thing);
             else{
-                auto move_ = nextMoveList[{firstMove.curRow, firstMove.curCol}];
-
                 // compare values
-                if ( (firstMove.moveOrdGrad > move_.moveOrdGrad) && firstMove.moveType >= move_.moveOrdGrad){
-                    nextMoveList[{firstMove.curRow, firstMove.curCol}] = firstMove;
+                if (firstMove.moveOrdGrad > nextMoveList[{first, second}].moveOrdGrad){
+                    nextMoveList[{first, second}] = firstMove;
                 }
             }
 
