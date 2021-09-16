@@ -883,6 +883,7 @@ board::board(const board &b) {
             this->zobVals[i][j] = b.zobVals[i][j];
         }
     }
+    this->hashMoves = b.hashMoves;
 }
 
 board &board::operator=(const board &b) {
@@ -910,6 +911,8 @@ board &board::operator=(const board &b) {
             this->zobVals[i][j] = b.zobVals[i][j];
         }
     }
+    this->hashMoves = b.hashMoves;
+
     return *this;
 }
 

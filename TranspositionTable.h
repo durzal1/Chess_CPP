@@ -57,7 +57,7 @@ public:
     // current depth of the search
     int depth;
 
-    // the best move that leads to this
+    // the best move that can be made from this position
     piece Move;
 
     // constructor

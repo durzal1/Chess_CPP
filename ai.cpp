@@ -5,14 +5,14 @@
 #include "ai.h"
 
 ai::ai(const board& b, int maxDepth, Color color, long long timeLimit) {
-	// gets the max depth recursive function will go to
-	this->maxDepth = maxDepth;
+    // gets the max depth recursive function will go to
+    this->maxDepth = maxDepth;
 
-	this->timeLimit = timeLimit;
+    this->timeLimit = timeLimit;
 }
 
 
-int ai::minMax(board b, int depth, Color color, int alpha, int beta, int &nodes, piece &bestMove,std::chrono::time_point<std::chrono::system_clock> start,std::map<std::pair<std::pair<row, col>, std::pair<row,col>>, piece> &nextMoveList, const std::vector <piece>& moveList, std::map<U64, TranspositionTable> &transpositionTable, piece firstMove){
+int ai::minMax(board b, int depth, Color color, int alpha, int beta, int &nodes, piece &bestMove,std::chrono::time_point<std::chrono::system_clock> start, std::map<U64, TranspositionTable> &transpositionTable, piece firstMove,std::map<U64, piece> &hashMoves){
     // checks to see if time ran out
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
@@ -61,29 +61,34 @@ int ai::minMax(board b, int depth, Color color, int alpha, int beta, int &nodes,
 
     // also checks for en passant moves if there are any
 
-    auto moves = moveList;
 
-    if (depth != maxDepth) moves = allPosMoves(b, color);
-    else{
-//        std::cout << moves.size() << std::endl;
-        for (auto &move:moves){
-            /// NOTE: make this depth != 1 if removing move list
-            if (depth == 1){
-                move.oldRow = move.curRow;
-                move.oldCol = move.curCol;
-            }else{
-                move.curCol = move.oldCol;
-                move.curRow = move.oldRow;
-            }
+    // zob key of the og board
+    U64 ogZobKey = b.zobKeys.getZob(b.boardArr, b.zobVals);
 
-//            std::cout << move.toString() << std::endl;
-        }
+    // essential queen moves that we need to check for castle purposes
+    std::vector<piece> essQueenMoves;
+
+    // if its the first iteration there will be no hash move(nor a need for it)
+
+    std::vector<piece> moves;
+    piece hashMove;
+    if (maxDepth != 1){
+        // finds the hash move
+        hashMove = b.hashMoves[ogZobKey];
+
+        // todo get the hash move and check to make sure this all works
     }
+    moves = allPosMoves(b, color, hashMove, essQueenMoves);
+
+    if (maxDepth != 1) moves.insert(moves.begin(), hashMove);
+
+    while (essQueenMoves.size() != 2)  essQueenMoves.emplace_back(-1,-1,PAWN, white);
 
     // resets old en passant moves and adds the new ones(if there are any)
     b.passentMoves.clear();
 
-    U64 kingMoves = getKingMoves(b, color, moves[0], moves[1]);
+    // todo test on first ply if it sees a castle move
+    U64 kingMoves = getKingMoves(b, color, essQueenMoves[0], essQueenMoves[1]);
 
     // for setting the best values gotten (minMax)
     int bestSoFar = -999999;
@@ -91,10 +96,10 @@ int ai::minMax(board b, int depth, Color color, int alpha, int beta, int &nodes,
     // if there are more than 3 moves with the same score at the maxDepth then we dont use hash move for move ordering
     int countHash = 0;
 
-    bool go = false;
-    for (int i = 0; i < moves.size(); i++) {
-        auto &m = moves[i];
+    // this is the pair that will be added to the hashMoves hashmap
+    std::pair<U64, piece> addHash;
 
+    for (auto & m : moves) {
         // if this is the first move then it will make it the first move Var
         if (depth == maxDepth) firstMove = m;
 
@@ -120,92 +125,26 @@ int ai::minMax(board b, int depth, Color color, int alpha, int beta, int &nodes,
             value = val1->second.score;
 
         }else{
-            // todo figure out to store the moves
             // here no key exists so we manually compute the value and add it to the table
-            value = -minMax(b, depth - 1, nextColor, -beta, -alpha, nodes, bestMove,start, nextMoveList, moveList, transpositionTable, firstMove);
+            value = -minMax(b, depth - 1, nextColor, -beta, -alpha, nodes, bestMove,start, transpositionTable, firstMove,hashMoves);
 
             m.Value = value;
             m.moveOrdGrad = value;
 
             transpositionTable.insert({zobristKey, TranspositionTable(zobristKey, value, depth, m)});
-
-
         }
-        // if its a capture we will add it to the nextMoveList as a priority
-        if (m.captured){
-            firstMove.moveOrdGrad = value;
-            if (color == black) firstMove.moveOrdGrad -= 100;
-            else firstMove.moveOrdGrad += 100;
-
-            firstMove.moveType = capture;
-
-            std::pair<row, col> first {firstMove.curRow, firstMove.curCol};
-            std::pair<row, col> second {firstMove.nextRow, firstMove.nextCol};
-            std::pair< std::pair<std::pair<row, col>, std::pair<row,col>>, piece> thing { {first, second}, firstMove};
-
-            if (nextMoveList.find({first,second}) == nextMoveList.end()) nextMoveList.insert(thing);
-            else{
-                // compare values
-                if (firstMove.moveOrdGrad > nextMoveList[{first, second}].moveOrdGrad){
-                    nextMoveList[{first, second}] = firstMove;
-                }
-            }
+        if (value > bestSoFar){
+            bestSoFar = value;
+            addHash = {ogZobKey, m};
         }
-
-        // if its the first move and no capture/killer move happened we make this move a regular move(noCapture)
-        if (depth == maxDepth){
-            firstMove.moveOrdGrad = value;
-            firstMove.moveType = nonCapture;
-
-            std::pair<row, col> first {firstMove.curRow, firstMove.curCol};
-            std::pair<row, col> second {firstMove.nextRow, firstMove.nextCol};
-            std::pair< std::pair<std::pair<row, col>, std::pair<row,col>>, piece> thing { {first, second}, firstMove};
-
-            if (nextMoveList.find({first,second}) == nextMoveList.end()) nextMoveList.insert(thing);
-            else{
-                // compare values
-                if (firstMove.moveOrdGrad > nextMoveList[{first, second}].moveOrdGrad){
-                    nextMoveList[{first, second}] = firstMove;
-                }
-            }
-        }
-        if (depth == maxDepth){
-            if (value >= bestSoFar){
-                countHash++;
-                if (countHash >= 5){
-                    m.ignoreBest = true;
-                }
-
-                bestMove = m;
-            }
-        }
-        bestSoFar = std::max(value, bestSoFar);
 
         if (bestSoFar > beta){
-            // killer move
-            firstMove.moveOrdGrad = value;
-            if (color == black) firstMove.moveOrdGrad -= 50;
-            else firstMove.moveOrdGrad += 50;
-
-            firstMove.moveType = killer;
-
-
-            std::pair<row, col> first {firstMove.curRow, firstMove.curCol};
-            std::pair<row, col> second {firstMove.nextRow, firstMove.nextCol};
-            std::pair< std::pair<std::pair<row, col>, std::pair<row,col>>, piece> thing { {first, second}, firstMove};
-
-            if (nextMoveList.find({first,second}) == nextMoveList.end()) nextMoveList.insert(thing);
-            else{
-                // compare values
-                if (firstMove.moveOrdGrad > nextMoveList[{first, second}].moveOrdGrad){
-                    nextMoveList[{first, second}] = firstMove;
-                }
-            }
-
+            hashMoves.insert(addHash);
             return bestSoFar;
         }
 
         alpha = std::max(alpha, bestSoFar);
+        hashMoves.insert(addHash);
 
         b.undoMove(m, oldPiece);
 
@@ -215,17 +154,17 @@ int ai::minMax(board b, int depth, Color color, int alpha, int beta, int &nodes,
 
 int ai::kingAttacks(board b, const piece& Piece) {
 
-	// moves that can attack the king
-	int killingMoves = 0;
+    // moves that can attack the king
+    int killingMoves = 0;
 
-	// sets variables of the piece
-	auto Class = Piece.type;
-	Color color = Piece.color;
+    // sets variables of the piece
+    auto Class = Piece.type;
+    Color color = Piece.color;
 
-	row Row = Piece.curRow;
-	col Col = Piece.curCol;
+    row Row = Piece.curRow;
+    col Col = Piece.curCol;
 
-	auto Board = b.boardArr;
+    auto Board = b.boardArr;
 
     if (color == white) {
 
@@ -245,7 +184,7 @@ int ai::kingAttacks(board b, const piece& Piece) {
             if (killingMoves >= 2) return 2;
         }
     }
-    // black
+        // black
     else {
         row newRow = Row + 1;
         row newCol = Col + 1;
@@ -264,9 +203,9 @@ int ai::kingAttacks(board b, const piece& Piece) {
         }
 
     }
-	/// rooks
-	// loop through all the possible moves a rook can move up/down/left/right
-	row newRow;
+    /// rooks
+    // loop through all the possible moves a rook can move up/down/left/right
+    row newRow;
     col newCol;
 
     // boolean variables to determine whether we should continue going a specific direction
@@ -386,8 +325,8 @@ int ai::kingAttacks(board b, const piece& Piece) {
             if (killingMoves >= 2) return 2;
         }
     }
-	/// king
-	moves.clear();
+    /// king
+    moves.clear();
 
     // adds all possible moves
     int new_col_up = Col - 1;
@@ -423,8 +362,8 @@ int ai::kingAttacks(board b, const piece& Piece) {
         }
     }
 
-	/// queen
-	// loop through all the possible moves a rook can move up/down/left/right
+    /// queen
+    // loop through all the possible moves a rook can move up/down/left/right
 
     // boolean variables to determine whether we should continue going a specific direction
     // this is useful because if it is going up and sees an obstacle it can not go up further
@@ -509,7 +448,7 @@ int ai::kingAttacks(board b, const piece& Piece) {
 
         // check to see if we can keep going that direction
         if (dir == Up && !goUp || dir == Down && !goDown || dir == Right && !goRight || dir == Left && !goLeft || dir == topLeft && !goTopLeft || dir == topRight && !goTopRight ||
-        dir == bottomLeft && !goBtmLeft || dir == bottomRight && !goBtmRight) continue;
+            dir == bottomLeft && !goBtmLeft || dir == bottomRight && !goBtmRight) continue;
 
         // check if the move is legal
         bool legal = true;
@@ -535,8 +474,8 @@ int ai::kingAttacks(board b, const piece& Piece) {
         }
     }
 
-	/// bishop
-	// loop through all the possible moves a bishop can move up/down/left/right
+    /// bishop
+    // loop through all the possible moves a bishop can move up/down/left/right
 
 
     // boolean variables to determine whether we should continue going a specific direction
@@ -547,7 +486,7 @@ int ai::kingAttacks(board b, const piece& Piece) {
     goRight = true;
     goLeft = true;
 
-   moves.clear();
+    moves.clear();
 
     for (int i = 1; i <= 8; i++) {
 
@@ -614,7 +553,7 @@ int ai::kingAttacks(board b, const piece& Piece) {
         }
     }
 
-	return killingMoves;
+    return killingMoves;
 }
 U64 ai::getKingMoves(board &b, Color color, const piece& moves1, const piece& moves2){
     // find the king piece
@@ -671,9 +610,10 @@ U64 ai::perft(board b, int depth, bool print, Color color) {
     U64 nodes = 0;
     if (depth == 0) return 1;
 
-    // also checks for en passant moves if there are any
+    // just ignore this
+    std::vector<piece> essQueenMoves;
 
-    auto moves = allPosMoves(b, color);
+    auto moves = allPosMoves(b, color,piece(-2,0,PAWN,white), essQueenMoves);
 
     // resets old en passant moves and adds the new ones(if there are any)
     b.passentMoves.clear();
@@ -712,7 +652,7 @@ bool ai::moveCheck(board b, const piece& Piece, int kingMoves) {
     // here only the king is allowed to move
     if (kingMoves == 2 && (Piece.type != KING || Piece.Castle != none)) return false;
 
-    // castle restrictions because of check
+        // castle restrictions because of check
     else if (kingMoves == 1 && Piece.Castle != none) return false;
     else if ((Piece.Castle == whiteCastleLeft || Piece.Castle == blackCastleLeft) && !b.castleLeft) return false;
     else if ((Piece.Castle == whiteCastleRight || Piece.Castle == blackCastleRight) && !b.castleRight) return false;
@@ -807,5 +747,3 @@ bool ai::moveCheck(board b, const piece& Piece, int kingMoves) {
 
 
 // iterate through every possible move
-
-

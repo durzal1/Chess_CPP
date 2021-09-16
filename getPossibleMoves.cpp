@@ -4,7 +4,7 @@
 ////
 //
 #include "getPossibleMoves.h"
-std::vector<piece> allPosMoves(const board& b, Color color){
+std::vector<piece> allPosMoves(const board& b, Color color, const piece& hashMove, std::vector<piece> &essQueenMoves){
     std::vector<piece> moves;
 
     for (int i = 0; i < 8 ; i++){
@@ -13,7 +13,7 @@ std::vector<piece> allPosMoves(const board& b, Color color){
 
             type.curCol = i;
             type.curRow = j;
-            if (type.color == color && type.type != NONE) posMoves(type, b, moves,everything);
+            if (type.color == color && type.type != NONE) posMoves(type, b, moves,everything, hashMove, essQueenMoves);
         }
     }
     return moves;
@@ -25,7 +25,7 @@ std::vector<piece> allCaptures(const board& b, Color color){
     for (int i = 0; i < 8 ; i++){
         for (int j = 0; j < 8; j++){
             piece type = b.boardArr[i][j];
-            posMoves(type, b, moves, captures);
+//            posMoves(type, b, moves, captures);
         }
     }
     return moves;
@@ -37,14 +37,14 @@ std::vector<piece> noCaptures(const board& b, Color color){
     for (int i = 0; i < 8 ; i++){
         for (int j = 0; j < 8; j++){
             piece type = b.boardArr[i][j];
-            posMoves(type, b, moves, nonCaptures);
+//            posMoves(type, b, moves, nonCaptures);
         }
     }
     return moves;
 }
 
 // directly adds moves to the moves vector in allPosMoves
-void posMoves(const piece& Piece,const board& b, std::vector<piece> &allMoves, Mode mode) { // , SDL_Renderer* renderer
+void posMoves(const piece& Piece,const board& b, std::vector<piece> &allMoves, Mode mode, const piece& hashMove, std::vector<piece> &essQueenMoves) { // , SDL_Renderer* renderer
 
     // sets variables of the piece
     auto Class = Piece.type;
@@ -81,7 +81,10 @@ void posMoves(const piece& Piece,const board& b, std::vector<piece> &allMoves, M
                     newPiece.rowPassant = Row + 1;
                     newPiece.colPassant = newCol;
 
-                    allMoves.push_back(newPiece);
+                    // makes sure its not the hashMove
+                    if (newPiece.curCol == hashMove.oldCol && newPiece.curRow == hashMove.oldRow && newPiece.nextRow == hashMove.nextRow && newPiece.nextCol == hashMove.nextCol);
+                    else allMoves.push_back(newPiece);
+
                 }
             }
             // if any of these have a row of 7 they are going to promote
@@ -99,17 +102,21 @@ void posMoves(const piece& Piece,const board& b, std::vector<piece> &allMoves, M
                 newPiece.nextCol = newCol;
                 newPiece.nextRow = newRow;
 
-                if (newRow == 7){
-                    newPiece.promotion = QUEEN;
-                    allMoves.push_back(newPiece);
-                    newPiece.promotion = HORSE;
-                    allMoves.push_back(newPiece);
-                    newPiece.promotion = BISHOP;
-                    allMoves.push_back(newPiece);
-                    newPiece.promotion = ROOK;
-                }
+                // makes sure its not the hashMove
+                if (newPiece.curCol == hashMove.oldCol && newPiece.curRow == hashMove.oldRow && newPiece.nextRow == hashMove.nextRow && newPiece.nextCol == hashMove.nextCol);
+                else{
+                    if (newRow == 7){
+                        newPiece.promotion = QUEEN;
+                        allMoves.push_back(newPiece);
+                        newPiece.promotion = HORSE;
+                        allMoves.push_back(newPiece);
+                        newPiece.promotion = BISHOP;
+                        allMoves.push_back(newPiece);
+                        newPiece.promotion = ROOK;
+                    }
 
-                allMoves.push_back(newPiece);
+                    allMoves.push_back(newPiece);
+                }
             }
 
             newRow = Row + 1;
@@ -124,19 +131,23 @@ void posMoves(const piece& Piece,const board& b, std::vector<piece> &allMoves, M
                 newPiece.nextCol = newCol;
                 newPiece.nextRow = newRow;
 
-                newPiece.captured = true;
+                if (newPiece.curCol == hashMove.oldCol && newPiece.curRow == hashMove.oldRow && newPiece.nextRow == hashMove.nextRow && newPiece.nextCol == hashMove.nextCol);
+                else{
+                    newPiece.captured = true;
 
-                if (newRow == 7){
-                    newPiece.promotion = QUEEN;
+                    if (newRow == 7){
+                        newPiece.promotion = QUEEN;
+                        allMoves.push_back(newPiece);
+                        newPiece.promotion = HORSE;
+                        allMoves.push_back(newPiece);
+                        newPiece.promotion = BISHOP;
+                        allMoves.push_back(newPiece);
+                        newPiece.promotion = ROOK;
+                    }
+
                     allMoves.push_back(newPiece);
-                    newPiece.promotion = HORSE;
-                    allMoves.push_back(newPiece);
-                    newPiece.promotion = BISHOP;
-                    allMoves.push_back(newPiece);
-                    newPiece.promotion = ROOK;
                 }
 
-                allMoves.push_back(newPiece);
             }
 
             newRow = Row + 1;
@@ -151,17 +162,21 @@ void posMoves(const piece& Piece,const board& b, std::vector<piece> &allMoves, M
 
                 newPiece.captured = true;
 
-                if (newRow == 7){
-                    newPiece.promotion = QUEEN;
+                if (newPiece.curCol == hashMove.oldCol && newPiece.curRow == hashMove.oldRow && newPiece.nextRow == hashMove.nextRow && newPiece.nextCol == hashMove.nextCol);
+                else{
+                    if (newRow == 7){
+                        newPiece.promotion = QUEEN;
+                        allMoves.push_back(newPiece);
+                        newPiece.promotion = HORSE;
+                        allMoves.push_back(newPiece);
+                        newPiece.promotion = BISHOP;
+                        allMoves.push_back(newPiece);
+                        newPiece.promotion = ROOK;
+                    }
+
                     allMoves.push_back(newPiece);
-                    newPiece.promotion = HORSE;
-                    allMoves.push_back(newPiece);
-                    newPiece.promotion = BISHOP;
-                    allMoves.push_back(newPiece);
-                    newPiece.promotion = ROOK;
                 }
 
-                allMoves.push_back(newPiece);
             }
             if (!b.passentMoves.empty()){
                 // en passant moves
@@ -176,11 +191,15 @@ void posMoves(const piece& Piece,const board& b, std::vector<piece> &allMoves, M
                     newPiece.nextCol = newCol;
                     newPiece.nextRow = newRow;
 
-                    newPiece.captured = true;
+                    if (newPiece.curCol == hashMove.oldCol && newPiece.curRow == hashMove.oldRow && newPiece.nextRow == hashMove.nextRow && newPiece.nextCol == hashMove.nextCol);
+                    else{
+                        newPiece.captured = true;
 
-                    newPiece.capRow = Row;
-                    newPiece.capCol = newCol;
-                    allMoves.push_back(newPiece);
+                        newPiece.capRow = Row;
+                        newPiece.capCol = newCol;
+                        allMoves.push_back(newPiece);
+
+                    }
 
                 }
 
@@ -194,11 +213,15 @@ void posMoves(const piece& Piece,const board& b, std::vector<piece> &allMoves, M
                     newPiece.nextCol = newCol;
                     newPiece.nextRow = newRow;
 
-                    newPiece.captured = true;
+                    if (newPiece.curCol == hashMove.oldCol && newPiece.curRow == hashMove.oldRow && newPiece.nextRow == hashMove.nextRow && newPiece.nextCol == hashMove.nextCol);
+                    else{
+                        newPiece.captured = true;
 
-                    newPiece.capRow = Row;
-                    newPiece.capCol = newCol;
-                    allMoves.push_back(newPiece);
+                        newPiece.capRow = Row;
+                        newPiece.capCol = newCol;
+                        allMoves.push_back(newPiece);
+
+                    }
 
                 }
             }
@@ -226,7 +249,8 @@ void posMoves(const piece& Piece,const board& b, std::vector<piece> &allMoves, M
                     newPiece.rowPassant = Row - 1;
                     newPiece.colPassant = newCol;
 
-                    allMoves.push_back(newPiece);
+                    if (newPiece.curCol == hashMove.oldCol && newPiece.curRow == hashMove.oldRow && newPiece.nextRow == hashMove.nextRow && newPiece.nextCol == hashMove.nextCol);
+                    else allMoves.push_back(newPiece);
                 }
             }
             row newRow = Row - 1;
@@ -240,17 +264,20 @@ void posMoves(const piece& Piece,const board& b, std::vector<piece> &allMoves, M
                 newPiece.nextCol = newCol;
                 newPiece.nextRow = newRow;
 
-                if (newRow == 0){
-                    newPiece.promotion = QUEEN;
-                    allMoves.push_back(newPiece);
-                    newPiece.promotion = HORSE;
-                    allMoves.push_back(newPiece);
-                    newPiece.promotion = BISHOP;
-                    allMoves.push_back(newPiece);
-                    newPiece.promotion = ROOK;
-                }
+                if (newPiece.curCol == hashMove.oldCol && newPiece.curRow == hashMove.oldRow && newPiece.nextRow == hashMove.nextRow && newPiece.nextCol == hashMove.nextCol);
+                else{
+                    if (newRow == 0){
+                        newPiece.promotion = QUEEN;
+                        allMoves.push_back(newPiece);
+                        newPiece.promotion = HORSE;
+                        allMoves.push_back(newPiece);
+                        newPiece.promotion = BISHOP;
+                        allMoves.push_back(newPiece);
+                        newPiece.promotion = ROOK;
+                    }
 
-                allMoves.push_back(newPiece);
+                    allMoves.push_back(newPiece);
+                }
             }
 
             newRow = Row-1;
@@ -266,17 +293,20 @@ void posMoves(const piece& Piece,const board& b, std::vector<piece> &allMoves, M
 
                 newPiece.captured = true;
 
-                if (newRow == 0){
-                    newPiece.promotion = QUEEN;
-                    allMoves.push_back(newPiece);
-                    newPiece.promotion = HORSE;
-                    allMoves.push_back(newPiece);
-                    newPiece.promotion = BISHOP;
-                    allMoves.push_back(newPiece);
-                    newPiece.promotion = ROOK;
-                }
+                if (newPiece.curCol == hashMove.oldCol && newPiece.curRow == hashMove.oldRow && newPiece.nextRow == hashMove.nextRow && newPiece.nextCol == hashMove.nextCol);
+                else{
+                    if (newRow == 0){
+                        newPiece.promotion = QUEEN;
+                        allMoves.push_back(newPiece);
+                        newPiece.promotion = HORSE;
+                        allMoves.push_back(newPiece);
+                        newPiece.promotion = BISHOP;
+                        allMoves.push_back(newPiece);
+                        newPiece.promotion = ROOK;
+                    }
 
-                allMoves.push_back(newPiece);
+                    allMoves.push_back(newPiece);
+                }
             }
 
             newRow = Row-1;
@@ -291,17 +321,20 @@ void posMoves(const piece& Piece,const board& b, std::vector<piece> &allMoves, M
 
                 newPiece.captured = true;
 
-                if (newRow == 0){
-                    newPiece.promotion = QUEEN;
-                    allMoves.push_back(newPiece);
-                    newPiece.promotion = HORSE;
-                    allMoves.push_back(newPiece);
-                    newPiece.promotion = BISHOP;
-                    allMoves.push_back(newPiece);
-                    newPiece.promotion = ROOK;
-                }
+                if (newPiece.curCol == hashMove.oldCol && newPiece.curRow == hashMove.oldRow && newPiece.nextRow == hashMove.nextRow && newPiece.nextCol == hashMove.nextCol);
+                else{
+                    if (newRow == 0){
+                        newPiece.promotion = QUEEN;
+                        allMoves.push_back(newPiece);
+                        newPiece.promotion = HORSE;
+                        allMoves.push_back(newPiece);
+                        newPiece.promotion = BISHOP;
+                        allMoves.push_back(newPiece);
+                        newPiece.promotion = ROOK;
+                    }
 
-                allMoves.push_back(newPiece);
+                    allMoves.push_back(newPiece);
+                }
             }
             if (!b.passentMoves.empty()){
                 // en passant attacks
@@ -321,7 +354,8 @@ void posMoves(const piece& Piece,const board& b, std::vector<piece> &allMoves, M
                     newPiece.capRow = Row;
                     newPiece.capCol = newCol;
 
-                    allMoves.push_back(newPiece);
+                    if (newPiece.curCol == hashMove.oldCol && newPiece.curRow == hashMove.oldRow && newPiece.nextRow == hashMove.nextRow && newPiece.nextCol == hashMove.nextCol);
+                    else allMoves.push_back(newPiece);
                 }
 
                 newRow = Row-1;
@@ -339,8 +373,8 @@ void posMoves(const piece& Piece,const board& b, std::vector<piece> &allMoves, M
                     newPiece.capRow = Row;
                     newPiece.capCol = newCol;
 
-
-                    allMoves.push_back(newPiece);
+                    if (newPiece.curCol == hashMove.oldCol && newPiece.curRow == hashMove.oldRow && newPiece.nextRow == hashMove.nextRow && newPiece.nextCol == hashMove.nextCol);
+                    else allMoves.push_back(newPiece);
 
 
                 }
@@ -420,34 +454,33 @@ void posMoves(const piece& Piece,const board& b, std::vector<piece> &allMoves, M
                 // adjust the new Piece
                 newPiece.nextCol = newCol;
                 newPiece.nextRow = newRow;
+                if (newPiece.curCol == hashMove.oldCol && newPiece.curRow == hashMove.oldRow && newPiece.nextRow == hashMove.nextRow && newPiece.nextCol == hashMove.nextCol);
+                else{
+                    // looks for castles
+                    if (color == white){
+                        // valid castles
+                        if (b.WhiteCastleLeft && newCol == 3 && newRow == 7 && Row == 7 && Col == 0){
+                            allMoves.push_back(newPiece);
+                            newPiece.Castle = whiteCastleLeft;
+                        }
+                        else if (b.WhiteCastleRight && newCol == 5 && newRow == 7 && Row == 7 && Col == 7){
+                            allMoves.push_back(newPiece);
+                            newPiece.Castle = whiteCastleRight;
+                        }
+                    }else{
+                        if (b.BlackCastleLeft && newCol == 3 && newRow == 0 && Row == 0 && Col == 0){
+                            allMoves.push_back(newPiece);
+                            newPiece.Castle = blackCastleLeft;
+                        }
+                        else if (b.BlackCastleRight && newCol == 5 && newRow == 0 && Row == 0 && Col == 7){
+                            allMoves.push_back(newPiece);
+                            newPiece.Castle = blackCastleRight;
+                        }
+                    }
 
-                // looks for castles
-                if (color == white){
-                    // valid castles
-                    if (b.WhiteCastleLeft && newCol == 3 && newRow == 7 && Row == 7 && Col == 0){
-                        allMoves.push_back(newPiece);
-                        newPiece.Castle = whiteCastleLeft;
-                        newPiece.nextCol = 999;
-                    }
-                    else if (b.WhiteCastleRight && newCol == 5 && newRow == 7 && Row == 7 && Col == 7){
-                        allMoves.push_back(newPiece);
-                        newPiece.Castle = whiteCastleRight;
-                        newPiece.nextCol = 999;
-                    }
-                }else{
-                    if (b.BlackCastleLeft && newCol == 3 && newRow == 0 && Row == 0 && Col == 0){
-                        allMoves.push_back(newPiece);
-                        newPiece.Castle = blackCastleLeft;
-                        newPiece.nextCol = 999;
-                    }
-                    else if (b.BlackCastleRight && newCol == 5 && newRow == 0 && Row == 0 && Col == 7){
-                        allMoves.push_back(newPiece);
-                        newPiece.Castle = blackCastleRight;
-                        newPiece.nextCol = 999;
-                    }
+                    allMoves.push_back(newPiece);
                 }
 
-                allMoves.push_back(newPiece);
             }
             // if there is a piece on the square
             if (Board[newRow][newCol].type != NONE && mode != nonCaptures){
@@ -461,7 +494,8 @@ void posMoves(const piece& Piece,const board& b, std::vector<piece> &allMoves, M
 
                     newPiece.captured = true;
 
-                    allMoves.push_back(newPiece);
+                    if (newPiece.curCol == hashMove.oldCol && newPiece.curRow == hashMove.oldRow && newPiece.nextRow == hashMove.nextRow && newPiece.nextCol == hashMove.nextCol);
+                    else allMoves.push_back(newPiece);
                 }
 
                 legal = false;
@@ -523,7 +557,8 @@ void posMoves(const piece& Piece,const board& b, std::vector<piece> &allMoves, M
                 newPiece.nextCol = newCol;
                 newPiece.nextRow = newRow;
 
-                allMoves.push_back(newPiece);
+                if (newPiece.curCol == hashMove.oldCol && newPiece.curRow == hashMove.oldRow && newPiece.nextRow == hashMove.nextRow && newPiece.nextCol == hashMove.nextCol);
+                else allMoves.push_back(newPiece);
             }
 
             if (Board[newRow][newCol].color != color && Board[newRow][newCol].type != NONE && mode != nonCaptures){
@@ -536,7 +571,8 @@ void posMoves(const piece& Piece,const board& b, std::vector<piece> &allMoves, M
 
                 newPiece.captured = true;
 
-                allMoves.push_back(newPiece);
+                if (newPiece.curCol == hashMove.oldCol && newPiece.curRow == hashMove.oldRow && newPiece.nextRow == hashMove.nextRow && newPiece.nextCol == hashMove.nextCol);
+                else allMoves.push_back(newPiece);
             }
         }
     }
@@ -596,7 +632,10 @@ void posMoves(const piece& Piece,const board& b, std::vector<piece> &allMoves, M
                 newPiece.nextCol = newCol;
                 newPiece.nextRow = newRow;
 
-                if (castleParam) allMoves.insert(allMoves.begin(),newPiece);
+                if (castleParam){
+                    essQueenMoves.push_back(newPiece);
+                }
+                if (newPiece.curCol == hashMove.oldCol && newPiece.curRow == hashMove.oldRow && newPiece.nextRow == hashMove.nextRow && newPiece.nextCol == hashMove.nextCol);
                 else allMoves.push_back(newPiece);
             }
             if (Board[newRow][newCol].color != color && Board[newRow][newCol].type != NONE && mode != nonCaptures){
@@ -609,7 +648,9 @@ void posMoves(const piece& Piece,const board& b, std::vector<piece> &allMoves, M
 
                 newPiece.captured = true;
 
-                if (castleParam) allMoves.insert(allMoves.begin(),newPiece);
+                if (castleParam) essQueenMoves.push_back(newPiece);
+
+                if (newPiece.curCol == hashMove.oldCol && newPiece.curRow == hashMove.oldRow && newPiece.nextRow == hashMove.nextRow && newPiece.nextCol == hashMove.nextCol);
                 else allMoves.push_back(newPiece);
             }
         }
@@ -717,7 +758,8 @@ void posMoves(const piece& Piece,const board& b, std::vector<piece> &allMoves, M
                 newPiece.nextCol = newCol;
                 newPiece.nextRow = newRow;
 
-                allMoves.push_back(newPiece);
+                if (newPiece.curCol == hashMove.oldCol && newPiece.curRow == hashMove.oldRow && newPiece.nextRow == hashMove.nextRow && newPiece.nextCol == hashMove.nextCol);
+                else allMoves.push_back(newPiece);
             }
 
             // if there is a piece on the square
@@ -732,7 +774,8 @@ void posMoves(const piece& Piece,const board& b, std::vector<piece> &allMoves, M
 
                     newPiece.captured = true;
 
-                    allMoves.push_back(newPiece);
+                    if (newPiece.curCol == hashMove.oldCol && newPiece.curRow == hashMove.oldRow && newPiece.nextRow == hashMove.nextRow && newPiece.nextCol == hashMove.nextCol);
+                    else allMoves.push_back(newPiece);
                 }
 
                 legal = false;
@@ -824,7 +867,8 @@ void posMoves(const piece& Piece,const board& b, std::vector<piece> &allMoves, M
                 newPiece.nextCol = newCol;
                 newPiece.nextRow = newRow;
 
-                allMoves.push_back(newPiece);
+                if (newPiece.curCol == hashMove.oldCol && newPiece.curRow == hashMove.oldRow && newPiece.nextRow == hashMove.nextRow && newPiece.nextCol == hashMove.nextCol);
+                else allMoves.push_back(newPiece);
             }
             // if there is a piece on the square
             if (Board[newRow][newCol].type != NONE && mode != nonCaptures){
@@ -838,7 +882,8 @@ void posMoves(const piece& Piece,const board& b, std::vector<piece> &allMoves, M
 
                     newPiece.captured = true;
 
-                    allMoves.push_back(newPiece);
+                    if (newPiece.curCol == hashMove.oldCol && newPiece.curRow == hashMove.oldRow && newPiece.nextRow == hashMove.nextRow && newPiece.nextCol == hashMove.nextCol);
+                    else allMoves.push_back(newPiece);
                 }
 
                 legal = false;

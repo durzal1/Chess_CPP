@@ -23,13 +23,14 @@ for kevin
 #include "board.h"
 #include "piece.h"
 // @returns the all legal moves a piece can do
-// @param int, row of the move
-// @param int, col of the move
-// @param bool, if the move captures another piece
-// @param string, either empty or castle location ex. "whiteLeft"
-void posMoves(const piece& Piece, const board& b, std::vector<piece> &moves, Mode mode); //, SDL_Renderer* renderer
+// @param piece, the piece it is searching the moves for
+// @param b, board
+// @param moves, all the moves that it found
+// @param mode, did not use this
+// @param hashMove, the best move, if it finds it, it simply ignores it
+void posMoves(const piece& Piece, const board& b, std::vector<piece> &moves, Mode mode, const piece& hasMove, std::vector<piece> &essQueenMoves); //, SDL_Renderer* renderer
 
-std::vector<piece> allPosMoves(const board& b, Color color);
+std::vector<piece> allPosMoves(const board& b, Color color, const piece& hashMove, std::vector<piece> &essQueenMoves);
 
 std::vector<piece> allCaptures(const board& b, Color color);
 

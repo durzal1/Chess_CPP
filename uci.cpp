@@ -8,8 +8,8 @@
 void uci::mainloop() {
     std::cout << "Durzal's Master Piece" << std::endl;
 
-    std::string line = "go depth 3";
-//    uci::processCommand(line);
+    std::string line = "go depth 5";
+    uci::processCommand(line);
 
     while (std::getline(std::cin, line)){
         uci::processCommand(line);
@@ -185,8 +185,6 @@ void uci::go(int depth, long long timeLimit) {
     int lastNode = 0;
 
     // move list that was made from the previous iteration (1 ply will have a default move list)
-    std::vector<piece> moveList = allPosMoves(Board, Board.playerTurn);
-    ;
 
     // the next move list that is being made in the current iteration
     std::map<std::pair<std::pair<row, col>, std::pair<row,col>>, piece> nextMoveList;
@@ -194,7 +192,14 @@ void uci::go(int depth, long long timeLimit) {
     // the moves that have been done in the current recursive iteration
     std::vector<piece> movesDone;
 
+    // map with all the hash moves
+    std::map<U64, piece> hashMoves;
+
     for (int i = 1; i <= depth; i++){
+        // sets the hash moves of the current iteration and then deletes them so they can store the new ones
+        Board.hashMoves = hashMoves;
+        hashMoves.clear();
+
         nextMoveList.clear();
 
         int nodes = 0;
@@ -207,19 +212,16 @@ void uci::go(int depth, long long timeLimit) {
         piece firstMove;
 
         // todo make it so that it only stops when there is no captures left
-        //  its going to get all the possible moves from the last search and create new vectors
-        //  One with captures and one with non captures (will add more later)
-        //  both will then be sorted in descending order and added to the moveList which will be used
-        //  the first priority will be lastBestMove
-        int score = AI.minMax(Board, i, Board.playerTurn,-999999, 999999, nodes, bestMove, start, nextMoveList, moveList, transpositionTable, firstMove);
+        //  first we create a second hash to hold all the best moves (hash moves)
+        //  for all the captures we grade them by mllVVa
+        //  the killers we will hold them in a hash map similar to hash moves but returns a killer (if there is one)
 
+
+        int score = AI.minMax(Board, i, Board.playerTurn,-999999, 999999, nodes, bestMove, start, transpositionTable, firstMove, hashMoves);
 
         // checks to makes sure it didnt leave too early
         auto stop = std::chrono::high_resolution_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
-
-        // sort the moveList
-        moveList = Sort(nextMoveList, bestMove);
 
         // didnt leave to early so we replace the lastBestMove
         if (duration.count() <= timeLimit){
