@@ -54,9 +54,12 @@ private:
     const int Q = 900;
     const int K = 20000;
 
-public:
     // map with all the hash moves
+protected:
     std::map<U64, piece> hashMoves;
+
+
+public:
 
     // to get zobrist keys in the future
     zobVal zobKeys = zobVal();

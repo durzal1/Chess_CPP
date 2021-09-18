@@ -192,12 +192,16 @@ void uci::go(int depth, long long timeLimit) {
     // the moves that have been done in the current recursive iteration
     std::vector<piece> movesDone;
 
-    // map with all the hash moves
+    // map with all the hash moves that will soon be created
     std::map<U64, piece> hashMoves;
+
+    // the old map of hashMoves that were already created and about to become used
+    std::map<U64,piece> oldHashMoves;
+
 
     for (int i = 1; i <= depth; i++){
         // sets the hash moves of the current iteration and then deletes them so they can store the new ones
-        Board.hashMoves = hashMoves;
+        oldHashMoves = hashMoves;
         hashMoves.clear();
 
         nextMoveList.clear();
@@ -217,7 +221,8 @@ void uci::go(int depth, long long timeLimit) {
         //  the killers we will hold them in a hash map similar to hash moves but returns a killer (if there is one)
 
 
-        int score = AI.minMax(Board, i, Board.playerTurn,-999999, 999999, nodes, bestMove, start, transpositionTable, firstMove, hashMoves);
+        int score = AI.minMax(Board, i, Board.playerTurn,-999999, 999999, nodes, bestMove, start, transpositionTable, firstMove, hashMoves, oldHashMoves);
+
 
         // checks to makes sure it didnt leave too early
         auto stop = std::chrono::high_resolution_clock::now();

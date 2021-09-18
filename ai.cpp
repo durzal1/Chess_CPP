@@ -12,7 +12,7 @@ ai::ai(const board& b, int maxDepth, Color color, long long timeLimit) {
 }
 
 
-int ai::minMax(board b, int depth, Color color, int alpha, int beta, int &nodes, piece &bestMove,std::chrono::time_point<std::chrono::system_clock> start, std::map<U64, TranspositionTable> &transpositionTable, piece firstMove,std::map<U64, piece> &hashMoves){
+int ai::minMax(board b, int depth, Color color, int alpha, int beta, int &nodes, piece &bestMove,std::chrono::time_point<std::chrono::system_clock> start, std::map<U64, TranspositionTable> &transpositionTable, piece firstMove,std::map<U64, piece> &hashMoves,  const std::map<U64, piece>oldHashMoves){
     // checks to see if time ran out
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
@@ -71,16 +71,17 @@ int ai::minMax(board b, int depth, Color color, int alpha, int beta, int &nodes,
     // if its the first iteration there will be no hash move(nor a need for it)
 
     std::vector<piece> moves;
-    piece hashMove;
-    if (maxDepth != 1){
+    piece hashMove = piece(-1,-1,ROOK,white);
+    if (depth != 1){
         // finds the hash move
-        hashMove = b.hashMoves[ogZobKey];
+        hashMove = oldHashMoves[ogZobKey];
 
-        // todo get the hash move and check to make sure this all works
+        hashMove.curCol = hashMove.oldCol;
+        hashMove.curRow = hashMove.oldRow;
     }
     moves = allPosMoves(b, color, hashMove, essQueenMoves);
 
-    if (maxDepth != 1) moves.insert(moves.begin(), hashMove);
+    if (depth != 1) moves.insert(moves.begin(), hashMove);
 
     while (essQueenMoves.size() != 2)  essQueenMoves.emplace_back(-1,-1,PAWN, white);
 
@@ -126,7 +127,7 @@ int ai::minMax(board b, int depth, Color color, int alpha, int beta, int &nodes,
 
         }else{
             // here no key exists so we manually compute the value and add it to the table
-            value = -minMax(b, depth - 1, nextColor, -beta, -alpha, nodes, bestMove,start, transpositionTable, firstMove,hashMoves);
+            value = -minMax(b, depth - 1, nextColor, -beta, -alpha, nodes, bestMove,start, transpositionTable, firstMove,hashMoves,oldHashMoves);
 
             m.Value = value;
             m.moveOrdGrad = value;
@@ -149,6 +150,7 @@ int ai::minMax(board b, int depth, Color color, int alpha, int beta, int &nodes,
         b.undoMove(m, oldPiece);
 
     }
+    hashMoves.insert(addHash);
     return bestSoFar;
 }
 
