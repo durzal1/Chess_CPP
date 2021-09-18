@@ -109,6 +109,14 @@ std::string piece::toString() {
     return uci;
 }
 
+bool piece::operator==(piece &hashMove) const {
+    if (this->curCol == hashMove.oldCol && this->curRow == hashMove.oldRow && this->nextRow == hashMove.nextRow && this->nextCol == hashMove.nextCol &&
+    this->type == hashMove.type){
+        return true;
+    }else return false;
+}
+
+
 
 
 

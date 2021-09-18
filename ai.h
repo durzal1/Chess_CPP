@@ -45,7 +45,7 @@ public:
 
     // function that does the minMax algorithm
 
-    int minMax(board b, int depth, Color color, int alpha, int beta, int &nodes, piece &bestMove,std::chrono::time_point<std::chrono::system_clock> start, std::map<U64, TranspositionTable> &transpositionTable, piece firstMove,std::map<U64, piece> &hashMoves,  std::map<U64, piece>oldHashMoves);
+    int minMax(board b, int depth, Color color, int alpha, int beta, int &nodes, piece &bestMove,std::chrono::time_point<std::chrono::system_clock> start, std::map<U64, TranspositionTable> &transpositionTable, piece firstMove,std::map<U64, piece> &hashMoves);
 
     // function that looks at all squares that can attack the king and determines if the piece there can do the attack
     // @return number of pieces that can attack the king (0,1,2)

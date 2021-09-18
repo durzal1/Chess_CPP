@@ -221,7 +221,7 @@ void uci::go(int depth, long long timeLimit) {
         //  the killers we will hold them in a hash map similar to hash moves but returns a killer (if there is one)
 
 
-        int score = AI.minMax(Board, i, Board.playerTurn,-999999, 999999, nodes, bestMove, start, transpositionTable, firstMove, hashMoves, oldHashMoves);
+        int score = AI.minMax(Board, i, Board.playerTurn,-999999, 999999, nodes, bestMove, start, transpositionTable, firstMove, hashMoves);
 
 
         // checks to makes sure it didnt leave too early
@@ -251,6 +251,8 @@ void uci::go(int depth, long long timeLimit) {
         else break;
 
     }
+    lastBestMove.curCol = lastBestMove.oldCol;
+    lastBestMove.curRow = lastBestMove.oldRow;
     std::cout << "bestmove" << " " << lastBestMove.toString() << std::endl;
 
 }

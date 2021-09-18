@@ -12,7 +12,7 @@ ai::ai(const board& b, int maxDepth, Color color, long long timeLimit) {
 }
 
 
-int ai::minMax(board b, int depth, Color color, int alpha, int beta, int &nodes, piece &bestMove,std::chrono::time_point<std::chrono::system_clock> start, std::map<U64, TranspositionTable> &transpositionTable, piece firstMove,std::map<U64, piece> &hashMoves,  const std::map<U64, piece>oldHashMoves){
+int ai::minMax(board b, int depth, Color color, int alpha, int beta, int &nodes, piece &bestMove,std::chrono::time_point<std::chrono::system_clock> start, std::map<U64, TranspositionTable> &transpositionTable, piece firstMove,std::map<U64, piece> &hashMoves){
     // checks to see if time ran out
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
@@ -71,17 +71,29 @@ int ai::minMax(board b, int depth, Color color, int alpha, int beta, int &nodes,
     // if its the first iteration there will be no hash move(nor a need for it)
 
     std::vector<piece> moves;
-    piece hashMove = piece(-1,-1,ROOK,white);
-    if (depth != 1){
-        // finds the hash move
-        hashMove = oldHashMoves[ogZobKey];
 
+    // if there is a hashMove
+    bool hasHashMove = true;
+
+    piece hashMove;
+
+    // finds the hash move
+//    hashMove = oldHashMoves[ogZobKey];
+
+    if (hashMove.type == NONE){
+        hasHashMove = false;
+    }else if (hashMove.color != color){
+        hasHashMove = false;
+    }
+    else{
         hashMove.curCol = hashMove.oldCol;
         hashMove.curRow = hashMove.oldRow;
     }
+
+
     moves = allPosMoves(b, color, hashMove, essQueenMoves);
 
-    if (depth != 1) moves.insert(moves.begin(), hashMove);
+    if (hasHashMove) moves.insert(moves.begin(), hashMove);
 
     while (essQueenMoves.size() != 2)  essQueenMoves.emplace_back(-1,-1,PAWN, white);
 
@@ -100,6 +112,17 @@ int ai::minMax(board b, int depth, Color color, int alpha, int beta, int &nodes,
     // this is the pair that will be added to the hashMoves hashmap
     std::pair<U64, piece> addHash;
 
+    //todo add one num/bit to zobkey if its white and remove if its black. this should help differntiate black and white
+    if (transpositionTable.count(ogZobKey)){
+        // key exists so we just make value the score(aka what it would have computed)
+        auto val1 = transpositionTable.find(ogZobKey);
+        int value1 = val1->second.score;
+
+        if (color != val1->second.Move.color || depth != val1->second.depth){
+            // do nothing here since this is not a valid
+        }
+        else return value1;
+    }
     for (auto & m : moves) {
         // if this is the first move then it will make it the first move Var
         if (depth == maxDepth) firstMove = m;
@@ -116,24 +139,14 @@ int ai::minMax(board b, int depth, Color color, int alpha, int beta, int &nodes,
         // score that the move will eventually lead to
         int value;
 
-        auto val = transpositionTable.find(zobristKey);
-
         // check if this move has already been computed.
-        if (transpositionTable.count(zobristKey) && val->second.depth == depth){
-            // key exists so we just make value the score(aka what it would have computed)
-            auto val1 = transpositionTable.find(zobristKey);
-            nodes --;
-            value = val1->second.score;
 
-        }else{
-            // here no key exists so we manually compute the value and add it to the table
-            value = -minMax(b, depth - 1, nextColor, -beta, -alpha, nodes, bestMove,start, transpositionTable, firstMove,hashMoves,oldHashMoves);
+        // here no key exists so we manually compute the value and add it to the table
+        value = -minMax(b, depth - 1, nextColor, -beta, -alpha, nodes, bestMove,start, transpositionTable, firstMove,hashMoves);
 
-            m.Value = value;
-            m.moveOrdGrad = value;
+        m.Value = value;
+        m.moveOrdGrad = value;
 
-            transpositionTable.insert({zobristKey, TranspositionTable(zobristKey, value, depth, m)});
-        }
         if (value > bestSoFar){
             bestSoFar = value;
             addHash = {ogZobKey, m};
@@ -141,6 +154,9 @@ int ai::minMax(board b, int depth, Color color, int alpha, int beta, int &nodes,
 
         if (bestSoFar > beta){
             hashMoves.insert(addHash);
+            bestMove = addHash.second;
+
+            transpositionTable.insert({ogZobKey, TranspositionTable(ogZobKey, bestSoFar, depth, addHash.second)});
             return bestSoFar;
         }
 
@@ -151,6 +167,10 @@ int ai::minMax(board b, int depth, Color color, int alpha, int beta, int &nodes,
 
     }
     hashMoves.insert(addHash);
+    bestMove = addHash.second;
+
+    transpositionTable.insert({ogZobKey, TranspositionTable(ogZobKey, bestSoFar, depth, addHash.second)});
+
     return bestSoFar;
 }
 

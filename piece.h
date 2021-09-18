@@ -83,6 +83,9 @@ public:
 
     piece& operator=(const piece& Piece);
 
+    bool operator==(piece& other) const;
+
+
 
     /* prints move in uci-output to help with debugging
      * @return string with the output

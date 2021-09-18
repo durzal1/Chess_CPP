@@ -454,7 +454,7 @@ void posMoves(const piece& Piece,const board& b, std::vector<piece> &allMoves, M
                 // adjust the new Piece
                 newPiece.nextCol = newCol;
                 newPiece.nextRow = newRow;
-                if (newPiece.curCol == hashMove.oldCol && newPiece.curRow == hashMove.oldRow && newPiece.nextRow == hashMove.nextRow && newPiece.nextCol == hashMove.nextCol);
+                if (newPiece.curCol == hashMove.oldCol && newPiece.curRow == hashMove.oldRow && newPiece.nextRow == hashMove.nextRow && newPiece.nextCol == hashMove.nextCol && newPiece.type == hashMove.type);
                 else{
                     // looks for castles
                     if (color == white){
