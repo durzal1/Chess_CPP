@@ -10,9 +10,67 @@ ai::ai(const board& b, int maxDepth, Color color, long long timeLimit) {
 
     this->timeLimit = timeLimit;
 }
+int ai::Evaluate(board b, Color nextColor){
+    // evaluate the move
+    auto eval = evaluate();
 
+    // sets value
+    int whiteVal = 0;
+    int blackVal = 0;
+    for (int i = 0; i < 8; i++){
+        for (int j = 0; j < 8; j++){
+            if (b.boardArr[i][j].type != NONE){
+                if (b.boardArr[i][j].color == white){
+                    whiteVal += b.getVal[b.boardArr[i][j].type];
+                }else{
+                    blackVal += b.getVal[b.boardArr[i][j].type];
+                }
+            }
+        }
+    }
+    int val = whiteVal - blackVal;
+    if (nextColor == black) val = blackVal - whiteVal;
 
-int ai::minMax(board b, int depth, Color color, int alpha, int beta, int &nodes, piece &bestMove,std::chrono::time_point<std::chrono::system_clock> start, std::map<U64, TranspositionTable> &transpositionTable, piece firstMove,std::map<U64, piece> &hashMoves){
+    int valuation = eval.evaluateFunc(b,nextColor, val);
+
+    return -valuation;
+}
+int ai::qSearch(board b, int alpha, int beta, Color color) {
+    // gets next color
+    Color nextColor;
+
+    if (color == white) nextColor = black;
+    else nextColor = white;
+
+    int stand_pat = Evaluate(b, nextColor);
+
+    if(stand_pat >= beta)
+        return beta;
+
+    if( alpha < stand_pat )
+        alpha = stand_pat;
+
+    piece p = piece(-22,-22,ROOK,white);
+
+    std::vector<piece> essQueenMoves;
+
+    // gets all the moves
+    auto moves = allPosMoves(b,color, p,essQueenMoves, captures);
+
+    // todo do the qsearch
+    for (auto & m : moves) {
+        piece oldPiece = b.move(m);
+        int score = -qSearch(b, -beta, -alpha,nextColor);
+        b.undoMove(m, oldPiece);
+
+        if( score >= beta )
+            return beta;
+        if( score > alpha )
+            alpha = score;
+    }
+    return alpha;
+}
+int ai::pvSearch(board b, int depth, Color color, int alpha, int beta, int &nodes, piece &bestMove,std::chrono::time_point<std::chrono::system_clock> start, std::map<U64, TranspositionTable> &transpositionTable, piece firstMove,std::map<U64, piece> &hashMoves){
     // checks to see if time ran out
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
@@ -34,29 +92,13 @@ int ai::minMax(board b, int depth, Color color, int alpha, int beta, int &nodes,
     else nextColor = white;
 
     if (depth == 0){
-        // evaluate the move
-        auto eval = evaluate();
-
-        // sets value
-        int whiteVal = 0;
-        int blackVal = 0;
-        for (int i = 0; i < 8; i++){
-            for (int j = 0; j < 8; j++){
-                if (b.boardArr[i][j].type != NONE){
-                    if (b.boardArr[i][j].color == white){
-                        whiteVal += b.getVal[b.boardArr[i][j].type];
-                    }else{
-                        blackVal += b.getVal[b.boardArr[i][j].type];
-                    }
-                }
-            }
-        }
-        int val = whiteVal - blackVal;
-        if (nextColor == black) val = blackVal - whiteVal;
-
-        int valuation = eval.evaluateFunc(b,nextColor, val);
-
-        return -valuation;
+//        if (firstMove.type == HORSE && firstMove.curCol == 7  && firstMove.nextRow == 4){
+//            b.print();
+//            std::cout << 'f';
+//        }
+        auto f = qSearch(b, alpha, beta, color);
+        return f;
+//        return Evaluate(b,nextColor);
     }
 
     // also checks for en passant moves if there are any
@@ -65,6 +107,10 @@ int ai::minMax(board b, int depth, Color color, int alpha, int beta, int &nodes,
     // zob key of the og board
     U64 ogZobKey = b.zobKeys.getZob(b.boardArr, b.zobVals);
 
+    // changes it based off of color
+    if (color == white) ogZobKey ^=1 ;
+    else ogZobKey ^= -1;
+
     // essential queen moves that we need to check for castle purposes
     std::vector<piece> essQueenMoves;
 
@@ -72,13 +118,16 @@ int ai::minMax(board b, int depth, Color color, int alpha, int beta, int &nodes,
 
     std::vector<piece> moves;
 
+    // sort the moves based off of their guess score
+
+
     // if there is a hashMove
     bool hasHashMove = true;
 
     piece hashMove;
 
     // finds the hash move
-//    hashMove = oldHashMoves[ogZobKey];
+    hashMove = hashMoves[ogZobKey];
 
     if (hashMove.type == NONE){
         hasHashMove = false;
@@ -91,7 +140,10 @@ int ai::minMax(board b, int depth, Color color, int alpha, int beta, int &nodes,
     }
 
 
-    moves = allPosMoves(b, color, hashMove, essQueenMoves);
+    moves = allPosMoves(b, color, hashMove, essQueenMoves, everything);
+
+    // sort moves
+    std::sort(moves.begin(), moves.end());
 
     if (hasHashMove) moves.insert(moves.begin(), hashMove);
 
@@ -103,26 +155,26 @@ int ai::minMax(board b, int depth, Color color, int alpha, int beta, int &nodes,
     // todo test on first ply if it sees a castle move
     U64 kingMoves = getKingMoves(b, color, essQueenMoves[0], essQueenMoves[1]);
 
-    // for setting the best values gotten (minMax)
-    int bestSoFar = -999999;
-
     // if there are more than 3 moves with the same score at the maxDepth then we dont use hash move for move ordering
     int countHash = 0;
 
     // this is the pair that will be added to the hashMoves hashmap
-    std::pair<U64, piece> addHash;
+    std::tuple<U64, piece, int> addHash;
 
-    //todo add one num/bit to zobkey if its white and remove if its black. this should help differntiate black and white
     if (transpositionTable.count(ogZobKey)){
         // key exists so we just make value the score(aka what it would have computed)
         auto val1 = transpositionTable.find(ogZobKey);
         int value1 = val1->second.score;
 
+        bestMove = val1->second.Move;
         if (color != val1->second.Move.color || depth != val1->second.depth){
-            // do nothing here since this is not a valid
+            // do nothing here since this is not valid
         }
         else return value1;
     }
+
+    // if it should fully search the move
+    bool bSearchPv = true;
     for (auto & m : moves) {
         // if this is the first move then it will make it the first move Var
         if (depth == maxDepth) firstMove = m;
@@ -133,45 +185,44 @@ int ai::minMax(board b, int depth, Color color, int alpha, int beta, int &nodes,
         nodes ++;
         piece oldPiece = b.move(m);
 
-        // zobrist key of the current board
-        U64 zobristKey = b.zobKeys.getZob(b.boardArr, b.zobVals);
-
-        // score that the move will eventually lead to
         int value;
 
-        // check if this move has already been computed.
+        if (bSearchPv) value = -pvSearch(b, depth - 1, nextColor, -beta, -alpha, nodes, bestMove,start, transpositionTable, firstMove,hashMoves);
+        else{
+            value = -pvSearch(b, depth - 1, nextColor, -alpha-1, -alpha, nodes, bestMove,start, transpositionTable, firstMove,hashMoves);
 
-        // here no key exists so we manually compute the value and add it to the table
-        value = -minMax(b, depth - 1, nextColor, -beta, -alpha, nodes, bestMove,start, transpositionTable, firstMove,hashMoves);
+            if (value > alpha){
+                // has potential to be good so we redo the search
+                value = -pvSearch(b, depth - 1, nextColor, -beta, -alpha, nodes, bestMove,start, transpositionTable, firstMove,hashMoves);
+            }
+        }
 
         m.Value = value;
-        m.moveOrdGrad = value;
 
-        if (value > bestSoFar){
-            bestSoFar = value;
-            addHash = {ogZobKey, m};
+        if (value >= beta){
+            transpositionTable.insert({ogZobKey, TranspositionTable(ogZobKey, value, depth, std::get<1>(addHash))});
+
+            if (depth == maxDepth){
+                bestMove = std::get<1>(addHash);
+            }
+            return beta;
         }
-
-        if (bestSoFar > beta){
-            hashMoves.insert(addHash);
-            bestMove = addHash.second;
-
-            transpositionTable.insert({ogZobKey, TranspositionTable(ogZobKey, bestSoFar, depth, addHash.second)});
-            return bestSoFar;
+        if (value > alpha){
+            alpha = value;
+            bSearchPv = false;
+            addHash = {ogZobKey, m, value};
         }
-
-        alpha = std::max(alpha, bestSoFar);
-        hashMoves.insert(addHash);
-
         b.undoMove(m, oldPiece);
 
     }
-    hashMoves.insert(addHash);
-    bestMove = addHash.second;
+    hashMoves.insert({std::get<0>(addHash), std::get<1>(addHash)});
+    if (depth == maxDepth){
+        bestMove = std::get<1>(addHash);
+    }
 
-    transpositionTable.insert({ogZobKey, TranspositionTable(ogZobKey, bestSoFar, depth, addHash.second)});
+    transpositionTable.insert({ogZobKey, TranspositionTable(ogZobKey, alpha, depth, bestMove)});
 
-    return bestSoFar;
+    return alpha;
 }
 
 int ai::kingAttacks(board b, const piece& Piece) {
@@ -635,7 +686,7 @@ U64 ai::perft(board b, int depth, bool print, Color color) {
     // just ignore this
     std::vector<piece> essQueenMoves;
 
-    auto moves = allPosMoves(b, color,piece(-2,0,PAWN,white), essQueenMoves);
+    auto moves = allPosMoves(b, color,piece(-2,0,PAWN,white), essQueenMoves, everything);
 
     // resets old en passant moves and adds the new ones(if there are any)
     b.passentMoves.clear();
@@ -760,6 +811,7 @@ bool ai::moveCheck(board b, const piece& Piece, int kingMoves) {
         return false;
     }
 }
+
 
 
 

@@ -4,7 +4,7 @@
 ////
 //
 #include "getPossibleMoves.h"
-std::vector<piece> allPosMoves(const board& b, Color color, const piece& hashMove, std::vector<piece> &essQueenMoves){
+std::vector<piece> allPosMoves(const board& b, Color color, const piece& hashMove, std::vector<piece> &essQueenMoves, Mode mode){
     std::vector<piece> moves;
 
     for (int i = 0; i < 8 ; i++){
@@ -13,7 +13,7 @@ std::vector<piece> allPosMoves(const board& b, Color color, const piece& hashMov
 
             type.curCol = i;
             type.curRow = j;
-            if (type.color == color && type.type != NONE) posMoves(type, b, moves,everything, hashMove, essQueenMoves);
+            if (type.color == color && type.type != NONE) posMoves(type, b, moves,mode, hashMove, essQueenMoves);
         }
     }
     return moves;
@@ -21,11 +21,16 @@ std::vector<piece> allPosMoves(const board& b, Color color, const piece& hashMov
 
 // only gets the captures
 std::vector<piece> allCaptures(const board& b, Color color){
+    std::vector<piece> essQueenMoves;
+
     std::vector<piece> moves;
     for (int i = 0; i < 8 ; i++){
         for (int j = 0; j < 8; j++){
             piece type = b.boardArr[i][j];
-//            posMoves(type, b, moves, captures);
+
+            type.curCol = i;
+            type.curRow = j;
+            if (type.color == color && type.type != NONE) posMoves(type, b, moves,captures, piece(-1, -1, ROOK, black), essQueenMoves);
         }
     }
     return moves;
@@ -53,8 +58,7 @@ void posMoves(const piece& Piece,const board& b, std::vector<piece> &allMoves, M
     row Row = Piece.curRow;
     col Col = Piece.curCol;
 
-    auto Board = b.boardArr;
-
+    auto getVal = b.getVal;
     // checks what class it is and gives the moves accordingly
     if (Class == PAWN) {
         if (color == black) {
@@ -66,7 +70,7 @@ void posMoves(const piece& Piece,const board& b, std::vector<piece> &allMoves, M
                 int newRow = Row + 2;
                 int newCol = Col;
 
-                if (Board[newRow][newCol].type == NONE && mode != captures&& newRow < 8 && newRow >= 0 && newCol >= 0 && newCol < 8&& Board[Row+1][Col].type == NONE){
+                if (b.boardArr[newRow][newCol].type == NONE && mode != captures && newRow < 8 && newRow >= 0 && newCol >= 0 && newCol < 8 && b.boardArr[Row + 1][Col].type == NONE){
                     // there is no piece on the square (move is legal)
                     // false at the end since it's not capturing a piece
 
@@ -94,7 +98,7 @@ void posMoves(const piece& Piece,const board& b, std::vector<piece> &allMoves, M
             row newRow = Row + 1;
             col newCol = Col;
 
-            if (Board[newRow][newCol].type == NONE && mode != captures&& newRow < 8 && newRow >= 0 && newCol >= 0 && newCol < 8){
+            if (b.boardArr[newRow][newCol].type == NONE && mode != captures && newRow < 8 && newRow >= 0 && newCol >= 0 && newCol < 8){
                 // create a copy of the piece
                 piece newPiece = piece(Piece);
 
@@ -123,7 +127,7 @@ void posMoves(const piece& Piece,const board& b, std::vector<piece> &allMoves, M
             newCol = Col + 1;
 
             // checks the attacks it can do
-            if (Board[newRow][newCol].color == white && Board[newRow][newCol].type != NONE && mode != nonCaptures&& newRow < 8 && newRow >= 0 && newCol >= 0 && newCol < 8){
+            if (b.boardArr[newRow][newCol].color == white && b.boardArr[newRow][newCol].type != NONE && mode != nonCaptures && newRow < 8 && newRow >= 0 && newCol >= 0 && newCol < 8){
                 // create a copy of the piece
                 piece newPiece = piece(Piece);
 
@@ -134,6 +138,10 @@ void posMoves(const piece& Piece,const board& b, std::vector<piece> &allMoves, M
                 if (newPiece.curCol == hashMove.oldCol && newPiece.curRow == hashMove.oldRow && newPiece.nextRow == hashMove.nextRow && newPiece.nextCol == hashMove.nextCol);
                 else{
                     newPiece.captured = true;
+
+                    newPiece.moveOrdGrad += getVal[b.boardArr[newRow][newCol].type] - getVal[newPiece.type];
+                    if (newPiece.moveOrdGrad >= 0)newPiece.moveOrdGrad += goodCapture;
+                    else newPiece.moveOrdGrad += badCapture;
 
                     if (newRow == 7){
                         newPiece.promotion = QUEEN;
@@ -152,7 +160,7 @@ void posMoves(const piece& Piece,const board& b, std::vector<piece> &allMoves, M
 
             newRow = Row + 1;
             newCol = Col - 1;
-            if (Board[newRow][newCol].color == white && Board[newRow][newCol].type != NONE && mode != nonCaptures&& newRow < 8 && newRow >= 0 && newCol >= 0 && newCol < 8){
+            if (b.boardArr[newRow][newCol].color == white && b.boardArr[newRow][newCol].type != NONE && mode != nonCaptures && newRow < 8 && newRow >= 0 && newCol >= 0 && newCol < 8){
                 // create a copy of the piece
                 piece newPiece = piece(Piece);
 
@@ -161,7 +169,9 @@ void posMoves(const piece& Piece,const board& b, std::vector<piece> &allMoves, M
                 newPiece.nextRow = newRow;
 
                 newPiece.captured = true;
-
+                newPiece.moveOrdGrad += getVal[b.boardArr[newRow][newCol].type] - getVal[newPiece.type];
+                if (newPiece.moveOrdGrad >= 0)newPiece.moveOrdGrad += goodCapture;
+                else newPiece.moveOrdGrad += badCapture;
                 if (newPiece.curCol == hashMove.oldCol && newPiece.curRow == hashMove.oldRow && newPiece.nextRow == hashMove.nextRow && newPiece.nextCol == hashMove.nextCol);
                 else{
                     if (newRow == 7){
@@ -183,7 +193,7 @@ void posMoves(const piece& Piece,const board& b, std::vector<piece> &allMoves, M
                 newRow = Row + 1;
                 newCol = Col + 1;
 
-                if (Board[newRow][newCol].type == NONE && Board[Row][newCol].type == PAWN &&Board[Row][newCol].color != color && b.passentMoves[0].first == newRow && b.passentMoves[0].second == newCol && newRow < 8 && newRow >= 0 && newCol >= 0 && newCol < 8){
+                if (b.boardArr[newRow][newCol].type == NONE && b.boardArr[Row][newCol].type == PAWN && b.boardArr[Row][newCol].color != color && b.passentMoves[0].first == newRow && b.passentMoves[0].second == newCol && newRow < 8 && newRow >= 0 && newCol >= 0 && newCol < 8){
                     // create a copy of the piece
                     piece newPiece = piece(Piece);
 
@@ -194,6 +204,10 @@ void posMoves(const piece& Piece,const board& b, std::vector<piece> &allMoves, M
                     if (newPiece.curCol == hashMove.oldCol && newPiece.curRow == hashMove.oldRow && newPiece.nextRow == hashMove.nextRow && newPiece.nextCol == hashMove.nextCol);
                     else{
                         newPiece.captured = true;
+
+                        newPiece.moveOrdGrad += getVal[b.boardArr[newRow][newCol].type] - getVal[newPiece.type];
+                        if (newPiece.moveOrdGrad >= 0)newPiece.moveOrdGrad += goodCapture;
+                        else newPiece.moveOrdGrad += badCapture;
 
                         newPiece.capRow = Row;
                         newPiece.capCol = newCol;
@@ -205,7 +219,7 @@ void posMoves(const piece& Piece,const board& b, std::vector<piece> &allMoves, M
 
                 newRow = Row + 1;
                 newCol = Col - 1;
-                if (Board[newRow][newCol].type == NONE && Board[Row][newCol].type == PAWN &&Board[Row][newCol].color != color && b.passentMoves[0].first == newRow && b.passentMoves[0].second == newCol && newRow < 8 && newRow >= 0 && newCol >= 0 && newCol < 8){
+                if (b.boardArr[newRow][newCol].type == NONE && b.boardArr[Row][newCol].type == PAWN && b.boardArr[Row][newCol].color != color && b.passentMoves[0].first == newRow && b.passentMoves[0].second == newCol && newRow < 8 && newRow >= 0 && newCol >= 0 && newCol < 8){
                     // create a copy of the piece
                     piece newPiece = piece(Piece);
 
@@ -216,6 +230,10 @@ void posMoves(const piece& Piece,const board& b, std::vector<piece> &allMoves, M
                     if (newPiece.curCol == hashMove.oldCol && newPiece.curRow == hashMove.oldRow && newPiece.nextRow == hashMove.nextRow && newPiece.nextCol == hashMove.nextCol);
                     else{
                         newPiece.captured = true;
+
+                        newPiece.moveOrdGrad += getVal[b.boardArr[newRow][newCol].type] - getVal[newPiece.type];
+                        if (newPiece.moveOrdGrad >= 0)newPiece.moveOrdGrad += goodCapture;
+                        else newPiece.moveOrdGrad += badCapture;
 
                         newPiece.capRow = Row;
                         newPiece.capCol = newCol;
@@ -237,7 +255,7 @@ void posMoves(const piece& Piece,const board& b, std::vector<piece> &allMoves, M
                 int newRow = Row - 2;
                 int newCol = Col;
 
-                if (Board[newRow][newCol].type == NONE && mode != captures&& newRow < 8 && newRow >= 0 && newCol >= 0 && newCol < 8 && Board[Row-1][Col].type == NONE){
+                if (b.boardArr[newRow][newCol].type == NONE && mode != captures && newRow < 8 && newRow >= 0 && newCol >= 0 && newCol < 8 && b.boardArr[Row - 1][Col].type == NONE){
                     // create a copy of the piece
                     piece newPiece = piece(Piece);
 
@@ -256,7 +274,7 @@ void posMoves(const piece& Piece,const board& b, std::vector<piece> &allMoves, M
             row newRow = Row - 1;
             col newCol = Col;
             // checks one square in front
-            if (Board[newRow][newCol].type == NONE && mode != captures && newRow < 8 && newRow >= 0 && newCol >= 0 && newCol < 8){
+            if (b.boardArr[newRow][newCol].type == NONE && mode != captures && newRow < 8 && newRow >= 0 && newCol >= 0 && newCol < 8){
                 // create a copy of the piece
                 piece newPiece = piece(Piece);
 
@@ -283,7 +301,7 @@ void posMoves(const piece& Piece,const board& b, std::vector<piece> &allMoves, M
             newRow = Row-1;
             newCol = Col + 1;
             // checks the attacks it can do
-            if (Board[newRow][newCol].color == black && Board[newRow][newCol].type != NONE && mode != nonCaptures&& newRow < 8 && newRow >= 0 && newCol >= 0 && newCol < 8){
+            if (b.boardArr[newRow][newCol].color == black && b.boardArr[newRow][newCol].type != NONE && mode != nonCaptures && newRow < 8 && newRow >= 0 && newCol >= 0 && newCol < 8){
                 // create a copy of the piece
                 piece newPiece = piece(Piece);
 
@@ -292,6 +310,10 @@ void posMoves(const piece& Piece,const board& b, std::vector<piece> &allMoves, M
                 newPiece.nextRow = newRow;
 
                 newPiece.captured = true;
+
+                newPiece.moveOrdGrad += getVal[b.boardArr[newRow][newCol].type] - getVal[newPiece.type];
+                if (newPiece.moveOrdGrad >= 0)newPiece.moveOrdGrad += goodCapture;
+                else newPiece.moveOrdGrad += badCapture;
 
                 if (newPiece.curCol == hashMove.oldCol && newPiece.curRow == hashMove.oldRow && newPiece.nextRow == hashMove.nextRow && newPiece.nextCol == hashMove.nextCol);
                 else{
@@ -311,7 +333,7 @@ void posMoves(const piece& Piece,const board& b, std::vector<piece> &allMoves, M
 
             newRow = Row-1;
             newCol = Col-1;
-            if (Board[newRow][newCol].color == black && Board[newRow][newCol].type != NONE && mode != nonCaptures && newRow < 8 && newRow >= 0 && newCol >= 0 && newCol < 8){
+            if (b.boardArr[newRow][newCol].color == black && b.boardArr[newRow][newCol].type != NONE && mode != nonCaptures && newRow < 8 && newRow >= 0 && newCol >= 0 && newCol < 8){
                 // create a copy of the piece
                 piece newPiece = piece(Piece);
 
@@ -320,6 +342,10 @@ void posMoves(const piece& Piece,const board& b, std::vector<piece> &allMoves, M
                 newPiece.nextRow = newRow;
 
                 newPiece.captured = true;
+
+                newPiece.moveOrdGrad += getVal[b.boardArr[newRow][newCol].type] - getVal[newPiece.type];
+                if (newPiece.moveOrdGrad >= 0)newPiece.moveOrdGrad += goodCapture;
+                else newPiece.moveOrdGrad += badCapture;
 
                 if (newPiece.curCol == hashMove.oldCol && newPiece.curRow == hashMove.oldRow && newPiece.nextRow == hashMove.nextRow && newPiece.nextCol == hashMove.nextCol);
                 else{
@@ -341,7 +367,7 @@ void posMoves(const piece& Piece,const board& b, std::vector<piece> &allMoves, M
                 newRow = Row-1;
                 newCol = Col + 1;
                 // checks if this move is an en passant move
-                if (Board[newRow][newCol].type == NONE && Board[Row][newCol].type == PAWN &&Board[Row][newCol].color != color &&  b.passentMoves[0].first == newRow && b.passentMoves[0].second == newCol && newRow < 8 && newRow >= 0 && newCol >= 0 && newCol < 8){
+                if (b.boardArr[newRow][newCol].type == NONE && b.boardArr[Row][newCol].type == PAWN && b.boardArr[Row][newCol].color != color && b.passentMoves[0].first == newRow && b.passentMoves[0].second == newCol && newRow < 8 && newRow >= 0 && newCol >= 0 && newCol < 8){
                     // create a copy of the piece
                     piece newPiece = piece(Piece);
 
@@ -350,6 +376,10 @@ void posMoves(const piece& Piece,const board& b, std::vector<piece> &allMoves, M
                     newPiece.nextRow = newRow;
 
                     newPiece.captured = true;
+
+                    newPiece.moveOrdGrad += getVal[b.boardArr[newRow][newCol].type] - getVal[newPiece.type];
+                    if (newPiece.moveOrdGrad >= 0)newPiece.moveOrdGrad += goodCapture;
+                    else newPiece.moveOrdGrad += badCapture;
 
                     newPiece.capRow = Row;
                     newPiece.capCol = newCol;
@@ -360,7 +390,7 @@ void posMoves(const piece& Piece,const board& b, std::vector<piece> &allMoves, M
 
                 newRow = Row-1;
                 newCol = Col-1;
-                if (Board[newRow][newCol].type == NONE && Board[Row][newCol].type == PAWN &&Board[Row][newCol].color != color && b.passentMoves[0].first == newRow && b.passentMoves[0].second == newCol && newRow < 8 && newRow >= 0 && newCol >= 0 && newCol < 8){
+                if (b.boardArr[newRow][newCol].type == NONE && b.boardArr[Row][newCol].type == PAWN && b.boardArr[Row][newCol].color != color && b.passentMoves[0].first == newRow && b.passentMoves[0].second == newCol && newRow < 8 && newRow >= 0 && newCol >= 0 && newCol < 8){
                     // create a copy of the piece
                     piece newPiece = piece(Piece);
 
@@ -369,6 +399,10 @@ void posMoves(const piece& Piece,const board& b, std::vector<piece> &allMoves, M
                     newPiece.nextRow = newRow;
 
                     newPiece.captured = true;
+
+                    newPiece.moveOrdGrad += getVal[b.boardArr[newRow][newCol].type] - getVal[newPiece.type];
+                    if (newPiece.moveOrdGrad >= 0)newPiece.moveOrdGrad += goodCapture;
+                    else newPiece.moveOrdGrad += badCapture;
 
                     newPiece.capRow = Row;
                     newPiece.capCol = newCol;
@@ -447,7 +481,7 @@ void posMoves(const piece& Piece,const board& b, std::vector<piece> &allMoves, M
             bool legal = true;
 
             // if there is nothing in the square
-            if (Board[newRow][newCol].type == NONE && mode != captures){
+            if (b.boardArr[newRow][newCol].type == NONE && mode != captures){
                 // create a copy of the piece
                 piece newPiece = piece(Piece);
 
@@ -483,8 +517,8 @@ void posMoves(const piece& Piece,const board& b, std::vector<piece> &allMoves, M
 
             }
             // if there is a piece on the square
-            if (Board[newRow][newCol].type != NONE && mode != nonCaptures){
-                if (Board[newRow][newCol].color != color){
+            if (b.boardArr[newRow][newCol].type != NONE && mode != nonCaptures){
+                if (b.boardArr[newRow][newCol].color != color){
                     // create a copy of the piece
                     piece newPiece = piece(Piece);
 
@@ -493,6 +527,10 @@ void posMoves(const piece& Piece,const board& b, std::vector<piece> &allMoves, M
                     newPiece.nextRow = newRow;
 
                     newPiece.captured = true;
+
+                    newPiece.moveOrdGrad += getVal[b.boardArr[newRow][newCol].type] - getVal[newPiece.type];
+                    if (newPiece.moveOrdGrad >= 0)newPiece.moveOrdGrad += goodCapture;
+                    else newPiece.moveOrdGrad += badCapture;
 
                     if (newPiece.curCol == hashMove.oldCol && newPiece.curRow == hashMove.oldRow && newPiece.nextRow == hashMove.nextRow && newPiece.nextCol == hashMove.nextCol);
                     else allMoves.push_back(newPiece);
@@ -549,7 +587,7 @@ void posMoves(const piece& Piece,const board& b, std::vector<piece> &allMoves, M
 
             // checks if the move is legal
 
-            if (Board[newRow][newCol].type == NONE && mode != captures){
+            if (b.boardArr[newRow][newCol].type == NONE && mode != captures){
                 // create a copy of the piece
                 piece newPiece = piece(Piece);
 
@@ -561,7 +599,7 @@ void posMoves(const piece& Piece,const board& b, std::vector<piece> &allMoves, M
                 else allMoves.push_back(newPiece);
             }
 
-            if (Board[newRow][newCol].color != color && Board[newRow][newCol].type != NONE && mode != nonCaptures){
+            if (b.boardArr[newRow][newCol].color != color && b.boardArr[newRow][newCol].type != NONE && mode != nonCaptures){
                 // create a copy of the piece
                 piece newPiece = piece(Piece);
 
@@ -570,6 +608,10 @@ void posMoves(const piece& Piece,const board& b, std::vector<piece> &allMoves, M
                 newPiece.nextRow = newRow;
 
                 newPiece.captured = true;
+
+                newPiece.moveOrdGrad += getVal[b.boardArr[newRow][newCol].type] - getVal[newPiece.type];
+                if (newPiece.moveOrdGrad >= 0)newPiece.moveOrdGrad += goodCapture;
+                else newPiece.moveOrdGrad += badCapture;
 
                 if (newPiece.curCol == hashMove.oldCol && newPiece.curRow == hashMove.oldRow && newPiece.nextRow == hashMove.nextRow && newPiece.nextCol == hashMove.nextCol);
                 else allMoves.push_back(newPiece);
@@ -624,7 +666,7 @@ void posMoves(const piece& Piece,const board& b, std::vector<piece> &allMoves, M
                 }else if (newCol == 5 && newRow == 0 && Col == 4 && Row == 0 ) castleParam = true;
             }
 
-            if (Board[newRow][newCol].type == NONE && mode != captures){
+            if (b.boardArr[newRow][newCol].type == NONE && mode != captures){
                 // create a copy of the piece
                 piece newPiece = piece(Piece);
 
@@ -638,7 +680,7 @@ void posMoves(const piece& Piece,const board& b, std::vector<piece> &allMoves, M
                 if (newPiece.curCol == hashMove.oldCol && newPiece.curRow == hashMove.oldRow && newPiece.nextRow == hashMove.nextRow && newPiece.nextCol == hashMove.nextCol);
                 else allMoves.push_back(newPiece);
             }
-            if (Board[newRow][newCol].color != color && Board[newRow][newCol].type != NONE && mode != nonCaptures){
+            if (b.boardArr[newRow][newCol].color != color && b.boardArr[newRow][newCol].type != NONE && mode != nonCaptures){
                 // create a copy of the piece
                 piece newPiece = piece(Piece);
 
@@ -647,6 +689,10 @@ void posMoves(const piece& Piece,const board& b, std::vector<piece> &allMoves, M
                 newPiece.nextRow = newRow;
 
                 newPiece.captured = true;
+
+                newPiece.moveOrdGrad += getVal[b.boardArr[newRow][newCol].type] - getVal[newPiece.type];
+                if (newPiece.moveOrdGrad >= 0)newPiece.moveOrdGrad += goodCapture;
+                else newPiece.moveOrdGrad += badCapture;
 
                 if (castleParam) essQueenMoves.push_back(newPiece);
 
@@ -750,7 +796,7 @@ void posMoves(const piece& Piece,const board& b, std::vector<piece> &allMoves, M
             bool legal = true;
 
             // if there is nothing in the square
-            if (Board[newRow][newCol].type == NONE && mode != captures){
+            if (b.boardArr[newRow][newCol].type == NONE && mode != captures){
                 // create a copy of the piece
                 piece newPiece = piece(Piece);
 
@@ -763,8 +809,8 @@ void posMoves(const piece& Piece,const board& b, std::vector<piece> &allMoves, M
             }
 
             // if there is a piece on the square
-            if (Board[newRow][newCol].type != NONE && mode != nonCaptures){
-                if (Board[newRow][newCol].color != color){
+            if (b.boardArr[newRow][newCol].type != NONE && mode != nonCaptures){
+                if (b.boardArr[newRow][newCol].color != color){
                     // create a copy of the piece
                     piece newPiece = piece(Piece);
 
@@ -773,6 +819,10 @@ void posMoves(const piece& Piece,const board& b, std::vector<piece> &allMoves, M
                     newPiece.nextRow = newRow;
 
                     newPiece.captured = true;
+
+                    newPiece.moveOrdGrad += getVal[b.boardArr[newRow][newCol].type] - getVal[newPiece.type];
+                    if (newPiece.moveOrdGrad >= 0)newPiece.moveOrdGrad += goodCapture;
+                    else newPiece.moveOrdGrad += badCapture;
 
                     if (newPiece.curCol == hashMove.oldCol && newPiece.curRow == hashMove.oldRow && newPiece.nextRow == hashMove.nextRow && newPiece.nextCol == hashMove.nextCol);
                     else allMoves.push_back(newPiece);
@@ -859,7 +909,7 @@ void posMoves(const piece& Piece,const board& b, std::vector<piece> &allMoves, M
             bool legal = true;
 
             // if there is nothing in the square
-            if (Board[newRow][newCol].type == NONE && mode != captures){
+            if (b.boardArr[newRow][newCol].type == NONE && mode != captures){
                 // create a copy of the piece
                 piece newPiece = piece(Piece);
 
@@ -871,8 +921,8 @@ void posMoves(const piece& Piece,const board& b, std::vector<piece> &allMoves, M
                 else allMoves.push_back(newPiece);
             }
             // if there is a piece on the square
-            if (Board[newRow][newCol].type != NONE && mode != nonCaptures){
-                if (Board[newRow][newCol].color != color){
+            if (b.boardArr[newRow][newCol].type != NONE && mode != nonCaptures){
+                if (b.boardArr[newRow][newCol].color != color){
                     // create a copy of the piece
                     piece newPiece = piece(Piece);
 
@@ -881,6 +931,10 @@ void posMoves(const piece& Piece,const board& b, std::vector<piece> &allMoves, M
                     newPiece.nextRow = newRow;
 
                     newPiece.captured = true;
+
+                    newPiece.moveOrdGrad += getVal[b.boardArr[newRow][newCol].type] - getVal[newPiece.type];
+                    if (newPiece.moveOrdGrad >= 0)newPiece.moveOrdGrad += goodCapture;
+                    else newPiece.moveOrdGrad += badCapture;
 
                     if (newPiece.curCol == hashMove.oldCol && newPiece.curRow == hashMove.oldRow && newPiece.nextRow == hashMove.nextRow && newPiece.nextCol == hashMove.nextCol);
                     else allMoves.push_back(newPiece);

@@ -52,6 +52,13 @@ enum moveOrdering{
     killer = 2,
     nonCapture = 1,
 };
+// how much to add based off of node type
+enum moveAdd{
+    goodCapture = 2000,
+    Killer = 1500,
+    badCapture = 800,
+
+};
 typedef uint64_t U64;
 typedef uint8_t U8;
 typedef int col;

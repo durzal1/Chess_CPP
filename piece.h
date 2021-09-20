@@ -14,6 +14,10 @@ private:
     char conversion[8] {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'};
 
 public:
+    bool operator< (const piece &other) const {
+        return moveOrdGrad > other.moveOrdGrad;
+    }
+
     // current cords
     col curCol;
     row curRow;
@@ -63,7 +67,7 @@ public:
     int Value;
 
     // grading value that will be used in move ordering
-    int moveOrdGrad;
+    int moveOrdGrad = 0;
 
     // move ordering type(capture, noncapture, killer, etc)
     moveOrdering moveType;

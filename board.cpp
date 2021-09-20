@@ -876,7 +876,6 @@ board::board(const board &b) {
     this->castleRight = b.castleRight;
     this->castleLeft = b.castleLeft;
     this->conversion = b.conversion;
-
     this->zobKeys = b.zobKeys;
     for (int i = 0; i < 8; i ++){
         for (int j = 0; j < 8; j++){

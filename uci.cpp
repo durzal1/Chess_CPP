@@ -8,8 +8,8 @@
 void uci::mainloop() {
     std::cout << "Durzal's Master Piece" << std::endl;
 
-    std::string line = "go depth 5";
-    uci::processCommand(line);
+    std::string line = "";
+//    uci::processCommand(line);
 
     while (std::getline(std::cin, line)){
         uci::processCommand(line);
@@ -173,7 +173,7 @@ void uci::go(int depth, long long timeLimit) {
     // then it will use best move from the last iteration
     auto start = std::chrono::high_resolution_clock::now();
 
-    timeLimit = 999999999999;
+//    timeLimit = 999999999999;
 
     ai AI = ai(Board, 1, Board.playerTurn, timeLimit);
 
@@ -195,14 +195,17 @@ void uci::go(int depth, long long timeLimit) {
     // map with all the hash moves that will soon be created
     std::map<U64, piece> hashMoves;
 
-    // the old map of hashMoves that were already created and about to become used
-    std::map<U64,piece> oldHashMoves;
+    std::map<U64, TranspositionTable> transpositionTable;
 
 
     for (int i = 1; i <= depth; i++){
-        // sets the hash moves of the current iteration and then deletes them so they can store the new ones
-        oldHashMoves = hashMoves;
         hashMoves.clear();
+
+        // sets the hash moves of the current iteration and then deletes them so they can store the new ones
+        std::map<U64, TranspositionTable>::iterator it;
+
+        for (it = transpositionTable.begin(); it != transpositionTable.end(); it++) hashMoves.insert({it->first, it->second.Move});
+        transpositionTable.clear();
 
         nextMoveList.clear();
 
@@ -211,17 +214,16 @@ void uci::go(int depth, long long timeLimit) {
         AI.maxDepth = i;
         piece bestMove = piece();
 
-        std::map<U64, TranspositionTable> transpositionTable;
 
         piece firstMove;
 
         // todo make it so that it only stops when there is no captures left
-        //  first we create a second hash to hold all the best moves (hash moves)
+        //  first we create a hash to hold all the best moves (hash moves) DONE
         //  for all the captures we grade them by mllVVa
         //  the killers we will hold them in a hash map similar to hash moves but returns a killer (if there is one)
 
 
-        int score = AI.minMax(Board, i, Board.playerTurn,-999999, 999999, nodes, bestMove, start, transpositionTable, firstMove, hashMoves);
+        int score = AI.pvSearch(Board, i, Board.playerTurn,-999999, 999999, nodes, bestMove, start, transpositionTable, firstMove, hashMoves);
 
 
         // checks to makes sure it didnt leave too early
@@ -235,10 +237,11 @@ void uci::go(int depth, long long timeLimit) {
             std::chrono::milliseconds dur(du);
 
             std::chrono::time_point<std::chrono::system_clock> dt(dur);
+            lastNode += nodes;
 
             double time = double(du) / 1000;
             int nps = nodes / time;
-            std::cout << "info depth " << i << " score cp "  << score << " nodes " << nodes - lastNode <<  " nps " << nps << " time " << duration.count() << " ";
+            std::cout << "info depth " << i << " score cp "  << score << " nodes " << lastNode <<  " nps " << nps << " time " << duration.count() << " ";
             std::cout << "PV ";
             for (piece p:bestMove.pastMoves){
                 std::cout << p.toString() << " ";
@@ -246,7 +249,6 @@ void uci::go(int depth, long long timeLimit) {
             std::cout << "" << std::endl;
 
             lastBestMove = bestMove;
-            lastNode = nodes;
         }
         else break;
 
@@ -255,91 +257,6 @@ void uci::go(int depth, long long timeLimit) {
     lastBestMove.curRow = lastBestMove.oldRow;
     std::cout << "bestmove" << " " << lastBestMove.toString() << std::endl;
 
-}
-
-std::vector<piece> uci::Sort(std::map<std::pair<std::pair<row, col>, std::pair<row,col>>, piece> moveList, piece bestMove) {
-    // todo ensure the hash map is the first move
-
-    // do not try to understand this. its so ugly but it does the job and happens so once per iteration
-    // so it doesnt have to be efficent
-
-    std::vector<piece> sorted;
-
-    // vectors that hold each type
-    std::vector<piece> captures;
-    std::vector<piece> killers;
-    std::vector<piece> nonCaptures;
-
-    std::vector<piece> captures1;
-    std::vector<piece> killers1;
-    std::vector<piece> nonCaptures1;
-
-    std::vector<int> capturesVal;
-    std::vector<int> killersVal;
-    std::vector<int> nonCapturesVal;
-
-    int j = 0;
-
-    for (auto it=moveList.begin(); it!=moveList.end(); ++it){
-        if (it->first.first.first == bestMove.oldRow && it->first.first.second == bestMove.oldCol && it->first.second.first == bestMove.nextRow && it->first.second.second == bestMove.nextCol && !bestMove.ignoreBest){
-            continue;
-        }
-        j++;
-        if (it->second.moveType == capture){
-            captures.push_back(it->second);
-            captures1.push_back(it->second);
-            capturesVal.push_back(it->second.moveOrdGrad);
-        }
-        else if (it->second.moveType == nonCapture){
-            nonCaptures.push_back(it->second);
-            nonCaptures1.push_back(it->second);
-            nonCapturesVal.push_back(it->second.moveOrdGrad);
-        }
-        else if (it->second.moveType == killer){
-            killers.push_back(it->second);
-            killers1.push_back(it->second);
-            killersVal.push_back(it->second.moveOrdGrad);
-        }
-    }
-
-    std::sort(capturesVal.begin(), capturesVal.end(), std::greater<int>());
-    std::sort(killersVal.begin(), killersVal.end(), std::greater<int>());
-    std::sort(nonCapturesVal.begin(), nonCapturesVal.end(), std::greater<int>());
-
-    for (int i = 0; i < captures.size(); i++){
-        for (j = 0; j < captures.size(); j++){
-            if (captures[j].moveOrdGrad == capturesVal[i]){
-                captures1[i] = captures[j];
-                capturesVal[i] = -999999;
-                captures[j].moveOrdGrad = -999900999;
-            }
-        }
-    }
-    for (int i = 0; i < nonCaptures.size(); i++){
-        for (j = 0; j < nonCaptures.size(); j++){
-            if (nonCaptures[j].moveOrdGrad == nonCapturesVal[i]){
-                nonCaptures1[i] = nonCaptures[j];
-                nonCapturesVal[i] = -999999;
-                nonCaptures[j].moveOrdGrad = -999900999;
-            }
-        }
-    }
-    for (int i = 0; i < killers.size(); i++){
-        for (j = 0; j < killers.size(); j++){
-            if (killers[j].moveOrdGrad == killersVal[i]){
-                killers1[i] = killers[j];
-                killersVal[i] = -9999999;
-                killers[j].moveOrdGrad = -999900999;
-            }
-        }
-    }
-    for (piece& cap:killers1) sorted.push_back(cap);
-    for (piece& cap:captures1) sorted.push_back(cap);
-    for (piece& cap:nonCaptures1) sorted.push_back(cap);
-
-    if (!bestMove.ignoreBest) sorted.insert(sorted.begin(), bestMove);
-
-    return sorted;
 }
 void uci::set_option(std::string &name, std::string &value) {
 
