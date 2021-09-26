@@ -51,6 +51,9 @@ public:
     // q serach
     int qSearch( board b, int alpha, int beta, Color nextColor);
 
+    // zw search
+    int zwSearch(int beta, int depth,  board b, Color nextColor, int &nodes);
+
     // evaluates the current board
     static int Evaluate(board b, Color nextColor);
 

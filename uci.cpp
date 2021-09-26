@@ -133,7 +133,7 @@ void uci::processCommand(std::string str) {
             uci::position_fen(fen);
 
             // reset the color
-            Board.playerTurn = white;
+//            Board.playerTurn = white;
 
             // do the moves and change color
             if (split.size() > 8){
@@ -173,7 +173,7 @@ void uci::go(int depth, long long timeLimit) {
     // then it will use best move from the last iteration
     auto start = std::chrono::high_resolution_clock::now();
 
-//    timeLimit = 999999999999;
+    timeLimit = 999999999999;
 
     ai AI = ai(Board, 1, Board.playerTurn, timeLimit);
 
@@ -225,7 +225,11 @@ void uci::go(int depth, long long timeLimit) {
 
         int score = AI.pvSearch(Board, i, Board.playerTurn,-999999, 999999, nodes, bestMove, start, transpositionTable, firstMove, hashMoves);
 
-
+        // check mate so we just end early
+        if (score == 6666666 || score == -6666666){
+            lastBestMove = bestMove;
+            break;
+        }
         // checks to makes sure it didnt leave too early
         auto stop = std::chrono::high_resolution_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);

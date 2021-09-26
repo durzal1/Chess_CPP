@@ -10,6 +10,36 @@ ai::ai(const board& b, int maxDepth, Color color, long long timeLimit) {
 
     this->timeLimit = timeLimit;
 }
+int ai::zwSearch(int beta, int depth,  board b, Color color, int &nodes) {
+    // gets next color
+    Color nextColor;
+
+    if (color == white) nextColor = black;
+    else nextColor = white;
+
+    // this is either a cut- or all-node
+    if( depth == 0 ) return qSearch(b, beta-1, beta, nextColor);
+
+    piece p = piece(-22,-22,ROOK,white);
+
+    std::vector<piece> essQueenMoves;
+
+    // gets all the moves
+    auto moves = allPosMoves(b,color, p,essQueenMoves, everything);
+
+    for (auto m:moves) {
+        nodes ++;
+        piece oldPiece = b.move(m);
+        int score = -zwSearch(1-beta, depth - 1, b, nextColor, nodes);
+        b.undoMove(m, oldPiece);
+
+        if(score >= beta){
+            return beta;
+        }
+    }
+    return beta-1;
+    // todo this needs so much work like move sorting, only do legal moves, etc
+}
 int ai::Evaluate(board b, Color nextColor){
     // evaluate the move
     auto eval = evaluate();
@@ -57,8 +87,10 @@ int ai::qSearch(board b, int alpha, int beta, Color color) {
     // gets all the moves
     auto moves = allPosMoves(b,color, p,essQueenMoves, captures);
 
-    // todo do the qsearch
     for (auto & m : moves) {
+        // if the move captures the king we dont do it cuz it will mess things up
+//        if (b.boardArr[m.nextRow][m.nextCol].type == KING) continue;
+
         piece oldPiece = b.move(m);
         int score = -qSearch(b, -beta, -alpha,nextColor);
         b.undoMove(m, oldPiece);
@@ -92,10 +124,7 @@ int ai::pvSearch(board b, int depth, Color color, int alpha, int beta, int &node
     else nextColor = white;
 
     if (depth == 0){
-//        if (firstMove.type == HORSE && firstMove.curCol == 7  && firstMove.nextRow == 4){
-//            b.print();
-//            std::cout << 'f';
-//        }
+
         auto f = qSearch(b, alpha, beta, color);
         return f;
 //        return Evaluate(b,nextColor);
@@ -108,8 +137,8 @@ int ai::pvSearch(board b, int depth, Color color, int alpha, int beta, int &node
     U64 ogZobKey = b.zobKeys.getZob(b.boardArr, b.zobVals);
 
     // changes it based off of color
-    if (color == white) ogZobKey ^=1 ;
-    else ogZobKey ^= -1;
+    if (color == white) ogZobKey +=1 ;
+    else ogZobKey -= 1;
 
     // essential queen moves that we need to check for castle purposes
     std::vector<piece> essQueenMoves;
@@ -152,7 +181,6 @@ int ai::pvSearch(board b, int depth, Color color, int alpha, int beta, int &node
     // resets old en passant moves and adds the new ones(if there are any)
     b.passentMoves.clear();
 
-    // todo test on first ply if it sees a castle move
     U64 kingMoves = getKingMoves(b, color, essQueenMoves[0], essQueenMoves[1]);
 
     // if there are more than 3 moves with the same score at the maxDepth then we dont use hash move for move ordering
@@ -175,25 +203,50 @@ int ai::pvSearch(board b, int depth, Color color, int alpha, int beta, int &node
 
     // if it should fully search the move
     bool bSearchPv = true;
+
+    // if it doesnt do any moves then its checkmate
+    bool checkmate = true;
+
     for (auto & m : moves) {
+
         // if this is the first move then it will make it the first move Var
         if (depth == maxDepth) firstMove = m;
 
         if (!moveCheck(b, m, kingMoves)){
             continue;
         }
+        checkmate = false;
+
         nodes ++;
         piece oldPiece = b.move(m);
 
         int value;
 
-        if (bSearchPv) value = -pvSearch(b, depth - 1, nextColor, -beta, -alpha, nodes, bestMove,start, transpositionTable, firstMove,hashMoves);
+        if (bSearchPv){
+            value = -pvSearch(b, depth - 1, nextColor, -beta, -alpha, nodes, bestMove,start, transpositionTable, firstMove,hashMoves);
+        }
         else{
             value = -pvSearch(b, depth - 1, nextColor, -alpha-1, -alpha, nodes, bestMove,start, transpositionTable, firstMove,hashMoves);
 
             if (value > alpha){
                 // has potential to be good so we redo the search
                 value = -pvSearch(b, depth - 1, nextColor, -beta, -alpha, nodes, bestMove,start, transpositionTable, firstMove,hashMoves);
+            }
+        }
+
+        // todo make sure the color is the board color
+        if (value == 100003 || value == -100003 && b.playerTurn == color){
+            firstMove.oldRow = firstMove.curRow;
+            firstMove.oldCol = firstMove.curCol;
+
+            bestMove = firstMove;
+
+            if (color == black){
+                alpha = 6666666;
+                return alpha;
+            }else{
+                beta = -6666666;
+                return beta;
             }
         }
 
@@ -221,6 +274,9 @@ int ai::pvSearch(board b, int depth, Color color, int alpha, int beta, int &node
     }
 
     transpositionTable.insert({ogZobKey, TranspositionTable(ogZobKey, alpha, depth, bestMove)});
+
+    // returns arbitrary number that can not be made using regular means
+    if (checkmate) alpha = 100003;
 
     return alpha;
 }
