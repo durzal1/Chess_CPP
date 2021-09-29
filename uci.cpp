@@ -133,7 +133,7 @@ void uci::processCommand(std::string str) {
             uci::position_fen(fen);
 
             // reset the color
-//            Board.playerTurn = white;
+            Board.playerTurn = white;
 
             // do the moves and change color
             if (split.size() > 8){
@@ -192,20 +192,13 @@ void uci::go(int depth, long long timeLimit) {
     // the moves that have been done in the current recursive iteration
     std::vector<piece> movesDone;
 
-    // map with all the hash moves that will soon be created
-    std::map<U64, piece> hashMoves;
-
     std::map<U64, TranspositionTable> transpositionTable;
 
 
     for (int i = 1; i <= depth; i++){
-        hashMoves.clear();
 
         // sets the hash moves of the current iteration and then deletes them so they can store the new ones
         std::map<U64, TranspositionTable>::iterator it;
-
-        for (it = transpositionTable.begin(); it != transpositionTable.end(); it++) hashMoves.insert({it->first, it->second.Move});
-        transpositionTable.clear();
 
         nextMoveList.clear();
 
@@ -223,7 +216,7 @@ void uci::go(int depth, long long timeLimit) {
         //  the killers we will hold them in a hash map similar to hash moves but returns a killer (if there is one)
 
 
-        int score = AI.pvSearch(Board, i, Board.playerTurn,-999999, 999999, nodes, bestMove, start, transpositionTable, firstMove, hashMoves);
+        int score = AI.pvSearch(Board, i, Board.playerTurn,-999999, 999999, nodes, bestMove, start, transpositionTable, firstMove);
 
         // check mate so we just end early
         if (score == 6666666 || score == -6666666){

@@ -46,10 +46,10 @@ public:
 
     // function that does the minMax algorithm
 
-    int pvSearch(board b, int depth, Color color, int alpha, int beta, int &nodes, piece &bestMove,std::chrono::time_point<std::chrono::system_clock> start, std::map<U64, TranspositionTable> &transpositionTable, piece firstMove,std::map<U64, piece> &hashMoves);
+    int pvSearch(board b, int depth, Color color, int alpha, int beta, int &nodes, piece &bestMove,std::chrono::time_point<std::chrono::system_clock> start, std::map<U64, TranspositionTable> &transpositionTable, piece firstMove);
 
     // q serach
-    int qSearch( board b, int alpha, int beta, Color nextColor);
+    int qSearch( board b, int alpha, int beta, Color nextColor, int &nodes);
 
     // zw search
     int zwSearch(int beta, int depth,  board b, Color nextColor, int &nodes);

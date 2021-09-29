@@ -18,7 +18,7 @@ int ai::zwSearch(int beta, int depth,  board b, Color color, int &nodes) {
     else nextColor = white;
 
     // this is either a cut- or all-node
-    if( depth == 0 ) return qSearch(b, beta-1, beta, nextColor);
+    if( depth == 0 ) return qSearch(b, beta-1, beta, nextColor, nodes);
 
     piece p = piece(-22,-22,ROOK,white);
 
@@ -65,7 +65,7 @@ int ai::Evaluate(board b, Color nextColor){
 
     return -valuation;
 }
-int ai::qSearch(board b, int alpha, int beta, Color color) {
+int ai::qSearch(board b, int alpha, int beta, Color color, int &nodes) {
     // gets next color
     Color nextColor;
 
@@ -88,11 +88,9 @@ int ai::qSearch(board b, int alpha, int beta, Color color) {
     auto moves = allPosMoves(b,color, p,essQueenMoves, captures);
 
     for (auto & m : moves) {
-        // if the move captures the king we dont do it cuz it will mess things up
-//        if (b.boardArr[m.nextRow][m.nextCol].type == KING) continue;
-
+        nodes ++;
         piece oldPiece = b.move(m);
-        int score = -qSearch(b, -beta, -alpha,nextColor);
+        int score = -qSearch(b, -beta, -alpha,nextColor, nodes);
         b.undoMove(m, oldPiece);
 
         if( score >= beta )
@@ -102,7 +100,7 @@ int ai::qSearch(board b, int alpha, int beta, Color color) {
     }
     return alpha;
 }
-int ai::pvSearch(board b, int depth, Color color, int alpha, int beta, int &nodes, piece &bestMove,std::chrono::time_point<std::chrono::system_clock> start, std::map<U64, TranspositionTable> &transpositionTable, piece firstMove,std::map<U64, piece> &hashMoves){
+int ai::pvSearch(board b, int depth, Color color, int alpha, int beta, int &nodes, piece &bestMove,std::chrono::time_point<std::chrono::system_clock> start, std::map<U64, TranspositionTable> &transpositionTable, piece firstMove){
     // checks to see if time ran out
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
@@ -125,7 +123,7 @@ int ai::pvSearch(board b, int depth, Color color, int alpha, int beta, int &node
 
     if (depth == 0){
 
-        auto f = qSearch(b, alpha, beta, color);
+        auto f = qSearch(b, alpha, beta, color, nodes);
         return f;
 //        return Evaluate(b,nextColor);
     }
@@ -139,6 +137,20 @@ int ai::pvSearch(board b, int depth, Color color, int alpha, int beta, int &node
     // changes it based off of color
     if (color == white) ogZobKey +=1 ;
     else ogZobKey -= 1;
+
+//    if (transpositionTable.count(ogZobKey)){
+//        // key exists so we just make value the score(aka what it would have computed)
+//        auto val1 = transpositionTable.find(ogZobKey);
+//        int value1 = val1->second.score;
+//
+//        if (depth == maxDepth){
+//            bestMove = val1->second.Move;
+//        }
+//
+//        if (color == val1->second.Move.color && depth == val1->second.depth){
+//            return value1;
+//        }
+//    }
 
     // essential queen moves that we need to check for castle purposes
     std::vector<piece> essQueenMoves;
@@ -156,11 +168,12 @@ int ai::pvSearch(board b, int depth, Color color, int alpha, int beta, int &node
     piece hashMove;
 
     // finds the hash move
-    hashMove = hashMoves[ogZobKey];
+    if (transpositionTable.count(ogZobKey)){
+        auto hash = transpositionTable.find(ogZobKey);
+        hashMove = hash->second.Move;
+    }
 
-    if (hashMove.type == NONE){
-        hasHashMove = false;
-    }else if (hashMove.color != color){
+    if (hashMove.type == NONE ||hashMove.color != color){
         hasHashMove = false;
     }
     else{
@@ -189,17 +202,7 @@ int ai::pvSearch(board b, int depth, Color color, int alpha, int beta, int &node
     // this is the pair that will be added to the hashMoves hashmap
     std::tuple<U64, piece, int> addHash;
 
-    if (transpositionTable.count(ogZobKey)){
-        // key exists so we just make value the score(aka what it would have computed)
-        auto val1 = transpositionTable.find(ogZobKey);
-        int value1 = val1->second.score;
 
-        bestMove = val1->second.Move;
-        if (color != val1->second.Move.color || depth != val1->second.depth){
-            // do nothing here since this is not valid
-        }
-        else return value1;
-    }
 
     // if it should fully search the move
     bool bSearchPv = true;
@@ -223,14 +226,14 @@ int ai::pvSearch(board b, int depth, Color color, int alpha, int beta, int &node
         int value;
 
         if (bSearchPv){
-            value = -pvSearch(b, depth - 1, nextColor, -beta, -alpha, nodes, bestMove,start, transpositionTable, firstMove,hashMoves);
+            value = -pvSearch(b, depth - 1, nextColor, -beta, -alpha, nodes, bestMove,start, transpositionTable, firstMove);
         }
         else{
-            value = -pvSearch(b, depth - 1, nextColor, -alpha-1, -alpha, nodes, bestMove,start, transpositionTable, firstMove,hashMoves);
+            value = -pvSearch(b, depth - 1, nextColor, -alpha-1, -alpha, nodes, bestMove,start, transpositionTable, firstMove);
 
             if (value > alpha){
                 // has potential to be good so we redo the search
-                value = -pvSearch(b, depth - 1, nextColor, -beta, -alpha, nodes, bestMove,start, transpositionTable, firstMove,hashMoves);
+                value = -pvSearch(b, depth - 1, nextColor, -beta, -alpha, nodes, bestMove,start, transpositionTable, firstMove);
             }
         }
 
@@ -253,7 +256,7 @@ int ai::pvSearch(board b, int depth, Color color, int alpha, int beta, int &node
         m.Value = value;
 
         if (value >= beta){
-            transpositionTable.insert({ogZobKey, TranspositionTable(ogZobKey, value, depth, std::get<1>(addHash))});
+//            transpositionTable.insert({ogZobKey, TranspositionTable(ogZobKey, value, depth, std::get<1>(addHash))}); //todo add back
 
             if (depth == maxDepth){
                 bestMove = std::get<1>(addHash);
@@ -268,7 +271,6 @@ int ai::pvSearch(board b, int depth, Color color, int alpha, int beta, int &node
         b.undoMove(m, oldPiece);
 
     }
-    hashMoves.insert({std::get<0>(addHash), std::get<1>(addHash)});
     if (depth == maxDepth){
         bestMove = std::get<1>(addHash);
     }
