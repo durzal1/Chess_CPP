@@ -1,5 +1,4 @@
 #include "uci.h"
-
 #include <bits/stdc++.h>
 
 //cmake_minimum_required(VERSION 3.17)
@@ -18,12 +17,15 @@
 //target_link_libraries(Chess mingw32 SDL2main SDL2 SDL2_Image)
 
 int main() {
-    // for random
-    srand(time(NULL));
+    board Board = board(1000);
 
-    uci Uci = uci();
-
-    Uci.mainloop();
+//
+//    // for random
+//    srand(time(NULL));
+//
+//    uci Uci = uci();
+//
+//    Uci.mainloop();
 
 
 //    auto stop = std::chrono::high_resolution_clock::now();

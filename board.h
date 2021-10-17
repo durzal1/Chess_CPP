@@ -12,7 +12,7 @@
 #include <unordered_set>
 #include "types.h"
 #include "piece.h"
-
+#include "bitBoard.h"
 class board{
 private:
 //    // SDL variables
@@ -58,8 +58,25 @@ private:
 protected:
     std::map<U64, piece> hashMoves;
 
-
 public:
+    bb::Square squareConversion[64];
+
+    // all bit boards that will be used
+    U64 bitAll = 0ULL;
+    U64 bitWRook = 0ULL;
+    U64 bitBRook = 0ULL;
+    U64 bitBBishop = 0ULL;
+    U64 bitWBishop = 0ULL;
+    U64 bitWQueen = 0ULL;
+    U64 bitBQueen = 0ULL;
+    U64 bitWPawn = 0ULL;
+    U64 bitBPawn = 0ULL;
+    U64 bitWHorse = 0ULL;
+    U64 bitBHorse = 0ULL;
+    U64 bitWKing = 0ULL;
+    U64 bitBKing = 0ULL;
+    U64 bitW = 0ULL;
+    U64 bitB = 0ULL;
 
     // to get zobrist keys in the future
     zobVal zobKeys = zobVal();
@@ -108,25 +125,8 @@ public:
     // half turns that have been made since last time a peice was captured or pawn moved
     int halfTurns = 0;
 
-    // map of all pieces (ind, cord<x,y>) (DOES UPDATE IF PIECE DIES)
-    std::map<int,std::pair<int,int>> PieceLoc;
-
     // size of each square and their interval
     int inter;
-
-    // map of all cords (cord<x,y>,ind) (DOES UPDATE IF PIECE DIES)
-    // basically the opposite of the former where you give it pos and it gives piece
-    // used it for updating board
-    std::map<std::pair<int,int>,int> BoardLoc;
-
-    // class of each index (DOES NOT UPDATE IF PIECE DIES)
-    std::vector<PieceTypes>IndClass;
-
-    // indexes of living white pieces (iterate through this for moves)
-    std::unordered_set<int> whitePieces;
-
-    // indexes of living black pieces (iterate through this for moves)
-    std::unordered_set<int> blackPieces;
 
     // array of the board
     piece boardArr[8][8];
@@ -151,7 +151,7 @@ public:
     void createBoard();
 
     // inits the pieces in their respective data classes
-    void createPieces();
+    static void createPieces();
 
     // @returns the piece that used to be there
     // does the move

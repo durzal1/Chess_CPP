@@ -59,11 +59,13 @@ enum moveAdd{
     badCapture = 800,
 
 };
-typedef uint64_t U64;
+typedef unsigned long long U64;
 typedef uint8_t U8;
 typedef int col;
 typedef int row;
 typedef uint8_t index;
+
+typedef int8_t   Square;
 
 
 #endif //CHESS_TYPES_H

@@ -13,7 +13,17 @@ board::board( int width) { // SDL_Window* win, SDL_Renderer* renderer1,
 
     // interval
     inter = width/ 8;
-
+    bb::Square SquareConversion[64] = {
+            bb::A1,bb::B1,bb::C1,bb::D1,bb::E1,bb::F1,bb::G1,bb::H1,
+            bb::A2,bb::B2,bb::C2,bb::D2,bb::E2,bb::F2,bb::G2,bb::H2,
+            bb::A3,bb::B3,bb::C3,bb::D3,bb::E3,bb::F3,bb::G3,bb::H3,
+            bb::A4,bb::B4,bb::C4,bb::D4,bb::E4,bb::F4,bb::G4,bb::H4,
+            bb::A5,bb::B5,bb::C5,bb::D5,bb::E5,bb::F5,bb::G5,bb::H5,
+            bb::A6,bb::B6,bb::C6,bb::D6,bb::E6,bb::F6,bb::G6,bb::H6,
+            bb::A7,bb::B7,bb::C7,bb::D7,bb::E7,bb::F7,bb::G7,bb::H7,
+            bb::A8,bb::B8,bb::C8,bb::D8,bb::E8,bb::F8,bb::G8,bb::H8
+    };
+    for (int i = 0; i < 64; i++) squareConversion[i] = SquareConversion[i];
     for (int i = 0; i < 8; i++){
         for (int j = 0; j < 8; j++){
             boardArr[i][j].curRow = i;
@@ -35,236 +45,30 @@ board::board( int width) { // SDL_Window* win, SDL_Renderer* renderer1,
     conversion.insert({'h',7});
 
 
-    /*
-    for zacky
-    // gets the images
+    // creates the bitboards
+    U64 bishops = 0ULL;
 
-
-    pawnB = IMG_LoadTexture(renderer, "C:\\Users\\zacky\\Desktop\\Coding\\c++\\games\\chess\\Chess_CPP\\images\\pawnb.png");
-    horseB  = IMG_LoadTexture(renderer, "C:\\Users\\zacky\\Desktop\\Coding\\c++\\games\\chess\\Chess_CPP\\images\\horseb.png");
-    queenB  = IMG_LoadTexture(renderer, "C:\\Users\\zacky\\Desktop\\Coding\\c++\\games\\chess\\Chess_CPP\\images\\queenb.png");
-    kingB  = IMG_LoadTexture(renderer, "C:\\Users\\zacky\\Desktop\\Coding\\c++\\games\\chess\\Chess_CPP\\images\\kingb.png");
-    rookB = IMG_LoadTexture(renderer, "C:\\Users\\zacky\\Desktop\\Coding\\c++\\games\\chess\\Chess_CPP\\images\\rookb.png");;
-    bishopB  = IMG_LoadTexture(renderer, "C:\\Users\\zacky\\Desktop\\Coding\\c++\\games\\chess\\Chess_CPP\\images\\bishopb.png");
-
-    pawnW  = IMG_LoadTexture(renderer, "C:\\Users\\zacky\\Desktop\\Coding\\c++\\games\\chess\\Chess_CPP\\images\\pawnw.png");
-    horseW  = IMG_LoadTexture(renderer, "C:\\Users\\zacky\\Desktop\\Coding\\c++\\games\\chess\\Chess_CPP\\images\\horsew.png");
-    queenW = IMG_LoadTexture(renderer, "C:\\Users\\zacky\\Desktop\\Coding\\c++\\games\\chess\\Chess_CPP\\images\\queenw.png");
-    kingW = IMG_LoadTexture(renderer, "C:\\Users\\zacky\\Desktop\\Coding\\c++\\games\\chess\\Chess_CPP\\images\\kingw.png");
-    rookW= IMG_LoadTexture(renderer, "C:\\Users\\zacky\\Desktop\\Coding\\c++\\games\\chess\\Chess_CPP\\images\\rookw.png");
-    bishopW = IMG_LoadTexture(renderer, "C:\\Users\\zacky\\Desktop\\Coding\\c++\\games\\chess\\Chess_CPP\\images\\bishopw.png");
-    */
-
-    /*
-    for kevin
-       pawnW = IMG_LoadTexture(renderer, "C:\\Users\\kevsk\\source\\repos\\Chess\\Chess\\Chess_CPP\\images\\pawnw.png");
-    horseW = IMG_LoadTexture(renderer, "C:\\Users\\kevsk\\source\\repos\\Chess\\Chess\\Chess_CPP\\images\\horsew.png");
-    queenW = IMG_LoadTexture(renderer, "C:\\Users\\kevsk\\source\\repos\\Chess\\Chess\\Chess_CPP\\images\\queenw.png");
-    kingW = IMG_LoadTexture(renderer, "C:\\Users\\kevsk\\source\\repos\\Chess\\Chess\\Chess_CPP\\images\\kingw.png");
-    rookW = IMG_LoadTexture(renderer, "C:\\Users\\kevsk\\source\\repos\\Chess\\Chess\\Chess_CPP\\images\\rookw.png");
-    bishopW = IMG_LoadTexture(renderer, "C:\\Users\\kevsk\\source\\repos\\Chess\\Chess\\Chess_CPP\\images\\bishopw.png");
-
-    pawnB = IMG_LoadTexture(renderer, "C:\\Users\\kevsk\\source\\repos\\Chess\\Chess\\Chess_CPP\\images\\pawnb.png");
-    horseB = IMG_LoadTexture(renderer, "C:\\Users\\kevsk\\source\\repos\\Chess\\Chess\\Chess_CPP\\images\\horseb.png");
-    queenB = IMG_LoadTexture(renderer, "C:\\Users\\kevsk\\source\\repos\\Chess\\Chess\\Chess_CPP\\images\\queenb.png");
-    kingB = IMG_LoadTexture(renderer, "C:\\Users\\kevsk\\source\\repos\\Chess\\Chess\\Chess_CPP\\images\\kingb.png");
-    rookB = IMG_LoadTexture(renderer, "C:\\Users\\kevsk\\source\\repos\\Chess\\Chess\\Chess_CPP\\images\\rookb.png");;
-    bishopB = IMG_LoadTexture(renderer, "C:\\Users\\kevsk\\source\\repos\\Chess\\Chess\\Chess_CPP\\images\\bishopb.png");
-    */
-
-//
-//    // adds them to the textures vector
-//    textures = {pawnB, horseB, queenB, kingB, rookB, bishopB, pawnW, horseW, queenW, kingW, rookW, bishopW};
-
-
-    // creates the pieces and board
-    this->createPieces();
-
-    this->createBoard();
-}
-
-// inits the pieces in their respective data classes
-void board::createPieces() {
-
-    /// black
-    // top row
-    piece p = piece(0,0,ROOK, black);
-    boardArr[0][0] = p;
-    IndClass.emplace_back(ROOK);
-    PieceLoc[IndClass.size()] = {0,0};
-    BoardLoc[{0,0}] = IndClass.size();
-    blackPieces.insert(IndClass.size());
-
-    boardArr[0][1] = piece(0,1,HORSE, black);
-    IndClass.emplace_back(HORSE);
-    PieceLoc[IndClass.size()] = {0,1};
-    BoardLoc[{0,1}] = IndClass.size();
-    blackPieces.insert(IndClass.size());
-
-    boardArr[0][2] = piece(0,2,BISHOP, black);
-    IndClass.emplace_back(BISHOP);
-    PieceLoc[IndClass.size()] = {0,2};
-    BoardLoc[{0,2}] = IndClass.size();
-    blackPieces.insert(IndClass.size());
-
-    boardArr[0][3] = piece(0,3,QUEEN, black);
-    IndClass.emplace_back(QUEEN);
-    PieceLoc[IndClass.size()] = {0,3};
-    BoardLoc[{0,3}] = IndClass.size();
-    blackPieces.insert(IndClass.size());
-
-    boardArr[0][4] = piece(0,4,KING, black);
-    IndClass.emplace_back(KING);
-    PieceLoc[IndClass.size()] = {0,4};
-    BoardLoc[{0,4}] = IndClass.size();
-    blackPieces.insert(IndClass.size());
-
-    boardArr[0][5] = piece(0,5,BISHOP, black);
-    IndClass.emplace_back(BISHOP);
-    PieceLoc[IndClass.size()] = {0,5};
-    BoardLoc[{0,5}] = IndClass.size();
-    blackPieces.insert(IndClass.size());
-
-    boardArr[0][6] = piece(0,6,HORSE, black);
-    IndClass.emplace_back(HORSE);
-    PieceLoc[IndClass.size()] = {0,6};
-    BoardLoc[{0,6}] = IndClass.size();
-    blackPieces.insert(IndClass.size());
-
-    boardArr[0][7] = piece(0,7,ROOK, black);
-    IndClass.emplace_back(ROOK);
-    PieceLoc[IndClass.size()] = {0,7};
-    BoardLoc[{0,7}] = IndClass.size();
-    blackPieces.insert(IndClass.size());
-
-    // pawns
-    for (uint64_t i = 0; i < 8; i++){
-        IndClass.emplace_back(PAWN);
-        boardArr[1][i] = piece(1,i,PAWN, black);
-        PieceLoc[IndClass.size()] = {1,i};
-        BoardLoc[{1,i}] = IndClass.size();
-        blackPieces.insert(IndClass.size());
+    // gets position of the pieces
+    for (int i = 0 ; i < 8; i++){
+        for (int j = 0; j < 8; j++){
+            Color color = boardArr[i][j].color;
+            PieceTypes type = boardArr[i][j].type;
+            Square square = squareConversion[i*8+j];
+            std::cout << i*8+j << std::endl;
+            std::cout << PieceTypes(type) << std::endl;
+            if (type == BISHOP){
+                bb::setBit(bishops, square);
+            }
+            //todo set this up so that it gets the correct square then set the bit of the bitboard
+        }
     }
 
-    /// white
-    // bottom row
-    boardArr[7][0] = piece(7,0,ROOK, white);
-    IndClass.emplace_back(ROOK);
-    PieceLoc[IndClass.size()] = {7,0};
-    BoardLoc[{7,0}] = IndClass.size();
-    whitePieces.insert(IndClass.size());
-
-    boardArr[7][1] = piece(7,1,HORSE, white);
-    IndClass.emplace_back(HORSE);
-    PieceLoc[IndClass.size()] = {7,1};
-    BoardLoc[{7,1}] = IndClass.size();
-    whitePieces.insert(IndClass.size());
-
-    boardArr[7][2] = piece(7,2,BISHOP, white);
-    IndClass.emplace_back(BISHOP);
-    PieceLoc[IndClass.size()] = {7,2};
-    BoardLoc[{7,2}] = IndClass.size();
-    whitePieces.insert(IndClass.size());
-
-    boardArr[7][3] = piece(7,3,QUEEN, white);
-    IndClass.emplace_back(QUEEN);
-    PieceLoc[IndClass.size()] = {7,3};
-    BoardLoc[{7,3}] = IndClass.size();
-    whitePieces.insert(IndClass.size());
-
-    boardArr[7][4] = piece(7,4,KING, white);
-    IndClass.emplace_back(KING);
-    PieceLoc[IndClass.size()] = {7,4};
-    BoardLoc[{7,4}] = IndClass.size();
-    whitePieces.insert(IndClass.size());
-
-    boardArr[7][5] = piece(7,5,BISHOP, white);
-    IndClass.emplace_back(BISHOP);
-    PieceLoc[IndClass.size()] = {7,5};
-    BoardLoc[{7,5}] = IndClass.size();
-    whitePieces.insert(IndClass.size());
-
-    boardArr[7][6] = piece(7,6,HORSE, white);
-    IndClass.emplace_back(HORSE);
-    PieceLoc[IndClass.size()] = {7,6} ;
-    BoardLoc[{7,6}] = IndClass.size();
-    whitePieces.insert(IndClass.size());
-
-    boardArr[7][7] = piece(7,7,ROOK, white);
-    IndClass.emplace_back(ROOK);
-    PieceLoc[IndClass.size()] = {7,7};
-    BoardLoc[{7,7}] = IndClass.size();
-    whitePieces.insert(IndClass.size());
-
-    // pawns
-    for (uint64_t i = 0; i < 8; i++){
-        boardArr[6][i] = piece(6,i,PAWN, white);
-        IndClass.emplace_back(PAWN);
-        PieceLoc[IndClass.size()] = {6,i};
-        BoardLoc[{6,i}] = IndClass.size();
-        whitePieces.insert(IndClass.size());
+    while(bishops){
+        int s = bb::bitscanForward(bishops);
+        bishops = bb::lsbReset(bishops);
     }
+}
 
-}
-// create board
-void board::createBoard() {
-//    // set color to black
-//    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-//
-//    // Clear the entire screen to black
-//    SDL_RenderClear(renderer);
-//
-//    // iterate through each square and draw it
-//    for (int row = 0; row < 8; row++){
-//        for (int col = 0; col<8; col++){
-//            // if the row and col is even or if the row and col is even
-//            if (row % 2 == 0 && col % 2 == 0 || row % 2 == 1 && col % 2 == 1){
-//                // make it light
-//                SDL_SetRenderDrawColor(renderer, 232,235,239, 255);
-//            }
-//            else{
-//                // make it dark
-//                SDL_SetRenderDrawColor(renderer, 125, 135, 150, 255);
-//            }
-//            SDL_Rect rect{col*inter, row*inter, inter, inter};
-//            SDL_RenderFillRect(renderer, &rect);
-//
-//            // class it will draw (if any)
-//            std::string piece;
-//            // if theres a piece it adds it
-//            if (BoardLoc.find({ row,col }) != BoardLoc.end()) {
-//                // get the index
-//                int index = BoardLoc[{row,col}];
-//
-//                // checks what piece it is
-//                piece = IndClass[index -1];
-//
-//                // add extra mandatory character
-//                if (index > 16) piece.push_back('W');
-//                else piece.push_back('B');
-//            }
-//
-//            // something belongs in the square
-//            if (!piece.empty()){
-//                // creates the square that will hold the png
-//                SDL_Rect pieceRect{col * inter , row* inter , inter, inter};
-//
-//                // gets index of the texture
-//                auto it = std::find(texturesStr.begin(), texturesStr.end(), piece);
-//                int index = it - texturesStr.begin();
-//
-//                // gets the png texture
-//                SDL_Texture *texture = textures[index];
-//
-//                // renders it
-//                SDL_RenderCopy(renderer, texture, NULL, &pieceRect);
-//            }
-//
-//        }
-//    }
-//    // present to screen
-//    SDL_RenderPresent(renderer);
-}
 
 piece board::move(piece &Piece) {
     // vars

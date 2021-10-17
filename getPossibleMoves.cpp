@@ -47,6 +47,15 @@ std::vector<piece> noCaptures(const board& b, Color color){
     }
     return moves;
 }
+// using bit boards
+void bitBoardMoves(){
+
+}
+
+
+
+
+
 
 // directly adds moves to the moves vector in allPosMoves
 void posMoves(const piece& Piece,const board& b, std::vector<piece> &allMoves, Mode mode, const piece& hashMove, std::vector<piece> &essQueenMoves) { // , SDL_Renderer* renderer

@@ -17,6 +17,8 @@ public:
     bool operator< (const piece &other) const {
         return moveOrdGrad > other.moveOrdGrad;
     }
+    // square
+    Square square;
 
     // current cords
     col curCol;

@@ -30,6 +30,8 @@ for kevin
 // @param hashMove, the best move, if it finds it, it simply ignores it
 void posMoves(const piece& Piece, const board& b, std::vector<piece> &moves, Mode mode, const piece& hasMove, std::vector<piece> &essQueenMoves); //, SDL_Renderer* renderer
 
+void bitBoardMoves();
+
 std::vector<piece> allPosMoves(const board& b, Color color, const piece& hashMove, std::vector<piece> &essQueenMoves, Mode mode);
 
 std::vector<piece> allCaptures(const board& b, Color color);

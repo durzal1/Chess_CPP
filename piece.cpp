@@ -39,6 +39,7 @@ piece::piece(const piece &Piece) {
     this->moveOrdGrad = Piece.moveOrdGrad;
     this->moveType = Piece.moveType;
     this->pastMoves = Piece.pastMoves;
+    this->square = Piece.square;
     this->ignoreBest = Piece.ignoreBest;
 }
 
@@ -65,6 +66,7 @@ piece &piece::operator=(const piece &Piece) {
     this->oldCol = Piece.oldCol;
     this->Value = Piece.Value;
     this->moveOrdGrad = Piece.moveOrdGrad;
+    this->square = Piece.square;
     this->moveType = Piece.moveType;
     this->ignoreBest = Piece.ignoreBest;
 
