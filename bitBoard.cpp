@@ -263,7 +263,7 @@ inline U64 lsbReset(U64 number) {
  * prints the given bitboard as a bitmap to the standard output stream
  * @param bb
  */
-void printBitmap(U64 bb) {
+void  bb::printBitmap(U64 bb) {
     for (int i = 7; i >= 0; i--) {
         for (int n = 0; n < 8; n++) {
             if ((bb >> (i * 8 + n)) & (U64) 1) {

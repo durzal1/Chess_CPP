@@ -4,7 +4,7 @@
 
 
 #include "board.h"
-
+#include <bitset>
 
 board::board( int width) { // SDL_Window* win, SDL_Renderer* renderer1,
 //    this->win = win;
@@ -47,26 +47,173 @@ board::board( int width) { // SDL_Window* win, SDL_Renderer* renderer1,
 
     // creates the bitboards
     U64 bishops = 0ULL;
-
+    U64 wbishops = 0ULL;
+    U64 bbishops = 0ULL;
+    U64 horses = 0ULL;
+    U64 whorses = 0ULL;
+    U64 bhorses = 0ULL;
+    U64 kings = 0ULL;
+    U64 wkings = 0ULL;
+    U64 bkings = 0ULL;
+    U64 rooks = 0ULL;
+    U64 wrooks = 0ULL;
+    U64 brooks = 0ULL;
+    U64 pawns = 0ULL;
+    U64 wpawns = 0ULL;
+    U64 bpawns = 0ULL;
+    U64 queens = 0ULL;
+    U64 wqueens = 0ULL;
+    U64 bqueens = 0ULL;
+    U64 allWhite = 0ULL;
+    U64 allBlack = 0ULL;
+    U64 all = 0ULL;
     // gets position of the pieces
     for (int i = 0 ; i < 8; i++){
         for (int j = 0; j < 8; j++){
-            Color color = boardArr[i][j].color;
-            PieceTypes type = boardArr[i][j].type;
-            Square square = squareConversion[i*8+j];
-            std::cout << i*8+j << std::endl;
-            std::cout << PieceTypes(type) << std::endl;
-            if (type == BISHOP){
+            int num = i *8+j;
+            Square square = squareConversion[num];
+            if (num == 2 || num == 5 || num == 58 || num == 61){
                 bb::setBit(bishops, square);
+                bb::setBit(all, square);
+
+                // segregates by color
+                if (num <= 8){
+                    bb::setBit(wbishops, square);
+                    bb::setBit(allWhite, square);
+                    boardArr[i][j] = piece(i, j, BISHOP, black);
+                }
+                else{
+                    bb::setBit(bbishops, square);
+                    bb::setBit(allBlack, square);
+                    boardArr[i][j] = piece(i, j, BISHOP, white);
+                }
             }
-            //todo set this up so that it gets the correct square then set the bit of the bitboard
         }
     }
 
-    while(bishops){
-        int s = bb::bitscanForward(bishops);
-        bishops = bb::lsbReset(bishops);
+    // horses
+    for (int i = 0 ; i < 8; i++){
+        for (int j = 0; j < 8; j++){
+            int num = i *8+j;
+            Square square = squareConversion[num];
+            if (num == 1 || num == 6 || num == 57 || num == 62){
+                bb::setBit(horses, square);
+                bb::setBit(all, square);
+
+                // segregates by color
+                if (num <= 8){
+                    bb::setBit(whorses, square);
+                    bb::setBit(allWhite, square);
+                    boardArr[i][j] = piece(i, j, HORSE, black);
+                }
+                else{
+                    bb::setBit(bhorses, square);
+                    bb::setBit(allBlack, square);
+                    boardArr[i][j] = piece(i, j, HORSE, white);
+                }
+            }
+        }
     }
+    // rooks
+    for (int i = 0 ; i < 8; i++){
+        for (int j = 0; j < 8; j++){
+            int num = i *8+j;
+            Square square = squareConversion[num];
+            if (num == 0 || num == 7 || num == 56 || num == 63){
+                bb::setBit(rooks, square);
+                bb::setBit(all, square);
+
+                // segregates by color
+                if (num <= 8){
+                    bb::setBit(wrooks, square);
+                    bb::setBit(allWhite, square);
+                    boardArr[i][j] = piece(i, j, ROOK, black);
+                }
+                else{
+                    bb::setBit(brooks, square);
+                    bb::setBit(allBlack, square);
+                    boardArr[i][j] = piece(i, j, ROOK, white);
+                }
+            }
+        }
+    }
+
+    // king
+    for (int i = 0 ; i < 8; i++){
+        for (int j = 0; j < 8; j++){
+            int num = i * 8 +j;
+            Square square = squareConversion[num];
+            if (num == 4 || num == 60){
+                bb::setBit(kings, square);
+                bb::setBit(all, square);
+
+                // segregates by color
+                if (num <= 8){
+                    bb::setBit(wkings, square);
+                    bb::setBit(allWhite, square);
+                    boardArr[i][j] = piece(i, j, KING, black);
+                }
+                else{
+                    bb::setBit(bkings, square);
+                    bb::setBit(allBlack, square);
+                    boardArr[i][j] = piece(i, j, KING, white);
+                }
+            }
+        }
+    }
+
+    // queen
+    for (int i = 0 ; i < 8; i++){
+        for (int j = 0; j < 8; j++){
+            int num = i * 8 +j;
+            Square square = squareConversion[num];
+            if (num == 3 || num == 59){
+                bb::setBit(queens, square);
+                bb::setBit(all, square);
+
+                // segregates by color
+                if (num <= 8){
+                    bb::setBit(wqueens, square);
+                    bb::setBit(allWhite, square);
+                    boardArr[i][j] = piece(i, j, QUEEN, black);
+                }
+                else{
+                    bb::setBit(bqueens, square);
+                    bb::setBit(allBlack, square);
+                    boardArr[i][j] = piece(i, j, QUEEN, white);
+                }
+            }
+        }
+    }
+    // pawns
+    for (int i = 0 ; i < 8; i++){
+        for (int j = 0; j < 8; j++){
+            int num = i * 8 + j;
+            Square square = squareConversion[num];
+            if (i == 1 || i == 6){
+                bb::setBit(pawns, square);
+                bb::setBit(all, square);
+
+                // segregates by color
+                if (num <= 16){
+                    bb::setBit(wpawns, square);
+                    bb::setBit(allWhite, square);
+                    boardArr[i][j] = piece(i, j, PAWN, black);
+                }
+                else{
+                    bb::setBit(bpawns, square);
+                    bb::setBit(allBlack, square);
+                    boardArr[i][j] = piece(i, j, PAWN, white);
+                }
+            }
+        }
+    }
+
+
+    bb::printBitmap(kings);
+    bb::printBitmap(wkings);
+    bb::printBitmap(bkings);
+    // todo setmoves
 }
 
 

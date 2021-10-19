@@ -713,7 +713,7 @@ namespace bb {
      * prints the given bitboard as a bitmap to the standard output stream
      * @param bb
      */
-    void       printBitmap(U64 bb);
+    void  printBitmap(U64 bb);
 
     /**
      * initialises the zobrist keys to random values
