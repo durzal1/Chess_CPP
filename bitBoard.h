@@ -226,6 +226,9 @@ namespace bb {
     constexpr U64 CIRCLE_C_BB = 0x3C24243C0000L;
     constexpr U64 CIRCLE_D_BB = 0x1818000000L;
 
+    constexpr U64 notAFile = 0xfefefefefefefefe;
+    constexpr U64 notHFile = 0x7f7f7f7f7f7f7f7f;
+
     constexpr U64 WHITE_SQUARES_BB = 0x55AA55AA55AA55AA;
     constexpr U64 BLACK_SQUARES_BB = ~WHITE_SQUARES_BB;
 
@@ -680,6 +683,31 @@ namespace bb {
     }
 
     /**
+     * computes right captures for white pawns
+     * @param wpawns
+     * @return
+     */
+    inline U64 wpawnCaptureRight(U64 wpawns) {
+        return wpawns << 9 & notAFile;
+    }
+
+    /**
+ * computes left captures for white pawns
+ * @param wpawns
+ * @return
+ */
+    inline U64 wpawnCaptureLeft(U64 wpawns) {
+        return wpawns << 7 & notHFile;
+    }
+    /**
+ * computes quiet moves up one for white pawns
+ * @param wpawns
+ * @return
+ */
+    inline U64 wpawnQuietOne(U64 wpawns) {
+        return wpawns << 7 & notHFile;
+    }
+    /**
      * computes all black passed pawns
      * @param bpawns
      * @param wpawns
@@ -931,5 +959,32 @@ namespace bb {
     }
 
 }    // namespace bb
+struct bitboard{
+public:
+    bitboard();
+
+    U64 bishops = 0ULL;
+    U64 wbishops = 0ULL;
+    U64 bbishops = 0ULL;
+    U64 horses = 0ULL;
+    U64 whorses = 0ULL;
+    U64 bhorses = 0ULL;
+    U64 kings = 0ULL;
+    U64 wkings = 0ULL;
+    U64 bkings = 0ULL;
+    U64 rooks = 0ULL;
+    U64 wrooks = 0ULL;
+    U64 brooks = 0ULL;
+    U64 pawns = 0ULL;
+    U64 wpawns = 0ULL;
+    U64 bpawns = 0ULL;
+    U64 queens = 0ULL;
+    U64 wqueens = 0ULL;
+    U64 bqueens = 0ULL;
+    U64 allWhite = 0ULL;
+    U64 allBlack = 0ULL;
+    U64 all = 0ULL;
+    U64 empty = 0ULL;
+};
 
 #endif //CHESS_BITBOARD_H

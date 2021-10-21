@@ -17,8 +17,10 @@
 //target_link_libraries(Chess mingw32 SDL2main SDL2 SDL2_Image)
 
 int main() {
-    board Board = board(1000);
-
+    std::string fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+    board Board = board(fen);
+    ai AI = ai(Board, 1, Board.playerTurn, 90000);
+    AI.perft(Board, 3, true, Board.playerTurn);
 //
 //    // for random
 //    srand(time(NULL));

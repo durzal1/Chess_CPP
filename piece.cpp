@@ -74,7 +74,7 @@ piece &piece::operator=(const piece &Piece) {
 }
 
 piece::piece() {
-    this->type = NONE;
+   this->type = NONE;
 }
 
 std::string piece::toString() {

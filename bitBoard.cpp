@@ -276,3 +276,5 @@ void  bb::printBitmap(U64 bb) {
     }
     std::cout << "\n";
 }
+
+bitboard::bitboard() = default;

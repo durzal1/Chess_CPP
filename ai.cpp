@@ -744,35 +744,35 @@ U64 ai::perft(board b, int depth, bool print, Color color) {
     // just ignore this
     std::vector<piece> essQueenMoves;
 
-    auto moves = allPosMoves(b, color,piece(-2,0,PAWN,white), essQueenMoves, everything);
+    moveGen gen = moveGen(b.bitBoard);
+    gen.genWPawnQuiet();
 
-    // resets old en passant moves and adds the new ones(if there are any)
-    b.passentMoves.clear();
+    auto moves = std::vector<int> {1};
 
-    U64 kingMoves = getKingMoves(b, color, moves[0], moves[1]);
+
 
     for (int i = 0; i < moves.size(); i++) {
 
-        piece m = moves[i];
-        if (!moveCheck(b, m, kingMoves)){
-            continue;
-        }
-
-        if (depth == 1){
-            nodes ++;
-            if (m.Castle != none)b.amountCastles ++;
-
-        }else{
-            piece oldPiece = b.move(m);
-
-            U64 np = perft(b, depth - 1, false, nextColor);
-
-            if (print) {
-                std::cout << m.toString() << " " << np << std::endl;
-            }
-            nodes += np;
-            b.undoMove(m, oldPiece);
-        }
+//        piece m = moves[i];
+//        if (!moveCheck(b, m, kingMoves)){
+//            continue;
+//        }
+//
+//        if (depth == 1){
+//            nodes ++;
+//            if (m.Castle != none)b.amountCastles ++;
+//
+//        }else{
+//            piece oldPiece = b.move(m);
+//
+//            U64 np = perft(b, depth - 1, false, nextColor);
+//
+//            if (print) {
+//                std::cout << m.toString() << " " << np << std::endl;
+//            }
+//            nodes += np;
+//            b.undoMove(m, oldPiece);
+//        }
 
 
     }

@@ -165,7 +165,7 @@ void uci::processCommand(std::string str) {
     }else if (split[0] == "uci"){
         uci::Uci();
     }else if (split[0] == "ucinewgame"){
-        Board = board(width);
+        Board = board(Default);
     }
 }
 void uci::go(int depth, long long timeLimit) {
@@ -261,6 +261,7 @@ void uci::set_option(std::string &name, std::string &value) {
 void uci::position_fen(std::string fen) {
     // sets up the board
     Board.FENboard(fen);
+    Board.setBitset();
 }
 void uci::stop() {
     std::cout << "STOP" << std::endl;
@@ -284,8 +285,7 @@ std::vector<std::string> uci::getSeperate(std::string str) {
 }
 
 uci::uci() {
-    Board = board(width);
-    Board.FENboard(Default);
+    Board = board(Default);
 }
 
 void uci::print() {

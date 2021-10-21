@@ -19,8 +19,6 @@ private:
 //    SDL_Window* win = NULL;
 //    SDL_Renderer* renderer = NULL;
 //
-    // constants
-    int width;
 
 //    // images
 //    SDL_Texture *pawnB = nullptr;
@@ -62,21 +60,7 @@ public:
     bb::Square squareConversion[64];
 
     // all bit boards that will be used
-    U64 bitAll = 0ULL;
-    U64 bitWRook = 0ULL;
-    U64 bitBRook = 0ULL;
-    U64 bitBBishop = 0ULL;
-    U64 bitWBishop = 0ULL;
-    U64 bitWQueen = 0ULL;
-    U64 bitBQueen = 0ULL;
-    U64 bitWPawn = 0ULL;
-    U64 bitBPawn = 0ULL;
-    U64 bitWHorse = 0ULL;
-    U64 bitBHorse = 0ULL;
-    U64 bitWKing = 0ULL;
-    U64 bitBKing = 0ULL;
-    U64 bitW = 0ULL;
-    U64 bitB = 0ULL;
+    bitboard bitBoard = bitboard();
 
     // to get zobrist keys in the future
     zobVal zobKeys = zobVal();
@@ -138,7 +122,7 @@ public:
     std::vector<std::pair<row, col>> passentMoves;
 
     // constructor
-    board(int width); // SDL_Window* win, SDL_Renderer* renderer1,
+    board(const std::string&); // SDL_Window* win, SDL_Renderer* renderer1,
 
     board();
 
@@ -149,6 +133,8 @@ public:
 
     // creates/updates board visually
     void createBoard();
+
+    void setBitset();
 
     // inits the pieces in their respective data classes
     static void createPieces();

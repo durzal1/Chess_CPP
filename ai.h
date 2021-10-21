@@ -8,6 +8,7 @@
 #include "getPossibleMoves.h"
 #include "piece.h"
 #include "types.h"
+#include "moveGenerator.h"
 /* zacky
 
 #include <bits/stdc++.h>
