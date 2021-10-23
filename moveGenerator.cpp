@@ -45,3 +45,25 @@ void moveGen::genWPawnQuiet() {
     }
 //    movelist.printMoveBits();
 }
+void moveGen::genWPawnCap() {
+    U64 right = bitBoard.wpawns << 9 & bb::notAFile & bitBoard.allBlack;
+    U64 left = bitBoard.wpawns << 7 & bb::notHFile & bitBoard.allBlack;
+
+    Square target;
+    Square from;
+    while (right){
+        target = bb::bitscanForward(right);
+        from = target - 9;
+        movelist.add(genMove(from, target,CAPTURE, PAWN));
+
+        right = bb::lsbReset(right);
+    }
+    while (left){
+        target = bb::bitscanForward(left);
+        from = target - 7;
+        movelist.add(genMove(from, target,CAPTURE, PAWN));
+
+        left = bb::lsbReset(left);
+    }
+//    movelist.printMoveBits();
+}

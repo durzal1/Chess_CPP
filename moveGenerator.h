@@ -20,6 +20,13 @@ public:
      */
     void genWPawnQuiet();
 
+    /**
+    * generates all white capture moves and updates the moveList
+    */
+    void genWPawnCap();
+
+
+
     void genAll();
 
 };

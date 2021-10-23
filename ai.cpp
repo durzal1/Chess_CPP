@@ -745,7 +745,7 @@ U64 ai::perft(board b, int depth, bool print, Color color) {
     std::vector<piece> essQueenMoves;
 
     moveGen gen = moveGen(b.bitBoard);
-    gen.genWPawnQuiet();
+    gen.genWPawnCap();
 
     auto moves = std::vector<int> {1};
 
