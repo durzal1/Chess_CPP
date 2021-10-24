@@ -745,8 +745,10 @@ U64 ai::perft(board b, int depth, bool print, Color color) {
     // just ignore this
     std::vector<piece> essQueenMoves;
 
-    moveGen gen = moveGen(b.bitBoard, b.playerTurn);
-    gen.genHorse();
+    moveGen gen = moveGen(b.bitBoard, b.playerTurn, b.boardArr);
+
+    moveList movelist = gen.genAll();
+    std::cout << movelist.getSize();
 
     auto moves = std::vector<int> {1};
 

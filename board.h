@@ -57,8 +57,6 @@ protected:
     std::map<U64, piece> hashMoves;
 
 public:
-    bb::Square squareConversion[64];
-
     // all bit boards that will be used
     bitboard bitBoard = bitboard();
 

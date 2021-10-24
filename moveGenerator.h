@@ -9,13 +9,20 @@
 struct moveGen{
 private:
     bitboard bitBoard;
+    piece boardArr [64];
     moveList movelist;
+
+    // bitboard of all the potential captures the enemy can do (helps with making moves legal)
+    U64 oppCaptures = 0ULL;
+
+    // bitboard that does all type moves from king (checks how many ways we're in check)
+    U64 attackers = 0ULL;
 
     Color color;
 public:
     moveGen();
 
-    moveGen(const bitboard &bitBoard, Color color);
+    moveGen(const bitboard &bitBoard, Color color, piece arr[]);
 
     /**
      * generates all white pawn quiet moves and updates the moveList
@@ -52,7 +59,18 @@ public:
 */
     void genHorse();
 
-    void genAll();
+    /**
+     * given the square index, returns the piece that is captured
+     * @return square
+     * @return captured piece
+     */
+    PieceTypes getCapPiece(Square square);
+
+    /**
+     * generates all the possible psuedo-legal moves and only returns legal moves
+     * @return moveList
+     */
+    moveList genAll();
 
 };
 

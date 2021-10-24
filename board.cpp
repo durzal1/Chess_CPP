@@ -10,17 +10,31 @@ board::board(const std::string& fen) {
     // setup the board
     FENboard(fen);
 
-    bb::Square SquareConversion[64] = {
-            bb::A8,bb::B8,bb::C8,bb::D8,bb::E8,bb::F8,bb::G8,bb::H8,
-            bb::A7,bb::B7,bb::C7,bb::D7,bb::E7,bb::F7,bb::G7,bb::H7,
-            bb::A6,bb::B6,bb::C6,bb::D6,bb::E6,bb::F6,bb::G6,bb::H6,
-            bb::A5,bb::B5,bb::C5,bb::D5,bb::E5,bb::F5,bb::G5,bb::H5,
-            bb::A4,bb::B4,bb::C4,bb::D4,bb::E4,bb::F4,bb::G4,bb::H4,
-            bb::A3,bb::B3,bb::C3,bb::D3,bb::E3,bb::F3,bb::G3,bb::H3,
-            bb::A2,bb::B2,bb::C2,bb::D2,bb::E2,bb::F2,bb::G2,bb::H2,
-            bb::A1,bb::B1,bb::C1,bb::D1,bb::E1,bb::F1,bb::G1,bb::H1
-    };
-    for (int i = 0; i < 64; i++) squareConversion[i] = SquareConversion[i];
+//    bb::Square SquareConversion[64] = {
+//            bb::A8,bb::B8,bb::C8,bb::D8,bb::E8,bb::F8,bb::G8,bb::H8,
+//            bb::A7,bb::B7,bb::C7,bb::D7,bb::E7,bb::F7,bb::G7,bb::H7,
+//            bb::A6,bb::B6,bb::C6,bb::D6,bb::E6,bb::F6,bb::G6,bb::H6,
+//            bb::A5,bb::B5,bb::C5,bb::D5,bb::E5,bb::F5,bb::G5,bb::H5,
+//            bb::A4,bb::B4,bb::C4,bb::D4,bb::E4,bb::F4,bb::G4,bb::H4,
+//            bb::A3,bb::B3,bb::C3,bb::D3,bb::E3,bb::F3,bb::G3,bb::H3,
+//            bb::A2,bb::B2,bb::C2,bb::D2,bb::E2,bb::F2,bb::G2,bb::H2,
+//            bb::A1,bb::B1,bb::C1,bb::D1,bb::E1,bb::F1,bb::G1,bb::H1
+//    };
+//
+//    bb::Square SquareConversion2[64] = {
+//            bb::A1,bb::B1,bb::C1,bb::D1,bb::E1,bb::F1,bb::G1,bb::H1,
+//            bb::A2,bb::B2,bb::C2,bb::D2,bb::E2,bb::F2,bb::G2,bb::H2,
+//            bb::A3,bb::B3,bb::C3,bb::D3,bb::E3,bb::F3,bb::G3,bb::H3,
+//            bb::A4,bb::B4,bb::C4,bb::D4,bb::E4,bb::F4,bb::G4,bb::H4,
+//            bb::A5,bb::B5,bb::C5,bb::D5,bb::E5,bb::F5,bb::G5,bb::H5,
+//            bb::A6,bb::B6,bb::C6,bb::D6,bb::E6,bb::F6,bb::G6,bb::H6,
+//            bb::A7,bb::B7,bb::C7,bb::D7,bb::E7,bb::F7,bb::G7,bb::H7,
+//            bb::A8,bb::B8,bb::C8,bb::D8,bb::E8,bb::F8,bb::G8,bb::H8
+//    };
+//    for (int i = 0; i < 64; i++){
+//        squareConversion2[i] = SquareConversion2[i];
+//        squareConversion[i] = SquareConversion[i];
+//    }
 
     for (int i = 0; i < 8; i++){
         for (int j = 0; j < 8; j++){
@@ -46,7 +60,7 @@ void board::setBitset() {
 
     // gets position of the pieces
     for (int i = 0 ; i < 64; i++){
-        Square square = squareConversion[i];
+        Square square = i;
         if (boardArr[i].type == BISHOP){
             bb::setBit(bitBoard.bishops, square);
             bb::setBit(bitBoard.all, square);
@@ -721,7 +735,7 @@ void board::FENboard(std::string FEN) {
     // sets the boardarr
     for (int i = 0; i < 8; i++){
         for (int j = 0; j < 8; j++){
-            boardArr[i*8+j] = temp[i][j];
+            boardArr[i*8+j] = temp[7-i][j];
         }
     }
     // find how many full turns there are
@@ -751,9 +765,7 @@ board::board(const board &b) {
     this->fullTurns = b.fullTurns;
     this->halfTurns = b.halfTurns;
     this->inter = b.inter;
-    for (int i = 0; i < 64; i ++){
-        this->boardArr[i]= b.boardArr[i];
-    }
+
     this->playerTurn = b.playerTurn;
     this->castles = b.castles;
     this->passentMoves = b.passentMoves;
@@ -782,9 +794,6 @@ board &board::operator=(const board &b) {
     this->halfTurns = b.halfTurns;
     this->castles = b.castles;
     this->inter = b.inter;
-    for (int i = 0; i < 64; i ++){
-        this->boardArr[i]= b.boardArr[i];
-    }
     this->playerTurn = b.playerTurn;
     this->passentMoves = b.passentMoves;
     this->conversion = b.conversion;
