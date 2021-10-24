@@ -10,22 +10,47 @@ struct moveGen{
 private:
     bitboard bitBoard;
     moveList movelist;
+
+    Color color;
 public:
     moveGen();
 
-    moveGen(const bitboard &bitBoard);
+    moveGen(const bitboard &bitBoard, Color color);
 
     /**
-     * generates all white quiet moves and updates the moveList
+     * generates all white pawn quiet moves and updates the moveList
      */
-    void genWPawnQuiet();
+    void genPawnQuiet();
 
     /**
-    * generates all white capture moves and updates the moveList
+    * generates all white pawn capture moves and updates the moveList
     */
-    void genWPawnCap();
+    void genPawnCap();
 
+    /**
+   * generates all rook moves and updates the moveList
+   */
+    void genRook();
 
+    /**
+  * generates all bishop moves and updates the moveList
+  */
+    void genBishop();
+
+    /**
+  * generates all Queen moves and updates the moveList
+  */
+    void genQueen();
+
+    /**
+ * generates all king moves and updates the moveList
+ */
+    void genKing();
+
+    /**
+* generates all horse moves and updates the moveList
+*/
+    void genHorse();
 
     void genAll();
 

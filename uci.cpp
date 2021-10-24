@@ -161,7 +161,7 @@ void uci::processCommand(std::string str) {
     }else if (split[0] == "stop"){
         uci::stop();
     }else if (split[0] == "print"){
-        uci::print();
+////        uci::print();
     }else if (split[0] == "uci"){
         uci::Uci();
     }else if (split[0] == "ucinewgame"){
@@ -289,8 +289,7 @@ uci::uci() {
 }
 
 void uci::print() {
-    Board.print();
-    std::cout << Color(Board.playerTurn) << std::endl;
+//    Board.print();
 }
 
 void uci::Uci() {
@@ -318,7 +317,8 @@ void uci::moves(std::string moves) {
     col toRow = 8- (moves[3] - '0');
 
     // finds the piece
-    Piece = Board.boardArr[fromRow][fromCol];
+    //todo change this to 1d
+//    Piece = Board.boardArr[fromRow][fromCol];
 
     Piece.nextRow = toRow;
     Piece.nextCol = toCol;
@@ -327,16 +327,16 @@ void uci::moves(std::string moves) {
     Piece.curCol = fromCol;
 
     // checks if its an en passant
-    if (Board.boardArr[toRow][toCol].type == NONE && Piece.type == PAWN){
-        // depending on color you have to +/- 1 to row
-        if (Piece.color == black && Board.boardArr[toRow-1][toCol].type == PAWN && Board.boardArr[toRow-1][toCol].color == white){
-            Piece.capRow = toRow-1;
-            Piece.capCol = toCol;
-        }else if (Piece.color == white && Board.boardArr[toRow+1][toCol].type == PAWN && Board.boardArr[toRow+1][toCol].color == black){
-            Piece.capRow = toRow+1;
-            Piece.capCol = toCol;
-        }
-    }
+//    if (Board.boardArr[toRow][toCol].type == NONE && Piece.type == PAWN){
+//        // depending on color you have to +/- 1 to row
+//        if (Piece.color == black && Board.boardArr[toRow-1][toCol].type == PAWN && Board.boardArr[toRow-1][toCol].color == white){
+//            Piece.capRow = toRow-1;
+//            Piece.capCol = toCol;
+//        }else if (Piece.color == white && Board.boardArr[toRow+1][toCol].type == PAWN && Board.boardArr[toRow+1][toCol].color == black){
+//            Piece.capRow = toRow+1;
+//            Piece.capCol = toCol;
+//        }
+//    }
 
     // checks for castling
     if (Piece.type == KING && Piece.curCol == 4){
@@ -362,7 +362,7 @@ void uci::moves(std::string moves) {
         }
     }
 
-    Board.move(Piece);
+////    Board.move(Piece);
 }
 
 

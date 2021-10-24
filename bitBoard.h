@@ -228,6 +228,8 @@ namespace bb {
 
     constexpr U64 notAFile = 0xfefefefefefefefe;
     constexpr U64 notHFile = 0x7f7f7f7f7f7f7f7f;
+    constexpr U64 notABFile = 0xfcfcfcfcfcfcfcfcL;
+    constexpr U64 notGHFile = 0x3f3f3f3f3f3f3f3fL;
 
     constexpr U64 WHITE_SQUARES_BB = 0x55AA55AA55AA55AA;
     constexpr U64 BLACK_SQUARES_BB = ~WHITE_SQUARES_BB;
@@ -895,12 +897,6 @@ namespace bb {
      */
     inline int bitCount(U64 bb) {
         return __builtin_popcountll(bb);
-        //        int counter = 0;
-        //        while(bb != 0){
-        //            bb = lsbReset(bb);
-        //            counter ++;
-        //        }
-        //        return counter;
     }
 
     /**

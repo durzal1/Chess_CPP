@@ -38,7 +38,7 @@ Move genMove(const bb::Square &from, const bb::Square &to, const MoveType&type, 
 
     return m;
 }
-inline Move genMoveCap(const bb::Square &from, const bb::Square &to, const MoveType & type, const bb::Piece &movingPiece,
+Move genMoveCap(const bb::Square &from, const bb::Square &to, const MoveType & type, const bb::Piece &movingPiece,
                     const bb::Piece &capturedPiece){
     Move m {0};
 

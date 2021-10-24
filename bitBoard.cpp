@@ -258,6 +258,59 @@ inline U64 lsbIsolation(U64 number) {
 inline U64 lsbReset(U64 number) {
     return number & (number - 1);
 }
+U64 bb::generateSlidingAttacks(Square sq, Direction direction, U64 occ) {
+    U64 res {0};
+
+    static const U64 topBottom = RANK_1_BB | RANK_8_BB;
+    static const U64 leftRight = FILE_A_BB | FILE_H_BB;
+
+    if ((1ULL << sq) & RANK_1_BB && direction < -2) {
+        return res;
+    }
+    if ((1ULL << sq) & RANK_8_BB && direction > 2) {
+        return res;
+    }
+    if ((1ULL << sq) & FILE_A_BB && (direction == WEST || direction == SOUTH_WEST || direction == NORTH_WEST)) {
+        return res;
+    }
+    if ((1ULL << sq) & FILE_H_BB && (direction == EAST || direction == SOUTH_EAST || direction == NORTH_EAST)) {
+        return res;
+    }
+
+    while (true) {
+        sq += direction;
+
+        U64 currentSq = (U64) 1 << sq;
+
+        res |= currentSq;
+
+        if (occ & currentSq) {
+            return res;
+        }
+        if (abs(direction) == 8) {
+            if (currentSq & topBottom) {
+                return res;
+            }
+        } else if (abs(direction) == 1) {
+            if (currentSq & leftRight) {
+                return res;
+            }
+        } else {
+            if (currentSq & CIRCLE_A_BB) {
+                return res;
+            }
+        }
+    }
+}
+U64 bb::generateRookAttack(Square sq, U64 occupied) {
+    return generateSlidingAttacks(sq, NORTH, occupied) | generateSlidingAttacks(sq, EAST, occupied)
+    | generateSlidingAttacks(sq, WEST, occupied) | generateSlidingAttacks(sq, SOUTH, occupied);
+}
+
+U64 bb::generateBishopAttack(Square sq, U64 occupied) {
+    return generateSlidingAttacks(sq, NORTH_WEST, occupied) | generateSlidingAttacks(sq, NORTH_EAST, occupied)
+    | generateSlidingAttacks(sq, SOUTH_WEST, occupied) | generateSlidingAttacks(sq, SOUTH_EAST, occupied);
+}
 
 /**
  * prints the given bitboard as a bitmap to the standard output stream

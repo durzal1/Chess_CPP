@@ -113,7 +113,7 @@ public:
     int inter;
 
     // array of the board
-    piece boardArr[8][8];
+    piece boardArr[64];
 
     // whos turn it is
     Color playerTurn = white;

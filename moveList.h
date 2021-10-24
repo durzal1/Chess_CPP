@@ -8,7 +8,7 @@
 #include <cstdint>
 #include "bitBoard.h"
 #include "types.h"
-typedef uint16_t Move;
+typedef uint32_t Move;
 typedef uint8_t  MoveType;
 
 
@@ -74,7 +74,7 @@ inline void setCapturedPiece(Move& move, const bb::Piece capturedPiece) {
     move |= (capturedPiece << SHIFT_CAPTURED_PIECE);
 }
 
-inline Move genMoveCap(const bb::Square &from, const bb::Square &to, const MoveType & type, const bb::Piece &movingPiece,
+Move genMoveCap(const bb::Square &from, const bb::Square &to, const MoveType & type, const bb::Piece &movingPiece,
                     const bb::Piece &capturedPiece);
 Move genMove(const bb::Square &from, const bb::Square &to, const MoveType&type, const bb::Piece &movingPiece);
 
