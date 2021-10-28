@@ -773,9 +773,11 @@ board::board(const board &b) {
     this->castleLeft = b.castleLeft;
     this->conversion = b.conversion;
     this->zobKeys = b.zobKeys;
+
     for (int i = 0; i < 8; i ++){
         for (int j = 0; j < 8; j++){
             this->zobVals[i][j] = b.zobVals[i][j];
+            this->boardArr[i*8+j] = b.boardArr[i*8+j];
         }
     }
     this->bitBoard = b.bitBoard;
@@ -801,6 +803,7 @@ board &board::operator=(const board &b) {
     for (int i = 0; i < 8; i ++){
         for (int j = 0; j < 8; j++){
             this->zobVals[i][j] = b.zobVals[i][j];
+            this->boardArr[i*8+j] = b.boardArr[i*8+j];
         }
     }
 //    this->hashMoves = b.hashMoves;

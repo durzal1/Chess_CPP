@@ -945,6 +945,7 @@ namespace bb {
      * @param sq2
      * @return
      */
+    //the orthogonal Manhattan-Distance is the sum of both absolute rank- and file-distance distances
     inline int manhattanDistance(Square sq1, Square sq2) {
         File fI1 = fileIndex(sq1);
         Rank rI1 = rankIndex(sq1);
@@ -954,33 +955,54 @@ namespace bb {
         return manhattanDistance(fI1, rI1, fI2, rI2);
     }
 
+    /** determines direction between two pieces (very ugly do not try to understand it)
+     * @param jKing - j cord of king
+     * @param iKing - i cord of king
+     * @param jAtt - j cord of Attacker
+     * @param iAtt - i cord of Attacker
+     * @return direction between them
+     **/
+    inline Directions dirBetTwo(int jKing, int iKing, int jAtt, int iAtt){
+        if (jKing == jAtt){
+            // above
+            if (iAtt > iKing) return NORTH;
+            else return SOUTH;
+        }else if (iKing == iAtt){
+            if (jAtt > jKing) return EAST;
+            else return WEST;
+        }
+        else if (jAtt > jKing && iAtt > iKing) return NORTH_EAST;
+        else if (jAtt > jKing && iKing > iAtt) return SOUTH_EAST;
+        else if (jKing > jAtt && iKing > iAtt) return SOUTH_WEST;
+        else if (jKing > jAtt && iAtt > iKing) return NORTH_WEST;
+    }
 }    // namespace bb
 struct bitboard{
 public:
-    bitboard();
+   bitboard();
 
-    U64 bishops = 0ULL;
-    U64 wbishops = 0ULL;
-    U64 bbishops = 0ULL;
-    U64 horses = 0ULL;
-    U64 whorses = 0ULL;
-    U64 bhorses = 0ULL;
-    U64 kings = 0ULL;
-    U64 wkings = 0ULL;
-    U64 bkings = 0ULL;
-    U64 rooks = 0ULL;
-    U64 wrooks = 0ULL;
-    U64 brooks = 0ULL;
-    U64 pawns = 0ULL;
-    U64 wpawns = 0ULL;
-    U64 bpawns = 0ULL;
-    U64 queens = 0ULL;
-    U64 wqueens = 0ULL;
-    U64 bqueens = 0ULL;
-    U64 allWhite = 0ULL;
-    U64 allBlack = 0ULL;
-    U64 all = 0ULL;
-    U64 empty = 0ULL;
+   U64 bishops = 0ULL;
+   U64 wbishops = 0ULL;
+   U64 bbishops = 0ULL;
+   U64 horses = 0ULL;
+   U64 whorses = 0ULL;
+   U64 bhorses = 0ULL;
+   U64 kings = 0ULL;
+   U64 wkings = 0ULL;
+   U64 bkings = 0ULL;
+   U64 rooks = 0ULL;
+   U64 wrooks = 0ULL;
+   U64 brooks = 0ULL;
+   U64 pawns = 0ULL;
+   U64 wpawns = 0ULL;
+   U64 bpawns = 0ULL;
+   U64 queens = 0ULL;
+   U64 wqueens = 0ULL;
+   U64 bqueens = 0ULL;
+   U64 allWhite = 0ULL;
+   U64 allBlack = 0ULL;
+   U64 all = 0ULL;
+   U64 empty = 0ULL;
 };
 
 #endif //CHESS_BITBOARD_H

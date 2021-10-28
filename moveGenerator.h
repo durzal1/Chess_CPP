@@ -6,6 +6,10 @@
 #define CHESS_MOVEGENERATOR_H
 #include "board.h"
 #include "moveList.h"
+#include <bitset>
+#include <cstdint>
+#include <initializer_list>
+#include <iostream>
 struct moveGen{
 private:
     bitboard bitBoard;
@@ -17,6 +21,12 @@ private:
 
     // bitboard that does all type moves from king (checks how many ways we're in check)
     U64 attackers = 0ULL;
+
+    // mask of all the square that can be captured (limited to one during check)
+    U64 capMask = ~0ULL;
+
+    // mask of all the square that can be moved to (limited to path between attacking piece and king during check)
+    U64 moveMask = ~0ULL;
 
     Color color;
 public:
@@ -71,6 +81,13 @@ public:
      * @return moveList
      */
     moveList genAll();
+
+    /**
+     * generates the attackers bitboard and thus the amount of checks
+     * pretty disorganized since i pile everthing in here
+     * i would put everything in its respective gen but it would make program slower
+     */
+    void genChecks();
 
 };
 

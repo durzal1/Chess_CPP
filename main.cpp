@@ -17,7 +17,7 @@
 //target_link_libraries(Chess mingw32 SDL2main SDL2 SDL2_Image)
 
 int main() {
-    std::string fen = "8/4r3/3n1pb1/8/2P1K2p/6P1/1PP4P/RNBQ1BNR w - - 0 1";
+    std::string fen = "8/6q1/2P4P/1p2K1r1/1P5B/P2p1p2/1P6/RNBQn1NR w - - 0 1";
     board Board = board(fen);
     ai AI = ai(Board, 1, Board.playerTurn, 90000);
     AI.perft(Board, 3, true, Board.playerTurn);
