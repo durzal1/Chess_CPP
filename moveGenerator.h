@@ -16,7 +16,7 @@ private:
     piece boardArr [64];
     moveList movelist;
 
-    // bitboard of all the potential captures the enemy can do (helps with making moves legal)
+    // bitboard of all the potential captures the enemy can do (determines king legal moves)
     U64 oppCaptures = 0ULL;
 
     // bitboard that does all type moves from king (checks how many ways we're in check)
@@ -28,6 +28,15 @@ private:
     // mask of all the square that can be moved to (limited to path between attacking piece and king during check)
     U64 moveMask = ~0ULL;
 
+    // bitboard of sliding moves from our king
+    U64 kingSliding = 0ULL;
+
+    // bitboard of opponent's sliding moves
+    U64 oppSliding = 0ULL;
+
+    // bitboard of all the pinned pieces
+    U64 pinned = 0ULL;
+
     Color color;
 public:
     moveGen();
@@ -35,9 +44,15 @@ public:
     moveGen(const bitboard &bitBoard, Color color, piece arr[]);
 
     /**
-     * generates all white pawn quiet moves and updates the moveList
+     * generates all pawn quiet moves and updates the moveList
      */
     void genPawnQuiet();
+
+
+    /**
+     * generates pawn Cap moves for a specific bitboard (for when pawn is pinned)
+     */
+    void pinPawnCap(int piece, int pinningPiece);
 
     /**
     * generates all white pawn capture moves and updates the moveList
@@ -68,6 +83,11 @@ public:
 * generates all horse moves and updates the moveList
 */
     void genHorse();
+
+    /**
+     * generates the moves for all pinned pieces
+     */
+     void getPinnedMoves();
 
     /**
      * given the square index, returns the piece that is captured

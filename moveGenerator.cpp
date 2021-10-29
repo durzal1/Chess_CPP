@@ -98,6 +98,8 @@ void moveGen::genChecks() {
         target = bb::bitscanForward(curKing);
         U64 options = bb::generateRookAttack(target, occ);
 
+        kingSliding |= options;
+
         // captures and quiet moves respectively
         U64 captures = options & opp;
 
@@ -147,6 +149,8 @@ void moveGen::genChecks() {
     while (curKing){
         target = bb::bitscanForward(curKing);
         U64 options = bb::generateBishopAttack(target, occ);
+
+        kingSliding |= options;
 
         // captures and quiet moves respectively
         U64 captures = options & opp;
@@ -333,23 +337,176 @@ void moveGen::genChecks() {
 
         oppHorse = bb::lsbReset(oppHorse);
     }
+
+    // bitboard of opponents sliding moves
+    if (color == white){
+        oppBishop = bitBoard.bbishops;
+        oppRook= bitBoard.brooks;
+        oppQueen= bitBoard.bqueens;
+        king = bitBoard.wkings;
+    }
+    else{
+        oppBishop = bitBoard.wbishops;
+        oppRook= bitBoard.wrooks;
+        oppQueen= bitBoard.wqueens;
+        king = bitBoard.bkings;
+    }
+
+    while (oppBishop){
+        target = bb::bitscanForward(oppBishop);
+        U64 options = bb::generateBishopAttack(target, occ);
+        U64 checkKing = bb::generateBishopAttack(target, 0ULL);
+
+        if ((checkKing & king) == 0ULL){
+            break;
+        }
+
+        // captures
+        captures = options & team;
+
+        // adds the captures to the opp sliding bitboard
+        oppSliding |= captures;
+
+        oppBishop = bb::lsbReset(oppBishop);
+    }
+
+    while (oppRook){
+        target = bb::bitscanForward(oppRook);
+        U64 options = bb::generateRookAttack(target, occ);
+        U64 checkKing = bb::generateRookAttack(target, 0ULL);
+
+        if ((checkKing & king) == 0ULL){
+            break;
+        }
+
+        // captures
+        captures = options & team;
+
+        // adds the captures to the opp sliding bitboard
+        oppSliding |= captures;
+
+        oppRook = bb::lsbReset(oppRook);
+    }
+
+    while (oppQueen){
+        target = bb::bitscanForward(oppQueen);
+        U64 options = bb::generateBishopAttack(target, occ) | bb::generateRookAttack(target, occ);
+        U64 checkKing = bb::generateBishopAttack(target, 0ULL) | bb::generateRookAttack(target, 0ULL);
+
+        if ((checkKing & king) == 0ULL){
+            break;
+        }
+
+        // captures
+        captures = options & team;
+
+        // adds the captures to the opp sliding bitboard
+        oppSliding |= captures;
+
+        oppQueen = bb::lsbReset(oppQueen);
+    }
+
+
+}
+void moveGen::getPinnedMoves() {
+    int indKing;
+    U64 king;
+    U64 opp;
+    if (color == white){
+        indKing = bb::bitscanForward(bitBoard.wkings);
+        king = bitBoard.wkings;
+        opp = bitBoard.allBlack;
+    }else{
+        indKing = bb::bitscanForward(bitBoard.bkings);
+        king = bitBoard.bkings;
+        opp = bitBoard.allWhite;
+    }
+    pinned = oppSliding & kingSliding;
+
+    // temp bitboard for pinned pieces
+    U64 tempPinned = pinned;
+
+    while (tempPinned){
+        int checksquare = bb::bitscanForward(tempPinned);
+
+        int jKing = indKing % 8;
+        int iKing = (indKing - jKing) / 8;
+
+        int jAtt = checksquare % 8;
+        int iAtt = (checksquare - jAtt) / 8;
+
+        // pinned move and move pinner
+        U64 pinnedMoves = 0ULL;
+        int movePinner;
+
+        // direction
+        bb::Directions direction = bb::dirBetTwo(jKing, iKing, jAtt, iAtt);
+        bb::Directions oppDir = bb::oppDirection(direction);
+
+        // makes sure pieces only go where they're supposed to
+        bb::Directions typeDir = bb::typeDirection(direction);
+
+        // type of moving piece
+        PieceTypes moving = boardArr[checksquare].type;
+
+        // bishop can only diag and rook can only non-diag and horse will never have a move
+        if ((typeDir == bb::DIAGONAL && moving == ROOK) || (typeDir == bb::NON_DIAGONAL && moving == BISHOP) || moving == HORSE) break;
+
+
+        pinnedMoves |= bb::generateSlidingAttacks(checksquare, direction, bitBoard.all);
+        pinnedMoves |= bb::generateSlidingAttacks(checksquare, oppDir, bitBoard.all);
+
+        // remove our king
+        pinnedMoves ^= king;
+        movePinner = bb::bitscanForward(pinnedMoves & opp);
+
+        if (moving == PAWN && direction == bb::DIAGONAL){
+            pinPawnCap(checksquare, movePinner);
+            break;
+        }
+        else if (moving == PAWN && direction == bb::NON_DIAGONAL) break;
+
+        // adds all the moves
+        while (pinnedMoves){
+            int move = bb::bitscanForward(pinnedMoves);
+
+            if (move == movePinner){
+                // capture
+                movelist.add(genMoveCap(checksquare, move, CAPTURE, moving, boardArr[move].type));
+
+            }
+            else{
+                // quiet
+                movelist.add(genMove(checksquare, move, QUIET, moving));
+            }
+
+            pinnedMoves = bb::lsbReset(pinnedMoves);
+
+        }
+
+        tempPinned = bb::lsbReset(tempPinned);
+
+    }
+
+
 }
 moveList moveGen::genAll() {
     // gets number of ways check is made
     genChecks();
+
+    // moves for pinned pieces
+    getPinnedMoves();
 
     // always needed
     genKing();
 
     int numChecks = bb::bitCount(attackers);
 
-    std::cout << numChecks << std::endl;
     if (numChecks > 1){
-        // only returns king moves since 2+ check
+        // only returns king moves since 2+ checks
         return movelist;
     }
     else if (numChecks == 1){
-
 
         // can only capture the attacking piece
         capMask = attackers;
@@ -380,7 +537,6 @@ moveList moveGen::genAll() {
 
         }
     }
-    bb::printBitmap(oppCaptures);
 
     // generates all moves
 
@@ -391,11 +547,65 @@ moveList moveGen::genAll() {
     genQueen();
     genHorse();
 
-    bb::printBitmap(attackers);
-
-
-
+    // todo perft and do the actual move
     return movelist;
+}
+void moveGen::pinPawnCap(int piece, int pinningPiece) {
+    U64 board = 0ULL;
+    bb::setBit(board, piece);
+
+    U64 right;
+    if (color == white){
+        right = board << 9 & bb::notAFile & bitBoard.allBlack;
+    }
+    else{
+        right = board >> 7 & bb::notAFile & bitBoard.allWhite;
+    }
+
+    U64 left;
+    if (color == white){
+        left = board << 7 & bb::notHFile & bitBoard.allBlack;
+    }
+    else{
+        left = board >> 9 & bb::notHFile & bitBoard.allWhite;
+    }
+
+
+    Square target;
+    Square from;
+
+    // adds the capMask
+    right &= capMask;
+    left  &= capMask;
+
+    while (right){
+        target = bb::bitscanForward(right);
+
+        if (target != pinningPiece){
+            break;
+        }
+
+        if (color == white) from = target - 9;
+        else from = target + 7;
+
+        movelist.add(genMoveCap(from, target,CAPTURE, PAWN, boardArr[target].type));
+
+        right = bb::lsbReset(right);
+    }
+    while (left){
+        target = bb::bitscanForward(left);
+
+        if (target != pinningPiece){
+            break;
+        }
+
+        if (color == white) from = target - 7;
+        else from = target + 9;
+
+        movelist.add(genMoveCap(from, target,CAPTURE, PAWN, boardArr[target].type));
+
+        left = bb::lsbReset(left);
+    }
 }
 
 void moveGen::genPawnQuiet() {
@@ -417,19 +627,33 @@ void moveGen::genPawnQuiet() {
     while (up1){
         target = bb::bitscanForward(up1);
 
+
         if (color == white){
             from = target - 8;
         }
         else{
             from = target + 8;
         }
+        // if pinned we skip since moves have been calculated
+        if (bb::getBit(pinned, from)){
+            up1 = bb::lsbReset(up1);
+            continue;
+        }
+
         movelist.add(genMove(from, target,QUIET, PAWN));
         up1 = bb::lsbReset(up1);
     }
     while (up2){
         target = bb::bitscanForward(up2);
+
         if (color == white) from = target - 16;
         else from = target + 16;
+
+        // if pinned we skip since moves have been calculated
+        if (bb::getBit(pinned, from)){
+            up2 = bb::lsbReset(up2);
+            continue;
+        }
 
         // does not let pieces that have moved, move again
         if (color == white){
@@ -475,7 +699,13 @@ void moveGen::genPawnCap() {
         if (color == white) from = target - 9;
         else from = target + 7;
 
-        movelist.add(genMove(from, target,CAPTURE, PAWN));
+        // if pinned we skip since moves have been calculated
+        if (bb::getBit(pinned, from)){
+            right = bb::lsbReset(right);
+            continue;
+        }
+
+        movelist.add(genMoveCap(from, target,CAPTURE, PAWN, boardArr[target].type));
 
         right = bb::lsbReset(right);
     }
@@ -485,7 +715,13 @@ void moveGen::genPawnCap() {
         if (color == white) from = target - 7;
         else from = target + 9;
 
-        movelist.add(genMove(from, target,CAPTURE, PAWN));
+        // if pinned we skip since moves have been calculated
+        if (bb::getBit(pinned, from)){
+            left = bb::lsbReset(left);
+            continue;
+        }
+
+        movelist.add(genMoveCap(from, target,CAPTURE, PAWN, boardArr[target].type));
 
         left = bb::lsbReset(left);
     }
@@ -515,6 +751,13 @@ void moveGen::genRook(){
 
     while (rook){
         target = bb::bitscanForward(rook);
+
+        // if pinned we skip since moves have been calculated
+        if (bb::getBit(pinned, target)){
+            rook = bb::lsbReset(rook);
+            continue;
+        }
+
         U64 options = bb::generateRookAttack(target, occ);
 
         // captures and quiet moves respectively
@@ -527,7 +770,7 @@ void moveGen::genRook(){
 
         while(captures){
             to = bb::bitscanForward(captures);
-            movelist.add(genMove(target, to,CAPTURE, ROOK));
+            movelist.add(genMoveCap(target, to,CAPTURE, ROOK, boardArr[to].type));
 
             captures = bb::lsbReset(captures);
         }
@@ -535,6 +778,7 @@ void moveGen::genRook(){
         while (quietMoves){
             to = bb::bitscanForward(quietMoves);
             movelist.add(genMove(target, to,QUIET, ROOK));
+
             quietMoves = bb::lsbReset(quietMoves);
         }
 
@@ -584,6 +828,13 @@ void moveGen::genBishop(){
 
     while (bishop){
         target = bb::bitscanForward(bishop);
+
+        // if pinned we skip since moves have been calculated
+        if (bb::getBit(pinned, target)){
+            bishop = bb::lsbReset(bishop);
+            continue;
+        }
+
         U64 options = bb::generateBishopAttack(target, occ);
 
         // captures and quiet moves respectively
@@ -596,7 +847,7 @@ void moveGen::genBishop(){
 
         while(captures){
             to = bb::bitscanForward(captures);
-            movelist.add(genMove(target, to,CAPTURE, BISHOP));
+            movelist.add(genMoveCap(target, to,CAPTURE, BISHOP, boardArr[target].type));
 
             captures = bb::lsbReset(captures);
         }
@@ -665,7 +916,7 @@ void moveGen::genQueen(){
 
         while(captures){
             to = bb::bitscanForward(captures);
-            movelist.add(genMove(target, to,CAPTURE, QUEEN));
+            movelist.add(genMoveCap(target, to,CAPTURE, QUEEN, boardArr[target].type));
 
             captures = bb::lsbReset(captures);
         }
@@ -728,6 +979,7 @@ void moveGen::genKing(){
 
     // only legal moves
     oppCaptures = ~oppCaptures;
+
     king2 &= oppCaptures;
 
     // gets the captures and quiet moves

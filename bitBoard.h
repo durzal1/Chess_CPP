@@ -123,7 +123,9 @@ namespace bb {
         NORTH_EAST =  9,
         SOUTH_WEST = -9,
         SOUTH_EAST = -7,
-        N_DIRECTIONS = 8
+        N_DIRECTIONS = 8,
+        DIAGONAL = 9,
+        NON_DIAGONAL = 10
     };
 
     enum Ranks{
@@ -975,6 +977,30 @@ namespace bb {
         else if (jAtt > jKing && iKing > iAtt) return SOUTH_EAST;
         else if (jKing > jAtt && iKing > iAtt) return SOUTH_WEST;
         else if (jKing > jAtt && iAtt > iKing) return NORTH_WEST;
+    }
+
+    /** determines opposite of a direction
+    * @param direction
+    * @return opposite direction
+    **/
+    inline Directions oppDirection(Directions direction){
+        if (direction == NORTH)return SOUTH;
+        else if (direction == SOUTH)return NORTH;
+        else if (direction == EAST)return WEST;
+        else if (direction == WEST)return EAST;
+        else if (direction == NORTH_EAST)return SOUTH_WEST;
+        else if (direction == SOUTH_WEST)return NORTH_EAST;
+        else if (direction == NORTH_WEST)return SOUTH_EAST;
+        else if (direction == SOUTH_EAST)return NORTH_WEST;
+    }
+
+    /** determines type of a direction (diag/nonDiag)
+    * @param direction
+    * @return type
+    **/
+    inline Directions typeDirection(Directions direction){
+        if (direction == NORTH|| direction == SOUTH || (direction == EAST) || direction == WEST) return NON_DIAGONAL;
+        else return DIAGONAL;
     }
 }    // namespace bb
 struct bitboard{
