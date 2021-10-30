@@ -364,5 +364,3 @@ void uci::moves(std::string moves) {
 
 ////    Board.move(Piece);
 }
-
-

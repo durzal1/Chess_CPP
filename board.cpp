@@ -160,7 +160,9 @@ void board::setBitset() {
 
 }
 
-//piece board::move(piece &Piece) {
+Move board::move(Move m) {
+    // push  076
+}
 //    // vars
 //    row CurRow = Piece.curRow;
 //    col CurCol = Piece.curCol;

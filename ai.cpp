@@ -750,32 +750,25 @@ U64 ai::perft(board b, int depth, bool print, Color color) {
     moveList movelist = gen.genAll();
     std::cout << movelist.getSize();
 
-    auto moves = std::vector<int> {1};
 
 
+    for (int i = 0; i < movelist.getSize(); i++) {
 
-    for (int i = 0; i < moves.size(); i++) {
+        Move m = movelist.getMove(i);
 
-//        piece m = moves[i];
-//        if (!moveCheck(b, m, kingMoves)){
-//            continue;
-//        }
-//
-//        if (depth == 1){
-//            nodes ++;
-//            if (m.Castle != none)b.amountCastles ++;
-//
-//        }else{
-//            piece oldPiece = b.move(m);
-//
-//            U64 np = perft(b, depth - 1, false, nextColor);
-//
-//            if (print) {
+        if (depth == 1){
+            nodes ++;
+        }else{
+            auto oldPiece = b.move(m);
+
+            U64 np = perft(b, depth - 1, false, nextColor);
+
+            if (print) {
 //                std::cout << m.toString() << " " << np << std::endl;
-//            }
-//            nodes += np;
-//            b.undoMove(m, oldPiece);
-//        }
+            }
+            nodes += np;
+            b.undoMove(m, oldPiece);
+        }
 
 
     }

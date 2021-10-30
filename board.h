@@ -13,8 +13,11 @@
 #include "types.h"
 #include "piece.h"
 #include "bitBoard.h"
+typedef uint32_t Move;
+
 class board{
 private:
+
 //    // SDL variables
 //    SDL_Window* win = NULL;
 //    SDL_Renderer* renderer = NULL;
@@ -139,7 +142,7 @@ public:
 
     // @returns the piece that used to be there
     // does the move
-    piece move(piece &Piece);
+    Move move(Move m);
 
     // undoes the move
     void undoMove(piece &Piece, const piece& oldPiece);
