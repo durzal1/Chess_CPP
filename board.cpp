@@ -126,7 +126,8 @@ void board::move(const Move &m) {
 
     auto type = getType(m);
 
-    auto moveType = getMovingPiece(m);
+    int8_t moveType = getMovingPieceType(m);
+    PieceTypes moveT = PieceTypes(moveType);
 //    auto capType = getCapturedPieceType(m);
 
     Color nextColor;
@@ -139,7 +140,8 @@ void board::move(const Move &m) {
 
     if (type == QUIET){
         changebb(m, QUIET, true, nextColor);
-
+        boardArr[from] = {NONE, white};
+        boardArr[to] = {moveT, playerTurn};
     }
 //    else if (type == CAPTURE){
 //        changebb(m, CAPTURE, true);
@@ -154,9 +156,10 @@ void board::undoMove(const Move &m) {
     Square from = getSquareFrom(m);
     Square to = getSquareTo(m);
 
-    auto moveType = getMovingPiece(m);
     auto capType = getCapturedPieceType(m);
 
+    int8_t moveType = getMovingPieceType(m);
+    PieceTypes moveT = PieceTypes(moveType);
 
     auto type = getType(m);
 
@@ -175,7 +178,8 @@ void board::undoMove(const Move &m) {
 
     if (type == QUIET){
         changebb(m, QUIET, false, oppColor);
-
+        boardArr[from] = {moveT, white};
+        boardArr[to] = {NONE, color};
     }
 //    else if (type == CAPTURE){
 //

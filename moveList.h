@@ -95,7 +95,7 @@ public:
 
     int getSize() const;
 
-    Move getMove(int ind);
+    inline Move getMove(int ind);
 
     void printMoveBits();
 
@@ -103,4 +103,13 @@ public:
 
 
 };
+
+/**
+ * returns a move
+ * @param index
+ * @return
+ */
+inline Move moveList::getMove(int ind) {
+    return moves[ind];
+}
 #endif //CHESS_MOVELIST_H

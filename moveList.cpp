@@ -18,14 +18,7 @@ void moveList::add(Move move) {
 int moveList::getSize() const {
     return size;
 }
-/**
- * returns a move
- * @param index
- * @return
- */
-Move moveList::getMove(int ind) {
-    return moves[ind];
-}
+
 
 void moveList::toString(const Move &m, U64 np) {
     std::string uci;

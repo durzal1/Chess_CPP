@@ -9,7 +9,7 @@
 #include <ctime>
 #include <iostream>
 #include <string>
-#include <bits/stdc++.h>
+#include <array>
 using namespace std;
 
 typedef uint64_t U64;
@@ -981,6 +981,7 @@ namespace bb {
         else if (jAtt > jKing && iKing > iAtt) return SOUTH_EAST;
         else if (jKing > jAtt && iKing > iAtt) return SOUTH_WEST;
         else if (jKing > jAtt && iAtt > iKing) return NORTH_WEST;
+        return SOUTH_EAST;
     }
 
     /** determines opposite of a direction
@@ -996,6 +997,7 @@ namespace bb {
         else if (direction == SOUTH_WEST)return NORTH_EAST;
         else if (direction == NORTH_WEST)return SOUTH_EAST;
         else if (direction == SOUTH_EAST)return NORTH_WEST;
+        return SOUTH_EAST;
     }
 
     /** determines type of a direction (diag/nonDiag)

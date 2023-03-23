@@ -306,6 +306,7 @@ U64 ai::perft(board b, int depth, bool print, Color color) {
 
     moveList movelist = gen.genAll();
 
+
     for (int i = 0; i < movelist.getSize(); i++) {
 
         Move m = movelist.getMove(i);
@@ -330,6 +331,7 @@ U64 ai::perft(board b, int depth, bool print, Color color) {
 }
 
 
+
 U64 ai::testTime(board b, int depth, bool print, Color color) {
 
     // gets next color
@@ -349,14 +351,14 @@ U64 ai::testTime(board b, int depth, bool print, Color color) {
 
     moveGen gen = moveGen(b.bitBoard, b.playerTurn, b.boardArr);
 
-    moveList movelist = gen.genAll();
+    moveList& movelist = gen.genAll();
 
-    int val = 10000000;
+    int val = 3200000;
 
 
     for (int i = 0; i < val; i++){
-        moveGen gen = moveGen(b.bitBoard, b.playerTurn, b.boardArr);
-        moveList movelist = gen.genAll();
+        gen = moveGen(b.bitBoard, b.playerTurn, b.boardArr);
+        movelist = gen.genAll();
 
         for (int j = 0; j < movelist.getSize(); j++){
 
@@ -368,7 +370,7 @@ U64 ai::testTime(board b, int depth, bool print, Color color) {
 
     }
 
-    return nodes;
+    return val * movelist.getSize();
 }
 //bool ai::moveCheck(board b, const piece& Piece, int kingMoves) {
 //

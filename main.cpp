@@ -1,5 +1,4 @@
 #include "uci.h"
-#include <bits/stdc++.h>
 
 //cmake_minimum_required(VERSION 3.17)
 //project(Chess)
@@ -25,12 +24,11 @@ int main() {
 
     ai AI = ai(Board, 1, Board.playerTurn, 90000);
 
-    int am = AI.perft(Board, 1, true, Board.playerTurn);
-    std::cout << am << std::endl;
-
     auto start = std::chrono::high_resolution_clock::now();
 
-     AI.testTime(Board, 1, true, Board.playerTurn);
+//    long long int am = AI.perft(Board, 6, true, Board.playerTurn);
+    long long int am = AI.perft2(Board, 6, true, Board.playerTurn);
+//    long long int am = AI.testTime(Board, 1, true, Board.playerTurn);
 
 
 
@@ -41,7 +39,11 @@ int main() {
 
     std::cout << du << "ms" << std::endl;
 
-    double val = am*10000000 / du / 1000;
+    long long int v2 =  am / 1000;
+   long double val = v2 / du ;
+   std::cout.precision(10);
+   std::cout.setf(std::ios::fixed);
+   cout << "TOTAL NODES: " << am << endl;
     std::cout << val << "mnps" << std::endl;
 
 

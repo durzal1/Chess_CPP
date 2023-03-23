@@ -7,7 +7,9 @@
 #include <random>
 #include <iostream>
 #include <ctime>
-#include <bits/stdc++.h>
+//#include <bits/stdc++.h>
+#include <chrono>
+
 using namespace std;
 
 mt19937 rng(std::chrono::steady_clock::now().time_since_epoch().count());

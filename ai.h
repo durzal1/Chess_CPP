@@ -65,7 +65,55 @@ public:
     // function to check the amount of moves
     U64 perft(board b, int depth, bool print, Color color);
 
+    // another testing function
+    U64 inline perft2(board b, int depth, bool print, Color color);
+
     // Purley testing purposes.
     U64 testTime(board b, int depth, bool print, Color color);
 };
+U64 inline ai::perft2(board b, int depth, bool print, Color color) {
+
+    // gets next color
+    Color nextColor;
+
+    if (color == white){
+        nextColor = black;
+        b.playerTurn = color;
+    }
+    else{
+        nextColor = white;
+        b.playerTurn = color;
+    }
+
+    U64 nodes = 0;
+    if (depth == 0) return 1;
+
+    moveGen gen = moveGen(b.bitBoard, b.playerTurn, b.boardArr);
+
+    moveList movelist = gen.genAll();
+
+
+    for (int i = 0; i < movelist.getSize(); i++) {
+
+        Move m = movelist.getMove(i);
+
+        if (depth == 1){
+            nodes ++;
+        }else{
+            b.move(m);
+
+            U64 np = perft2(b, depth - 1, false, nextColor);
+            b.undoMove(m);
+
+            if (print) {
+                movelist.toString(m, np);
+            }
+            nodes += np;
+        }
+
+
+    }
+    return nodes;
+}
+
 #endif //CHESS_AI_H
