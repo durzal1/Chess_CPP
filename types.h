@@ -18,13 +18,14 @@ enum Direction{
     bottomRight
 };
 enum PieceTypes{
-    NONE = -1,
-    PAWN   = 0,
-    HORSE = 1,
-    BISHOP = 2,
-    ROOK   = 3,
-    QUEEN  = 4,
-    KING   = 5,
+    NONE = 8,
+    PAWN   = 2,
+    HORSE = 3,
+    BISHOP = 4,
+    ROOK   = 5,
+    QUEEN  = 6,
+    KING   = 7,
+
     N_PIECE_TYPES = 6
 };
 enum Color{

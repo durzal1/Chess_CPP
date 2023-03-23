@@ -64,5 +64,8 @@ public:
 
     // function to check the amount of moves
     U64 perft(board b, int depth, bool print, Color color);
+
+    // Purley testing purposes.
+    U64 testTime(board b, int depth, bool print, Color color);
 };
 #endif //CHESS_AI_H

@@ -13,7 +13,7 @@
 struct moveGen{
 private:
     bitboard bitBoard;
-    piece boardArr [64];
+    std::pair<PieceTypes, Color> boardArr [64];
     moveList movelist;
 
     // bitboard of all the potential captures the enemy can do (determines king legal moves)
@@ -41,7 +41,7 @@ private:
 public:
     moveGen();
 
-    moveGen(const bitboard &bitBoard, Color color, piece arr[]);
+    moveGen(const bitboard &bitBoard, Color color,  std::pair<PieceTypes, Color> arr[]);
 
     /**
      * generates all pawn quiet moves and updates the moveList

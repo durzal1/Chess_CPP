@@ -27,7 +27,48 @@ Move moveList::getMove(int ind) {
     return moves[ind];
 }
 
+void moveList::toString(const Move &m, U64 np) {
+    std::string uci;
 
+    Square from = getSquareFrom(m);
+    Square to = getSquareTo(m);
+
+    int nextRow = to / 8;
+    int nextCol = to % 8;
+
+    int oldRow = from / 8;
+    int oldCol = from % 8;
+    // for castling
+//    if (Castle != none){
+//        if (Castle == whiteCastleLeft) uci = "e1c1";
+//        else if (Castle == whiteCastleRight) uci = "e1g1";
+//        else if (Castle == blackCastleLeft) uci = "e8c8";
+//        else if (Castle == blackCastleRight) uci = "e8g8";
+//    }
+
+    // the rows have to be subtracted by 8 because they are going up to down instead of down to up
+    std::string newRow1 = std::to_string(oldRow + 1);
+    std::string newRow2 = std::to_string(nextRow + 1);
+
+    // col values have to be converted to real characters
+    char newCol1 = conversion[oldCol];
+    char newCol2 = conversion[nextCol];
+
+    std::cout << newCol1 << newRow1;
+    std::cout << newCol2 << newRow2 << " " << np << std::endl;
+
+//    uci.append(newCol1 + newRow1);
+//    uci.append(newCol2 + newRow2);
+
+
+
+    // if its a promotion then we add what piece it promotes to
+//    if (promotion == QUEEN) uci.push_back('q');
+//    else if (promotion == ROOK) uci.push_back('r');
+//    else if (promotion == BISHOP) uci.push_back('b');
+//    else if (promotion == HORSE) uci.push_back('n');
+
+}
 Move genMove(const bb::Square &from, const bb::Square &to, const MoveType&type, const bb::Piece &movingPiece){
     Move m {0};
 
@@ -108,4 +149,9 @@ void moveList::printMoveBits() {
     for (int i = 0; i < this->size; i++) {
         PrintMoveBits(getMove(i), false);
     }
+}
+
+void moveList::reset() {
+    std::fill_n(moves, 0, size);
+    size = 0;
 }

@@ -2,7 +2,7 @@
 //////
 ////// Created by zacky on 8/16/2021.
 //////
-////
+//// THIS IS NOT USED ANYMORE. THIS WAS HOW I USED TO DO IT BUT CHANGED BECUASE IT WAS TOO SLOW
 #include "getPossibleMoves.h"
 std::vector<piece> allPosMoves(const board& b, Color color, const piece& hashMove, std::vector<piece> &essQueenMoves, Mode mode){
     return std::vector<piece> {};

@@ -47,10 +47,9 @@ enum MoveShifts{
 template<uint8_t N>
 constexpr uint32_t MASK = (1 << N) - 1;
 
-
 inline bb::Square    getSquareFrom          (const Move& move) { return ((move >> SHIFT_FROM) & MASK<6>); }
 inline bb::Square    getSquareTo            (const Move& move) { return ((move >> SHIFT_TO) & MASK<6>); }
-inline MoveType      getType                (const Move& move) { return ((move >> SHIFT_TYPE) & MASK<4>); }
+inline MoveType      getType                (const Move& move) {return ((move >> SHIFT_TYPE) & MASK<4>);}
 inline bb::Piece     getMovingPiece         (const Move& move) { return ((move >> SHIFT_MOVING_PIECE) & MASK<4>); }
 inline bb::PieceType getMovingPieceType     (const Move& move) { return ((move >> SHIFT_MOVING_PIECE) & MASK<3>);}
 inline bb::Piece     getCapturedPiece       (const Move& move) { return ((move >> SHIFT_CAPTURED_PIECE) & MASK<4>); }
@@ -74,6 +73,8 @@ inline void setCapturedPiece(Move& move, const bb::Piece capturedPiece) {
     move |= (capturedPiece << SHIFT_CAPTURED_PIECE);
 }
 
+
+
 Move genMoveCap(const bb::Square &from, const bb::Square &to, const MoveType & type, const bb::Piece &movingPiece,
                     const bb::Piece &capturedPiece);
 Move genMove(const bb::Square &from, const bb::Square &to, const MoveType&type, const bb::Piece &movingPiece);
@@ -84,7 +85,12 @@ struct moveList{
 private:
     Move moves [256];
     int size = 0;
+
+    // array to convert col nums to A-H uci format
+    char conversion[8] {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'};
 public:
+    void reset();
+
     void add(Move move);
 
     int getSize() const;
@@ -93,6 +99,7 @@ public:
 
     void printMoveBits();
 
+    void toString(const Move &m, U64 np);
 
 
 };

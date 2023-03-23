@@ -13,6 +13,7 @@
 #include "types.h"
 #include "piece.h"
 #include "bitBoard.h"
+#include "moveList.h"
 typedef uint32_t Move;
 
 class board{
@@ -111,10 +112,10 @@ public:
     int halfTurns = 0;
 
     // size of each square and their interval
-    int inter;
+    int inter{};
 
     // array of the board
-    piece boardArr[64];
+    std::pair<PieceTypes, Color> boardArr[64];
 
     // whos turn it is
     Color playerTurn = white;
@@ -132,20 +133,21 @@ public:
 
     board& operator=(const board& b);
 
-    // creates/updates board visually
-    void createBoard();
-
     void setBitset();
 
-    // inits the pieces in their respective data classes
-    static void createPieces();
-
-    // @returns the piece that used to be there
     // does the move
-    Move move(Move m);
+    void move(const Move &m);
+
+    /**
+     * changes bitboards
+     * @param m
+     * @param type
+     * @param Do - if its doing the move or undoing it
+     */
+    void changebb(const Move &m, bb::PieceType type, bool Do, int nextColor);
 
     // undoes the move
-    void undoMove(piece &Piece, const piece& oldPiece);
+    void undoMove(const Move &m);
 
     // create board from FEN string
     //@param FEN string

@@ -9,6 +9,8 @@
 #include <ctime>
 #include <iostream>
 #include <string>
+#include <bits/stdc++.h>
+using namespace std;
 
 typedef uint64_t U64;
 typedef int8_t   Square;
@@ -77,12 +79,13 @@ namespace bb {
     };
 
     enum PieceTypes{
-        PAWN   = 0,
-        KNIGHT = 1,
-        BISHOP = 2,
-        ROOK   = 3,
-        QUEEN  = 4,
-        KING   = 5,
+        NONE = 0,
+        PAWN   = 1,
+        KNIGHT = 2,
+        BISHOP = 3,
+        ROOK   = 4,
+        QUEEN  = 5,
+        KING   = 6,
         N_PIECE_TYPES = 6
     };
 
@@ -398,6 +401,7 @@ namespace bb {
         0x4400442800000000L, 0x8800885000000000L, 0x100010a000000000L, 0x2000204000000000L,
         0x0004020000000000L, 0x0008050000000000L, 0x00110a0000000000L, 0x0022140000000000L,
         0x0044280000000000L, 0x0088500000000000L, 0x0010a00000000000L, 0x0020400000000000L};
+
 
     extern U64 seed;
 
@@ -1002,33 +1006,14 @@ namespace bb {
         if (direction == NORTH|| direction == SOUTH || (direction == EAST) || direction == WEST) return NON_DIAGONAL;
         else return DIAGONAL;
     }
+
 }    // namespace bb
 struct bitboard{
 public:
    bitboard();
 
-   U64 bishops = 0ULL;
-   U64 wbishops = 0ULL;
-   U64 bbishops = 0ULL;
-   U64 horses = 0ULL;
-   U64 whorses = 0ULL;
-   U64 bhorses = 0ULL;
-   U64 kings = 0ULL;
-   U64 wkings = 0ULL;
-   U64 bkings = 0ULL;
-   U64 rooks = 0ULL;
-   U64 wrooks = 0ULL;
-   U64 brooks = 0ULL;
-   U64 pawns = 0ULL;
-   U64 wpawns = 0ULL;
-   U64 bpawns = 0ULL;
-   U64 queens = 0ULL;
-   U64 wqueens = 0ULL;
-   U64 bqueens = 0ULL;
-   U64 allWhite = 0ULL;
-   U64 allBlack = 0ULL;
-   U64 all = 0ULL;
-   U64 empty = 0ULL;
+
+   array<U64, 8> bit_boards;
 };
 
 #endif //CHESS_BITBOARD_H

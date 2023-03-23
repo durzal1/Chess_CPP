@@ -17,11 +17,34 @@
 //target_link_libraries(Chess mingw32 SDL2main SDL2 SDL2_Image)
 
 int main() {
-    std::string fen = "8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w 1 1 ";
+
+    std::string fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1\n"
+
+                      ;
     board Board = board(fen);
+
     ai AI = ai(Board, 1, Board.playerTurn, 90000);
-    AI.perft(Board, 3, true, Board.playerTurn);
-//
+
+    int am = AI.perft(Board, 1, true, Board.playerTurn);
+    std::cout << am << std::endl;
+
+    auto start = std::chrono::high_resolution_clock::now();
+
+     AI.testTime(Board, 1, true, Board.playerTurn);
+
+
+
+    auto stop = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
+
+    auto du = duration.count();
+
+    std::cout << du << "ms" << std::endl;
+
+    double val = am*10000000 / du / 1000;
+    std::cout << val << "mnps" << std::endl;
+
+
 //    // for random
 //    srand(time(NULL));
 //

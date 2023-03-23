@@ -10,6 +10,7 @@ ai::ai(const board& b, int maxDepth, Color color, long long timeLimit) {
 
     this->timeLimit = timeLimit;
 }
+// zero window search
 int ai::zwSearch(int beta, int depth,  board b, Color color, int &nodes) {
     // gets next color
     Color nextColor;
@@ -26,7 +27,7 @@ int ai::zwSearch(int beta, int depth,  board b, Color color, int &nodes) {
 
     // gets all the moves
 //    auto moves = allPosMoves(b,color, p,essQueenMoves, everything);
-    int moves = 1;
+
     for (int i = 0; i < 9; i++) {
         nodes ++;
 //        piece oldPiece = b.move(m);
@@ -284,473 +285,26 @@ int ai::pvSearch(board b, int depth, Color color, int alpha, int beta, int &node
     return alpha;
 }
 
-//int ai::kingAttacks(board b, const piece& Piece) {
-//
-//    // moves that can attack the king
-//    int killingMoves = 0;
-//
-//    // sets variables of the piece
-//    auto Class = Piece.type;
-//    Color color = Piece.color;
-//
-//    row Row = Piece.curRow;
-//    col Col = Piece.curCol;
-//
-//    auto Board = b.boardArr;
-//
-//    if (color == white) {
-//
-//        row newRow = Row - 1;
-//        col newCol = Col + 1;
-//
-//        // checks the attacks it can do
-//        if (Board[newRow][newCol].color == black && Board[newRow][newCol].type == PAWN &&newRow < 8 && newRow >= 0 && newCol >= 0 && newCol < 8 ) {
-//            killingMoves++;
-//            if (killingMoves >= 2) return 2;
-//        }
-//
-//        newRow = Row - 1;
-//        newCol = Col - 1;
-//        if (Board[newRow][newCol].color == black && Board[newRow][newCol].type == PAWN&&newRow < 8 && newRow >= 0 && newCol >= 0 && newCol < 8) {
-//            killingMoves++;
-//            if (killingMoves >= 2) return 2;
-//        }
-//    }
-//        // black
-//    else {
-//        row newRow = Row + 1;
-//        row newCol = Col + 1;
-//        // checks the attacks it can do
-//        if (Board[newRow][newCol].color == white && Board[newRow][newCol].type == PAWN &&newRow < 8 && newRow >= 0 && newCol >= 0 && newCol < 8) {
-//
-//            killingMoves++;
-//            if (killingMoves >= 2) return 2;
-//        }
-//
-//        newRow = Row + 1;
-//        newCol = Col - 1;
-//        if (Board[newRow][newCol].color == white && Board[newRow][newCol].type == PAWN&&newRow < 8 && newRow >= 0 && newCol >= 0 && newCol < 8 ) {
-//            killingMoves++;
-//            if (killingMoves >= 2) return 2;
-//        }
-//
-//    }
-//    /// rooks
-//    // loop through all the possible moves a rook can move up/down/left/right
-//    row newRow;
-//    col newCol;
-//
-//    // boolean variables to determine whether we should continue going a specific direction
-//    // this is useful because if it is going up and sees an obstacle it can not go up further
-//    // so this is the indicator to not go up anymore
-//    bool goUp = true;
-//    bool goDown = true;
-//    bool goRight = true;
-//    bool goLeft = true;
-//
-//    // vector of all possible moves here (could be illegal)
-//    std::vector<std::pair<int, int>> moves;
-//
-//    for (int i = 1; i <= 8; i++) {
-//
-//        // up
-//        newRow = Row - i;
-//        newCol = Col;
-//
-//        // add to moves vector
-//        moves.emplace_back(newRow, newCol);
-//
-//        // down
-//        newRow = Row + i;
-//        newCol = Col;
-//
-//        moves.emplace_back(newRow, newCol);
-//
-//        // right
-//        newRow = Row;
-//        newCol = Col + i;
-//
-//        moves.emplace_back(newRow, newCol);
-//
-//        // left
-//        newRow = Row;
-//        newCol = Col - i;
-//
-//        moves.emplace_back(newRow, newCol);
-//    }
-//    // iterate through the possible moves to find which ones are legal
-//    for (int i = 0; i < moves.size(); i++) {
-//        std::pair<int, int> pair = moves[i];
-//        newRow = pair.first;
-//        newCol = pair.second;
-//
-//        // makes sure its in bounds
-//        if (newRow < 0 || newRow > 7 || newCol < 0 || newCol > 7) continue;
-//
-//        // determine which direction it is going
-//        // we do this by looking at the remainder (1 = up, 2 = down, 3 = right, 4 = left)
-//        Direction dir = Direction((i + 4) % 4);
-//
-//        // check to see if we can keep going that direction
-//        if (dir == Up && !goUp || dir == Down && !goDown || dir == Right && !goRight || dir == Left && !goLeft) continue;
-//
-//        // check if the move is legal
-//        bool legal = true;
-//
-//        // if there is a piece on the square
-//        if (Board[newRow][newCol].type != NONE){
-//            if (Board[newRow][newCol].color != color && Board[newRow][newCol].type == ROOK){
-//                killingMoves++;
-//                if (killingMoves >= 2) return 2;
-//            }
-//            legal = false;
-//        }
-//        if (!legal) {
-//            // we make it illegal to go that direction
-//            if (dir == Up) goUp = false;
-//            else if (dir == Down) goDown = false;
-//            else if (dir == Right) goRight = false;
-//            else if (dir == Left) goLeft = false;
-//        }
-//    }
-//
-//    /// horses
-//
-//    moves.clear();
-//
-//    // variables needed
-//    int col_down1 = Col + 1;
-//    int col_down2 = Col + 2;
-//    int col_up1 = Col - 1;
-//    int col_up2 = Col - 2;
-//
-//    int row_right1 = Row + 1;
-//    int row_right2 = Row + 2;
-//    int row_left1 = Row - 1;
-//    int row_left2 = Row - 2;
-//
-//    // adds all the moves
-//    moves.emplace_back(row_right1, col_down2);
-//    moves.emplace_back(row_left1, col_down2);
-//
-//    moves.emplace_back(row_left2, col_down1);
-//    moves.emplace_back(row_left2, col_up1);
-//
-//    moves.emplace_back(row_left1, col_up2);
-//    moves.emplace_back(row_right1, col_up2);
-//
-//    moves.emplace_back(row_right2, col_up1);
-//    moves.emplace_back(row_right2, col_down1);
-//
-//
-//    for (std::pair<int, int> pair : moves) {
-//        newRow = pair.first;
-//        newCol = pair.second;
-//
-//        // makes sure its in bounds
-//        if (newRow < 0 || newRow > 7 || newCol < 0 || newCol > 7) continue;
-//
-//        // checks if the move is legal
-//
-//        if (Board[newRow][newCol].color != color && Board[newRow][newCol].type == HORSE ){
-//            killingMoves++;
-//            if (killingMoves >= 2) return 2;
-//        }
-//    }
-//    /// king
-//    moves.clear();
-//
-//    // adds all possible moves
-//    int new_col_up = Col - 1;
-//    int new_col_down = Col + 1;
-//
-//    int new_row_left = Row - 1;
-//    int new_row_right = Row + 1;
-//
-//    moves.emplace_back(Row, new_col_up);
-//    moves.emplace_back(Row, new_col_down);
-//
-//    moves.emplace_back(new_row_right, Col);
-//    moves.emplace_back(new_row_left, Col);
-//
-//    moves.emplace_back(new_row_right, new_col_down);
-//    moves.emplace_back(new_row_right, new_col_up);
-//
-//    moves.emplace_back(new_row_left, new_col_down);
-//    moves.emplace_back(new_row_left, new_col_up);
-//
-//    for (std::pair<int, int> pair : moves) {
-//        newRow = pair.first;
-//        newCol = pair.second;
-//
-//        // makes sure its in bounds
-//        if (newRow < 0 || newRow > 7 || newCol < 0 || newCol > 7) continue;
-//
-//        // checks if the move is legal
-//
-//        if (Board[newRow][newCol].color != color && Board[newRow][newCol].type == KING){
-//            killingMoves++;
-//            if (killingMoves >= 2) return 2;
-//        }
-//    }
-//
-//    /// queen
-//    // loop through all the possible moves a rook can move up/down/left/right
-//
-//    // boolean variables to determine whether we should continue going a specific direction
-//    // this is useful because if it is going up and sees an obstacle it can not go up further
-//    // so this is the indicator to not go up anymore
-//    goUp = true;
-//    goDown = true;
-//    goRight = true;
-//    goLeft = true;
-//    bool goTopLeft = true;
-//    bool goBtmRight = true;
-//    bool goTopRight = true;
-//    bool goBtmLeft = true;
-//
-//    // vector of all possible moves here (could be illegal)
-//    moves.clear();
-//
-//    for (int i = 1; i <= 8; i++) {
-//
-//        // up
-//        newRow = Row - i;
-//        newCol = Col;
-//
-//        // add to moves vector
-//        moves.emplace_back(newRow, newCol);
-//
-//        // down
-//        newRow = Row + i;
-//        newCol = Col;
-//
-//        moves.emplace_back(newRow, newCol);
-//
-//        // right
-//        newRow = Row;
-//        newCol = Col + i;
-//
-//        moves.emplace_back(newRow, newCol);
-//
-//        // left
-//        newRow = Row;
-//        newCol = Col - i;
-//
-//        moves.emplace_back(newRow, newCol);
-//
-//        // up left
-//        newRow = Row - i;
-//        newCol = Col - i;
-//
-//
-//        // add to moves vector
-//        moves.emplace_back(newRow, newCol);
-//
-//        // down right
-//        newRow = Row + i;
-//        newCol = Col + i;
-//
-//        moves.emplace_back(newRow, newCol);
-//
-//        // down right
-//        newRow = Row - i;
-//        newCol = Col + i;
-//
-//        moves.emplace_back(newRow, newCol);
-//
-//        // down left
-//        newRow = Row + i;
-//        newCol = Col - i;
-//
-//        moves.emplace_back(newRow, newCol);
-//    }
-//    // iterate through the possible moves to find which ones are legal
-//    for (int i = 0; i < moves.size(); i++) {
-//        std::pair<int, int> pair = moves[i];
-//        newRow = pair.first;
-//        newCol = pair.second;
-//
-//        // makes sure its in bounds
-//        if (newRow < 0 || newRow > 7 || newCol < 0 || newCol > 7) continue;
-//
-//        // determine which direction it is going
-//        // we do this by looking at the remainder (1 = up, 2 = down, 3 = right, 4 = left, 5 topRight...)
-//        Direction dir = Direction((i + 8) % 8);
-//
-//        // check to see if we can keep going that direction
-//        if (dir == Up && !goUp || dir == Down && !goDown || dir == Right && !goRight || dir == Left && !goLeft || dir == topLeft && !goTopLeft || dir == topRight && !goTopRight ||
-//            dir == bottomLeft && !goBtmLeft || dir == bottomRight && !goBtmRight) continue;
-//
-//        // check if the move is legal
-//        bool legal = true;
-//
-//        // if there is a piece on the square
-//        if (Board[newRow][newCol].type != NONE){
-//            if (Board[newRow][newCol].color != color && Board[newRow][newCol].type == QUEEN){
-//                killingMoves++;
-//                if (killingMoves >= 2) return 2;
-//            }
-//            legal = false;
-//        }
-//        if (!legal) {
-//            // we make it illegal to go that direction
-//            if (dir == Up) goUp = false;
-//            else if (dir == Down) goDown = false;
-//            else if (dir == Right) goRight = false;
-//            else if (dir == Left) goLeft = false;
-//            else if (dir == topLeft) goTopLeft = false;
-//            else if (dir == topRight) goTopRight = false;
-//            else if (dir == bottomLeft) goBtmLeft = false;
-//            else if (dir == bottomRight) goBtmRight = false;
-//        }
-//    }
-//
-//    /// bishop
-//    // loop through all the possible moves a bishop can move up/down/left/right
-//
-//
-//    // boolean variables to determine whether we should continue going a specific direction
-//    // this is useful because if it is going up and sees an obstacle it can not go up further
-//    // so this is the indicator to not go up anymore
-//    goUp = true;
-//    goDown = true;
-//    goRight = true;
-//    goLeft = true;
-//
-//    moves.clear();
-//
-//    for (int i = 1; i <= 8; i++) {
-//
-//        // up left
-//        newRow = Row - i;
-//        newCol = Col - i;
-//
-//        // add to moves vector
-//        moves.emplace_back(newRow, newCol);
-//
-//        // down right
-//        newRow = Row + i;
-//        newCol = Col + i;
-//
-//        moves.emplace_back(newRow, newCol);
-//
-//        // down right
-//        newRow = Row - i;
-//        newCol = Col + i;
-//
-//        moves.emplace_back(newRow, newCol);
-//
-//        // down left
-//        newRow = Row + i;
-//        newCol = Col - i;
-//
-//        moves.emplace_back(newRow, newCol);
-//
-//    }
-//
-//    // iterate through the possible moves to find which ones are legal
-//    for (int i = 0; i < moves.size(); i++) {
-//        std::pair<int, int> pair = moves[i];
-//        newRow = pair.first;
-//        newCol = pair.second;
-//
-//        // determine which direction it is going
-//        // we do this by looking at the remainder (1 = up, 2 = down, 3 = right, 4 = left)
-//        Direction dir = Direction((i + 4) % 4);
-//
-//        // makes sure its in bounds
-//        if (newRow < 0 || newRow > 7 || newCol < 0 || newCol > 7) continue;
-//
-//        // check to see if we can keep going that direction
-//        if (dir == Up && !goUp || dir == Down && !goDown || dir == Right && !goRight || dir == Left && !goLeft) continue;
-//
-//        // check if the move is legal
-//        bool legal = true;
-//
-//        // if there is a piece on the square
-//        if (Board[newRow][newCol].type != NONE){
-//            if (Board[newRow][newCol].color != color && Board[newRow][newCol].type == BISHOP){
-//                killingMoves++;
-//                if (killingMoves >= 2) return 2;
-//            }
-//            legal = false;
-//        }
-//        if (!legal) {
-//            // we make it illegal to go that direction
-//            if (dir == Up) goUp = false;
-//            else if (dir == Down) goDown = false;
-//            else if (dir == Right) goRight = false;
-//            else if (dir == Left) goLeft = false;
-//        }
-//    }
-//
-//    return killingMoves;
-//}
-U64 ai::getKingMoves(board &b, Color color, const piece& moves1, const piece& moves2){
-    // find the king piece
-    piece kingPiece;
-
-    ////    for (int i = 0; i < 8; i++){
-////        for (int j = 0; j < 8; j++){
-////            if (b.boardArr[i][j].type == KING && b.boardArr[i][j].color == color){
-////                kingPiece = b.boardArr[i][j];
-////            }
-////        }
-////    }
-
-    // check all of opposite color's moves in case of check
-    // moves correlates to the amount of pieces that can kill the king
-//    U64 kingMoves = kingAttacks(b,kingPiece);
-
-    b.castleRight = false;
-    b.castleLeft = false;
-    // checks if we can move the king one spot right or left if they are at the default position
-    // if we can move it then we can do the castle move on that side
-    if (moves1.type == KING){
-//        if (moveCheck(b,moves1,kingMoves)){
-//            // can do this move
-//            if (moves1.nextCol == 3){
-//                // left
-//                b.castleLeft = true;
-//            }else{
-//                b.castleRight = true;
-//            }
-//        }
-    }
-    if (moves2.type == KING){
-//        if (moveCheck(b,moves2,kingMoves)){
-//            // can do this move
-//            if (moves2.nextCol == 3){
-//                // left
-//                b.castleLeft = true;
-//            }else{
-//                b.castleRight = true;
-//            }
-//        }
-    }
-    return (1);
-}
 U64 ai::perft(board b, int depth, bool print, Color color) {
 
     // gets next color
     Color nextColor;
 
-    if (color == white) nextColor = black;
-    else nextColor = white;
+    if (color == white){
+        nextColor = black;
+        b.playerTurn = color;
+    }
+    else{
+        nextColor = white;
+        b.playerTurn = color;
+    }
 
     U64 nodes = 0;
     if (depth == 0) return 1;
 
-    // just ignore this
-    std::vector<piece> essQueenMoves;
-
     moveGen gen = moveGen(b.bitBoard, b.playerTurn, b.boardArr);
 
     moveList movelist = gen.genAll();
-    std::cout << movelist.getSize();
-
-
 
     for (int i = 0; i < movelist.getSize(); i++) {
 
@@ -759,19 +313,61 @@ U64 ai::perft(board b, int depth, bool print, Color color) {
         if (depth == 1){
             nodes ++;
         }else{
-            auto oldPiece = b.move(m);
+            b.move(m);
 
             U64 np = perft(b, depth - 1, false, nextColor);
 
             if (print) {
-//                std::cout << m.toString() << " " << np << std::endl;
+                movelist.toString(m, np);
             }
             nodes += np;
-            b.undoMove(m, oldPiece);
+            b.undoMove(m);
         }
 
 
     }
+    return nodes;
+}
+
+
+U64 ai::testTime(board b, int depth, bool print, Color color) {
+
+    // gets next color
+    Color nextColor;
+
+    if (color == white){
+        nextColor = black;
+        b.playerTurn = color;
+    }
+    else{
+        nextColor = white;
+        b.playerTurn = color;
+    }
+
+    U64 nodes = 0;
+    if (depth == 0) return 1;
+
+    moveGen gen = moveGen(b.bitBoard, b.playerTurn, b.boardArr);
+
+    moveList movelist = gen.genAll();
+
+    int val = 10000000;
+
+
+    for (int i = 0; i < val; i++){
+        moveGen gen = moveGen(b.bitBoard, b.playerTurn, b.boardArr);
+        moveList movelist = gen.genAll();
+
+        for (int j = 0; j < movelist.getSize(); j++){
+
+            auto m = movelist.getMove(j);
+            b.move(m);
+            b.undoMove(m);
+        }
+
+
+    }
+
     return nodes;
 }
 //bool ai::moveCheck(board b, const piece& Piece, int kingMoves) {

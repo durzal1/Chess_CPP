@@ -330,4 +330,8 @@ void  bb::printBitmap(U64 bb) {
     std::cout << "\n";
 }
 
-bitboard::bitboard() = default;
+bitboard::bitboard(){
+    for (int i = 0; i < 8; i++){
+        bit_boards[i] = 0ULL;
+    }
+};
